@@ -8,7 +8,7 @@ Resources:
     Properties:
       UserName: s3-test-user
       Policies:
-        Groups:
+        - Groups:
           - !Ref TestS3UserGroup
 
   TestS3UserGroup:

@@ -7,7 +7,7 @@ Resources:
     Type: AWS::IAM::User
     Properties:
       Policies:
-        Groups:
+        - Groups:
           - !Ref SuperAdminGroup
 
   SuperAdminGroup:
@@ -17,6 +17,7 @@ Resources:
       Policies:
         - PolicyName: SuperAdminPolicy
           PolicyDocument:
+            Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action: "*"
