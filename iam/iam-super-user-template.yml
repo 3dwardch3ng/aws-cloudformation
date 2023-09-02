@@ -6,8 +6,7 @@ Resources:
   ECSuperUser:
     Type: AWS::IAM::User
     Properties:
-      Policies:
-        - Groups:
+        Groups:
           - !Ref SuperAdminGroup
 
   SuperAdminGroup:
@@ -19,14 +18,18 @@ Resources:
           - - "super-admin-group"
             - !Ref "AWS::Region"
       Policies:
-        - PolicyName: SuperAdminPolicy
+        - PolicyName:
+            Fn::Join:
+              - "-"
+              - - "super-admin-policy"
+              - !Ref "AWS::Region"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action: "*"
                 Resource: "*"
-      Path: /
+      Path: "/"
 
   ECSuperUserAccessKey:
     Type: AWS::IAM::AccessKey
