@@ -26,17 +26,8 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 's3:ListBucket'
-                Resource:
-                  - Fn::ImportValue: DeleteFromS3ActionBucketArn
-                  - Fn::Join
-                    - ''
-                    - - Fn::ImportValue: DeleteFromS3ActionBucketArn
-                      - '/*'
-              - Effect: Allow
-                Action:
-                  - 's3:PutObject'
                   - 's3:GetObject'
+                  - 's3:ListBucket'
                   - 's3:DeleteObject'
                 Resource:
                   - Fn::ImportValue: DeleteFromS3ActionBucketArn
