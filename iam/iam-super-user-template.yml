@@ -46,3 +46,58 @@ Resources:
     Properties:
       Name: ec-super-user-access-key
       SecretString: !Sub '{"ACCESS_KEY":"${ECSuperUserAccessKey}","SECRET_KEY":"${ECSuperUserAccessKey.SecretAccessKey}"}'
+
+  PutBucketPolicyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join:
+          - "-"
+          - - "PutBucketPolicyRole"
+            - !Ref "AWS::Region"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:iam::"
+                    - !Ref "AWS::AccountId"
+                    - ":root"
+            Action:
+              - sts:AssumeRole
+              - sts:AssumeRoleWithWebIdentity
+          - Effect: Allow
+            Principal:
+              Federated:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:iam::"
+                    - !Ref "AWS::AccountId"
+                    - ":oidc-provider/token.actions.githubusercontent.com"
+            Action:
+              - sts:AssumeRole
+              - sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                "token.actions.githubusercontent.com:sub": "repo:3dwardch3ng/aws-cloudformation:ref:refs/heads/*"
+                "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+      Path: "/"
+      Policies:
+        - PolicyName:
+            Fn::Join:
+            - "-"
+            - - "PutBucketPolicyPolicy"
+              - !Ref "AWS::Region"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutBucketPolicy
+              Resource: *
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/CloudFormationFullAccess
