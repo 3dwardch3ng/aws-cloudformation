@@ -97,7 +97,7 @@ Resources:
             - Effect: Allow
               Action:
                 - s3:PutBucketPolicy
-              Resource: *
+              Resource: "*"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/CloudFormationFullAccess
