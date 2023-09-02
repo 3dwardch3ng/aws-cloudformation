@@ -33,6 +33,7 @@ jobs:
   create-s3:
     name: Create / Update S3 Resources
     runs-on: ubuntu-latest
+    environment: aws
     steps:
       - name: Checkout
         uses: actions/checkout@v3
