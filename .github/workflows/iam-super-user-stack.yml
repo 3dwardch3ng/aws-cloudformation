@@ -50,4 +50,4 @@ jobs:
           name: s3-super-user-stack
           template: iam/iam-super-user-template.yml
           no-fail-on-empty-changeset: "1"
-          capabilities: CAPABILITY_IAM
+          capabilities: CAPABILITY_NAMED_IAM
