@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: S3 Bucket test-delete-from-s3-action
+Description: Create S3 Bucket
 
 Resources:
   DeleteFromS3ActionBucket:
