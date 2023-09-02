@@ -1,0 +1,51 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create IAM Super Admin Users
+
+Resources:
+  ECSuperUser:
+    Type: AWS::IAM::User
+    Properties:
+        Groups:
+          - !Ref SuperAdminGroup
+
+  SuperAdminGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName:
+        Fn::Join:
+          - "-"
+          - - "super-admin-group"
+            - !Ref "AWS::Region"
+      Policies:
+        - PolicyName:
+            Fn::Join:
+              - "-"
+              - - "super-admin-policy"
+                - !Ref "AWS::Region"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
+              - Effect: Allow
+                Action: "s3:PutBucketPolicy"
+                Resource: arn:aws:s3:::*
+              - Effect: Allow
+                Action: "sts:AssumeRoleWithWebIdentity"
+                Resource: "*"
+      Path: "/"
+
+  ECSuperUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      Serial: 1
+      Status: Active
+      UserName: !Ref ECSuperUser
+
+  ECSuperUserAccessKeySecretsManagerStored:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: ec-super-user-access-key
+      SecretString: !Sub '{"ACCESS_KEY":"${ECSuperUserAccessKey}","SECRET_KEY":"${ECSuperUserAccessKey.SecretAccessKey}"}'

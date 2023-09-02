@@ -1,0 +1,53 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: IAM Users that used by to test S3 Bucket via pipelines
+
+Resources:
+  S3TestUser:
+    Type: AWS::IAM::User
+    Properties:
+      Groups:
+        - !Ref TestS3UserGroup
+
+  TestS3UserGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName:
+        Fn::Join:
+          - "-"
+          - - "test-s3-user-group"
+            - !Ref "AWS::Region"
+      Policies:
+        - PolicyName:
+            Fn::Join:
+              - "-"
+              - - "test-s3-user-group-policy"
+                - !Ref "AWS::Region"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                  - 's3:ListBucket'
+                  - 's3:DeleteObject'
+                Resource:
+                  - Fn::ImportValue: DeleteFromS3ActionBucketArn
+                  - Fn::Join
+                      - ''
+                      - - Fn::ImportValue: DeleteFromS3ActionBucketArn
+                      - '/*'
+
+  S3TestUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      Serial: 1
+      Status: Active
+      UserName: !Ref S3TestUser
+
+  S3TestUserAccessKeySecretsManagerStored:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: s3-test-user-access-key
+      SecretString: !Sub '{"ACCESS_KEY":"${S3TestUserAccessKey}","SECRET_KEY":"${S3TestUserAccessKey.SecretAccessKey}"}'
+

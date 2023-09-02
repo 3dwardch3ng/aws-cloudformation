@@ -1,0 +1,52 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create S3 Bucket
+
+Resources:
+  DeleteFromS3ActionBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: test-delete-from-s3-action
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  DeleteFromS3ActionBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref DeleteFromS3ActionBucket
+      PolicyDocument:
+        Id: DeleteFromS3ActionBucketPolicyDocument
+        Version: '2012-10-17'
+        Statement:
+          - Sid: PublicReadGetObjectPolicyDocumentStatement
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+              - 's3:ListBucket'
+              - 's3:DeleteObject'
+            Resource:
+              - Fn::Join:
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - !Ref DeleteFromS3ActionBucket
+              -
+                Fn::Join:
+                - ''
+                - - 'arn:aws:s3:::'
+                  - !Ref DeleteFromS3ActionBucket
+                  - '/*'
+
+Outputs:
+  DeleteFromS3ActionBucketArn:
+    Value: !GetAtt DeleteFromS3ActionBucket.Arn
+    Export:
+      Name: DeleteFromS3ActionBucketArn

@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create IAM User Roles
+
+Resources:
+  PutBucketPolicyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join:
+          - "-"
+          - - "PutBucketPolicyRole"
+            - !Ref "AWS::Region"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:iam::"
+                    - !Ref "AWS::AccountId"
+                    - ":root"
+            Action:
+              - sts:AssumeRole
+              - sts:AssumeRoleWithWebIdentity
+          - Effect: Allow
+            Principal:
+              Federated:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:iam::"
+                    - !Ref "AWS::AccountId"
+                    - ":oidc-provider/token.actions.githubusercontent.com"
+            Action:
+              - sts:AssumeRole
+              - sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringLike:
+                "token.actions.githubusercontent.com:sub": "repo:3dwardch3ng/aws-cloudformation:*"
+              "ForAllValues:StringEquals":
+                "token.actions.githubusercontent.com:iss": "https://token.actions.githubusercontent.com"
+                "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+      Path: "/"
+      Policies:
+        - PolicyName:
+            Fn::Join:
+              - "-"
+              - - "PutBucketPolicyPolicy"
+                - !Ref "AWS::Region"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutBucketPolicy
+                Resource: "*"
+              - Effect: Allow
+                Action: "sts:AssumeRoleWithWebIdentity"
+                Resource: "*"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
