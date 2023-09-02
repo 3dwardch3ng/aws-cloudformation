@@ -1,4 +1,4 @@
-name: Create / Update S3 Resources
+name: Create / Update IAM User Resources
 
 on:
   workflow_dispatch:
@@ -43,10 +43,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ github.event.inputs.region}}
-      - name: Deploy S3 with CloudFormation
-        id: s3-test-delete-from-s3-action-stack
+      - name: Deploy IAM stack with CloudFormation
+        id: iam-user-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: s3-stack
-          template: s3/s3-template.yml
+          name: s3-super-user-stack
+          template: iam/iam-super-user-template.yml
           no-fail-on-empty-changeset: "1"

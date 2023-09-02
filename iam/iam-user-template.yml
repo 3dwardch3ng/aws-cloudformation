@@ -1,10 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 Description: IAM Users that used by to test S3 Bucket via pipelines
-Mappings:
-  AWSAccount:
-    default:
-      ID: "359331717478"
 
 Resources:
   S3TestUser:

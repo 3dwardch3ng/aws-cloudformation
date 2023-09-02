@@ -1,0 +1,37 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create IAM Super Admin Users
+
+Resources:
+  ECSuperUser:
+    Type: AWS::IAM::User
+    Properties:
+      Policies:
+        Groups:
+          - !Ref SuperAdminGroup
+
+  SuperAdminGroup:
+    Type: "AWS::IAM::Group"
+    Properties:
+      GroupName: super-admin-group
+      Policies:
+        - PolicyName: SuperAdminPolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
+      Path: /
+
+  ECSuperUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      Serial: 1
+      Status: Active
+      UserName: !Ref ECSuperUser
+
+  ECSuperUserAccessKeySecretsManagerStored:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: ec-super-user-access-key
+      SecretString: !Sub '{"ACCESS_KEY":"${ECSuperUserAccessKey}","SECRET_KEY":"${ECSuperUserAccessKey.SecretAccessKey}"}'
