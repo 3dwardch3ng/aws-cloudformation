@@ -47,6 +47,6 @@ jobs:
         id: iam-user-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: s3-user-stack
+          name: iam-user-stack
           template: iam/iam-user-template.yml
           no-fail-on-empty-changeset: "1"

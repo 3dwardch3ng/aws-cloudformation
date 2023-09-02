@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   create-s3:
-    name: Create / Update S3 Resources
+    name: Create / Update User Role Resources
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -44,10 +44,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ github.event.inputs.region}}
       - name: Deploy IAM stack with CloudFormation
-        id: iam-user-stack
+        id: iam-user-role-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: iam-super-user-stack
-          template: iam/iam-super-user-template.yml
+          name: iam-user-role-stack
+          template: iam/iam-user-role-template.yml
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
