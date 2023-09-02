@@ -6,17 +6,23 @@ Resources:
   S3TestUser:
     Type: AWS::IAM::User
     Properties:
-      UserName: s3-test-user
-      Policies:
-        - Groups:
-          - !Ref TestS3UserGroup
+      Groups:
+        - !Ref TestS3UserGroup
 
   TestS3UserGroup:
     Type: AWS::IAM::Group
     Properties:
-      GroupName: test-s3-user-group
+      GroupName:
+        Fn::Join:
+          - "-"
+          - - "test-s3-user-group"
+            - !Ref "AWS::Region"
       Policies:
-        - PolicyName: test-s3-user-group-policy
+        - PolicyName:
+            Fn::Join:
+              - "-"
+              - - "test-s3-user-group-policy"
+                - !Ref "AWS::Region"
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
