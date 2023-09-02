@@ -11,13 +11,17 @@ Resources:
           - !Ref SuperAdminGroup
 
   SuperAdminGroup:
-    Type: "AWS::IAM::Group"
+    Type: AWS::IAM::Group
     Properties:
-      GroupName: super-admin-group
+      GroupName:
+        Fn::Join:
+          - "-"
+          - - "super-admin-group"
+            - !Ref "AWS::Region"
       Policies:
         - PolicyName: SuperAdminPolicy
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action: "*"
