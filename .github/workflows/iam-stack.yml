@@ -1,4 +1,4 @@
-name: Create / Update S3 Resources
+name: Create / Update IAM User Resources
 
 on:
   workflow_dispatch:
