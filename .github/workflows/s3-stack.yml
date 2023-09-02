@@ -1,4 +1,4 @@
-name: Create / Update S3 Resources
+name: S3 Stack
 
 on:
   workflow_dispatch:

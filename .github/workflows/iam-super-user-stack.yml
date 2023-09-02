@@ -1,4 +1,4 @@
-name: Create AM Super User Stack
+name: IAM Super User Stack
 
 on:
   workflow_dispatch:
