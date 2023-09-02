@@ -1,4 +1,4 @@
-name: Create / Update IAM User Resources
+name: Create AM Super User Stack
 
 on:
   workflow_dispatch:
