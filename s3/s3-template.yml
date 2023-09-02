@@ -41,6 +41,6 @@ Resources:
 
 Outputs:
   DeleteFromS3ActionBucketArn:
-    Value: !Ref DeleteFromS3ActionBucket.Arn
+    Value: !GetAtt DeleteFromS3ActionBucket.Arn
     Export:
       Name: DeleteFromS3ActionBucketArn
