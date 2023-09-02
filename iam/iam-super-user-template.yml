@@ -32,6 +32,9 @@ Resources:
               - Effect: Allow
                 Action: "s3:PutBucketPolicy"
                 Resource: arn:aws:s3:::*
+              - Effect: Allow
+                Action: "sts:AssumeRoleWithWebIdentity"
+                Resource: "*"
       Path: "/"
 
   ECSuperUserAccessKey:

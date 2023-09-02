@@ -55,6 +55,9 @@ Resources:
                 Action:
                   - s3:PutBucketPolicy
                 Resource: "*"
+              - Effect: Allow
+                Action: "sts:AssumeRoleWithWebIdentity"
+                Resource: "*"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonS3FullAccess
         - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
