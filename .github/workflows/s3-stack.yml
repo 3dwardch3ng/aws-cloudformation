@@ -5,6 +5,7 @@ on:
     inputs:
       region:
         description: 'AWS Region'
+        type: choice
         default: 'ap-southeast-2'
         options:
           - 'us-east-1'
@@ -47,5 +48,5 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: s3-stack
-          template: s3/s3-template.yaml
+          template: s3/s3-template.yml
           no-fail-on-empty-changeset: "1"
