@@ -22,7 +22,7 @@ Resources:
             Fn::Join:
               - "-"
               - - "super-admin-policy"
-              - !Ref "AWS::Region"
+                - !Ref "AWS::Region"
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
