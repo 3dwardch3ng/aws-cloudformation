@@ -31,6 +31,43 @@ Resources:
                 Resource: "*"
       Path: "/"
 
+  PutBucketPolicyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join:
+          - "-"
+          - - "PutBucketPolicyRole"
+            - !Ref "AWS::Region"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:iam::"
+                    - !Ref "AWS::AccountId"
+                    - ":root"
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName:
+            Fn::Join:
+              - "-"
+              - - "PutBucketPolicyPolicy"
+                - !Ref "AWS::Region"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:*"
+                  - "s3:PutBucketPolicy"
+                  - "cloudformation:*"
+                Resource: "*"
+
   ECSuperUserAccessKey:
     Type: AWS::IAM::AccessKey
     Properties:
