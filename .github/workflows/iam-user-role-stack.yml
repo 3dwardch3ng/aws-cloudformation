@@ -1,4 +1,4 @@
-name: IAM Super User Stack
+name: IAM User Role Stack
 
 on:
   workflow_dispatch:
