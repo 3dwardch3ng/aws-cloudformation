@@ -1,0 +1,428 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Base infrastructure stack. A VPC with 2 public and 2 private subnet will be created
+Parameters:
+  Category:
+    Description: The category of VPC
+    Type: String
+    Default: GENERAL
+    AllowedValues:
+      - GENERAL
+Mappings:
+  VPCCIDRBlock:
+    GENERAL:
+      CIDRBlock: 10.1.0.0/16
+  SubnetCIDRBlock:
+    GENERAL:
+      PublicA: 10.1.1.0/24
+      PublicB: 10.1.2.0/24
+      PrivateA: 10.1.10.0/24
+      PrivateB: 10.1.20.0/24
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock:
+        Fn::FindInMap:
+          - VPCCIDRBlock
+          - Ref: Category
+          - CIDRBlock
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "VPC"
+        - Key: Category
+          Value: Category
+  EIPNatGatewayPrivateSubnetA:
+    Type: AWS::EC2::EIP
+  EIPNatGatewayPrivateSubnetB:
+    Type: AWS::EC2::EIP
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Category
+          Value:
+            Ref: Category
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "InternetGateway"
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: VPC
+      InternetGatewayId:
+        Ref: InternetGateway
+  PublicSubnetARouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: Category
+          Value:
+            Ref: Category
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "RouteTable"
+                - "PublicSubnetA"
+  PublicSubnetBRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: Category
+          Value:
+            Ref: Category
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "RouteTable"
+                - "PublicSubnetB"
+  PrivateSubnetARouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: Category
+          Value:
+            Ref: Category
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "RouteTable"
+                - "PrivateSubnetA"
+  PrivateSubnetBRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+      Tags:
+        - Key: Category
+          Value:
+            Ref: Category
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "RouteTable"
+                - "PrivateSubnetB"
+  PublicSubnetARoute:
+    DependsOn: AttachInternetGateway
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PublicSubnetARouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+  PublicSubnetBRoute:
+    DependsOn: AttachInternetGateway
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PublicSubnetBRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGateway
+  NatGatewaySubnetA:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - EIPNatGatewayPrivateSubnetA
+          - AllocationId
+      SubnetId:
+        Ref: PublicSubnetA
+  NatGatewaySubnetB:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - EIPNatGatewayPrivateSubnetB
+          - AllocationId
+      SubnetId:
+        Ref: PublicSubnetB
+  PrivateSubnetANATRoute:
+    DependsOn: NatGatewaySubnetA
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PrivateSubnetARouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NatGatewaySubnetA
+  PrivateSubnetBNATRoute:
+    DependsOn: NatGatewaySubnetA
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PrivateSubnetBRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: NatGatewaySubnetB
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetCIDRBlock
+          - Ref: Category
+          - PublicA
+      AvailabilityZone:
+        Fn::Join:
+          - ''
+          - - Ref: AWS::Region
+            - a
+      Tags:
+        - Key: Category
+          Value:
+            Ref: Category
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "Subnet"
+                - "PublicA"
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnetA
+      RouteTableId:
+        Ref: PublicRouteTable
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetCIDRBlock
+          - Ref: Category
+          - PublicB
+      AvailabilityZone:
+        Fn::Join:
+          - ''
+          - - Ref: AWS::Region
+            - a
+      Tags:
+        - Key: Category
+          Value:
+            Ref: Category
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "Subnet"
+                - "PublicB"
+  PublicSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnetB
+      RouteTableId:
+        Ref: PublicRouteTable
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetCIDRBlock
+          - Ref: Category
+          - PrivateA
+      AvailabilityZone:
+        Fn::Join:
+          - ''
+          - - Ref: AWS::Region
+            - a
+      Tags:
+        - Key: Category
+          Value:
+            Ref: Category
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "Subnet"
+                - "PrivateA"
+  PrivateSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnetA
+      RouteTableId:
+        Ref: PrivateSubnetARouteTable
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetCIDRBlock
+          - Ref: Category
+          - PrivateB
+      AvailabilityZone:
+        Fn::Join:
+          - ''
+          - - Ref: AWS::Region
+            - b
+      Tags:
+        - Key: Category
+          Value:
+            Ref: Category
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - Ref: AWS::StackName
+                - Ref: Category
+                - "Subnet"
+                - "PrivateB"
+  PrivateSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnetB
+      RouteTableId:
+        Ref: PrivateSubnetBRouteTable
+
+Outputs:
+  VPCId:
+    Value:
+      Ref: VPC
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-VPCId"
+  VPCCIDRBlock:
+    Value:
+      Fn::GetAtt:
+        - VPC
+        - CidrBlock
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-VPCCIDRBlock"
+  PublicSubnetAId:
+    Value:
+      Ref: PublicSubnetA
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-PublicSubnetAId"
+  PublicSubnetAAvailabilityZone:
+    Value:
+      Fn::GetAtt:
+        - PublicSubnetA
+        - AvailabilityZone
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-PublicSubnetAAvailabilityZone"
+  PublicSubnetBId:
+    Value:
+      Ref: PublicSubnetB
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-PublicSubnetBId"
+  PublicSubnetBAvailabilityZone:
+    Value:
+      Fn::GetAtt:
+        - PublicSubnetB
+        - AvailabilityZone
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-PublicSubnetBAvailabilityZone"
+  PrivateSubnetAAvailabilityZone:
+    Value:
+      Fn::GetAtt:
+        - PrivateSubnetA
+        - AvailabilityZone
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-PrivateSubnetAAvailabilityZone"
+  PrivateSubnetBId:
+    Value:
+      Ref: PrivateSubnetB
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-PrivateSubnetBId"
+  PrivateSubnetBAvailabilityZone:
+    Value:
+      Fn::GetAtt:
+        - PrivateSubnetB
+        - AvailabilityZone
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-PrivateSubnetBAvailabilityZone"
+  Category:
+    Description: Category name of stack
+    Value:
+      Ref: Category
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-Category"
+  PublicSubnetATableId:
+    Value: !Ref PublicSubnetARouteTable
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicSubnetARouteTableId
+  PublicSubnetBTableId:
+    Value: !Ref PublicSubnetBRouteTable
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicSubnetBRouteTableId
+  PrivateSubnetARouteTableId:
+    Value: !Ref PrivateSubnetARouteTable
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateSubnetARouteTableId
+  PrivateSubnetBRouteTableId:
+    Value: !Ref PrivateSubnetBRouteTable
+    Export:
+      Name: !Sub ${AWS::StackName}-PrivateSubnetBRouteTableId
+  EIPNatGatewaySubnetA:
+    Description: Public IP of NAT Gateway Subnet A
+    Value:
+      Ref: EIPNatGatewayPrivateSubnetA
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-EIPNatGatewaySubnetA"
+  EIPNatGatewaySubnetB:
+    Description: Public IP of NAT Gateway Subnet B
+    Condition: CreateProdResources
+    Value:
+      Ref: EIPNatGatewayPrivateSubnetB
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-EIPNatGatewaySubnetB"
