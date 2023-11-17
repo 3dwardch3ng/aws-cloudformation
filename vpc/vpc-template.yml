@@ -74,11 +74,6 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       DestinationIpv6CidrBlock: ::/0
       GatewayId: !Ref InternetGateway
-      Tags:
-        - Key: Category
-          Value: !Ref Category
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Route', 'PublicSubnet1' ] ]
   PublicSubnet2RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -96,11 +91,6 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       DestinationIpv6CidrBlock: ::/0
       GatewayId: !Ref InternetGateway
-      Tags:
-        - Key: Category
-          Value: !Ref Category
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Route', 'PublicSubnet2' ] ]
 
   # Routing - private subnet 1 and 2
   EIPNatGatewayPrivateSubnet1:
@@ -135,11 +125,6 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       DestinationIpv6CidrBlock: ::/0
       NatGatewayId: !Ref NatGatewayPrivateSubnet1
-      Tags:
-        - Key: Category
-          Value: !Ref Category
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Route', 'PrivateSubnet1' ] ]
   EIPNatGatewayPrivateSubnet2:
     Type: AWS::EC2::EIP
   NatGatewayPrivateSubnet2:
@@ -172,11 +157,6 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       DestinationIpv6CidrBlock: ::/0
       NatGatewayId: !Ref NatGatewayPrivateSubnet2
-      Tags:
-        - Key: Category
-          Value: !Ref Category
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Route', 'PrivateSubnet2' ] ]
 
   # Access control
   PrivateSubnetsNetworkAcl:
