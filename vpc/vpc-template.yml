@@ -163,7 +163,7 @@ Resources:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       NetworkAclId: !Ref PrivateSubnetsNetworkAcl
-      RuleNumber: 2
+      RuleNumber: 3
       Protocol: -1
       RuleAction: allow
       Egress: true
