@@ -34,7 +34,7 @@ Resources:
         - Key: Category
           Value: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'VPC' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'VPC' ]]
   IPv6CidrBlock:
     Type: AWS::EC2::VPCCidrBlock
     Properties:
@@ -44,7 +44,7 @@ Resources:
         - Key: Category
           Value: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'Ipv6CidrBlock' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Ipv6CidrBlock' ] ]
 
   # Internet Gateway
   InternetGateway:
@@ -54,7 +54,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'InternetGateway' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'InternetGateway' ]]
   InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -70,7 +70,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'RouteTable', 'PublicSubnet1' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PublicSubnet1' ]]
   PublicSubnet1Route:
     DependsOn: InternetGatewayAttachment
     Type: AWS::EC2::Route
@@ -83,7 +83,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'Route', 'PublicSubnet1' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Route', 'PublicSubnet1' ] ]
   PublicSubnet2RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -92,7 +92,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'RouteTable', 'PublicSubnet2' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PublicSubnet2' ]]
   PublicSubnet2Route:
     DependsOn: InternetGatewayAttachment
     Type: AWS::EC2::Route
@@ -105,7 +105,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'Route', 'PublicSubnet2' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Route', 'PublicSubnet2' ] ]
 
   # Routing - private subnet 1 and 2
   EIPNatGatewayPrivateSubnet1:
@@ -122,7 +122,7 @@ Resources:
       - Key: Category
         Value: Category
       - Key: Name
-        Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'NatGateway', 'PrivateSubnet1' ] ]
+        Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'NatGateway', 'PrivateSubnet1' ] ]
   PrivateSubnet1RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -131,7 +131,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'RouteTable', 'PrivateSubnet1' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PrivateSubnet1' ] ]
   PrivateSubnet1NATRoute:
     DependsOn: NatGatewaySubnet1
     Type: AWS::EC2::Route
@@ -144,7 +144,7 @@ Resources:
         - Key: Category
           Value: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'Route', 'PrivateSubnet1' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Route', 'PrivateSubnet1' ] ]
   EIPNatGatewayPrivateSubnet2:
     Type: AWS::EC2::EIP
   NatGatewaySubnet2:
@@ -159,7 +159,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'NatGateway', 'PrivateSubnet2' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'NatGateway', 'PrivateSubnet2' ] ]
   PrivateSubnet2RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -168,7 +168,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'RouteTable', 'PrivateSubnet2' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PrivateSubnet2' ] ]
   PrivateSubnet2NATRoute:
     DependsOn: NatGatewaySubnet2
     Type: AWS::EC2::Route
@@ -181,7 +181,7 @@ Resources:
         - Key: Category
           Value: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'Route', 'PrivateSubnet2' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Route', 'PrivateSubnet2' ] ]
 
   # Access control
   PrivateSubnetsNetworkAcl:
@@ -193,7 +193,7 @@ Resources:
           Value: !Ref: Category
         - Key: Name
           Value:
-            Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'NetworkAcl' ]]
+            Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'NetworkAcl' ]]
   PrivateSubnetsNetworkAclInboundEntry:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
@@ -210,7 +210,7 @@ Resources:
         - Key: Category
           Value: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'NetworkAclEntry', '1' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'NetworkAclEntry', '1' ] ]
   PrivateSubnetsNetworkAclOutboundEntry:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
@@ -225,7 +225,7 @@ Resources:
         - Key: Category
           Value: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'NetworkAclEntry', '2' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'NetworkAclEntry', '2' ] ]
 
   # Public subnet 1 and 2
   PublicSubnet1:
@@ -243,7 +243,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'Subnet', 'Public1' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Public1' ]]
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -266,7 +266,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'Subnet', 'Public2' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Public2' ]]
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -292,7 +292,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'Subnet', 'Private1' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Private1' ]]
   PrivateSubnet1AclAssociation:
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
@@ -319,7 +319,7 @@ Resources:
         - Key: Category
           Value: !Ref: Category
         - Key: Name
-          Value: !Join [ '-', [ !Ref: AWS::StackName, !Ref: Category, 'Subnet', 'Private2' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Private2' ]]
   PrivateSubnet2AclAssociation:
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
