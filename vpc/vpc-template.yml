@@ -219,7 +219,7 @@ Resources:
       SubnetId:
         Ref: PublicSubnetA
       RouteTableId:
-        Ref: PublicRouteTable
+        Ref: PublicSubnetARouteTable
   PublicSubnetB:
     Type: AWS::EC2::Subnet
     Properties:
@@ -253,7 +253,7 @@ Resources:
       SubnetId:
         Ref: PublicSubnetB
       RouteTableId:
-        Ref: PublicRouteTable
+        Ref: PublicSubnetBRouteTable
   PrivateSubnetA:
     Type: AWS::EC2::Subnet
     Properties:
