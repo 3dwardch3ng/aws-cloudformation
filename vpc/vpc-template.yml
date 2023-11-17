@@ -313,6 +313,7 @@ Resources:
           - '${VpcPart}${SubnetPart}'
           - - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
             - SubnetPart: !FindInMap [ SubnetCIDRBlock, Ref: Category, Ipv6SubnetPrivate2 ]
+      AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
         - Key: Category
