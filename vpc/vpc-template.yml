@@ -409,13 +409,3 @@ Outputs:
     Value: !Ref PrivateSubnet2RouteTable
     Export:
       Name: !Sub '${AWS::StackName}-PrivateSubnet2RouteTableId'
-  EIPNatGatewaySubnet1:
-    Description: Public IP of NAT Gateway Subnet 1
-    Value: !Ref EIPNatGatewayPrivateSubnet1
-    Export:
-      Name: !Sub '${AWS::StackName}-EIPNatGatewaySubnet1'
-  EIPNatGatewaySubnet2:
-    Description: Public IP of NAT Gateway Subnet 2
-    Value: !Ref EIPNatGatewayPrivateSubnet2
-    Export:
-      Name: !Sub '${AWS::StackName}-EIPNatGatewaySubnet2'
