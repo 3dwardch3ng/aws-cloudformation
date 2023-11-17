@@ -30,8 +30,8 @@ permissions:
   contents: write
 
 jobs:
-  create-vpc:
-    name: Create / Update VPC Resources
+  create-and-execute-lambda:
+    name: Create / Update Lambda Stack and Execute
     runs-on: ubuntu-latest
     environment: AWS
     steps:
@@ -44,8 +44,8 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ github.event.inputs.region}}
-      - name: Deploy VPC with CloudFormation
-        id: vpc-stack
+      - name: Deploy and execute Lambda function with CloudFormation
+        id: fetch-ec2-ipv6-lambda-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: fetch-ec2-ipv6-lambda-stack
