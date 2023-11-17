@@ -72,6 +72,11 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicSubnet1RouteTable
       DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  PublicSubnet1Ipv6Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicSubnet1RouteTable
       DestinationIpv6CidrBlock: ::/0
       GatewayId: !Ref InternetGateway
   PublicSubnet2RouteTable:
@@ -89,6 +94,11 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicSubnet2RouteTable
       DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  PublicSubnet2Ipv6Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicSubnet2RouteTable
       DestinationIpv6CidrBlock: ::/0
       GatewayId: !Ref InternetGateway
 
@@ -123,6 +133,12 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateSubnet1RouteTable
       DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayPrivateSubnet1
+  PrivateSubnet1Ipv6NATRoute:
+    DependsOn: NatGatewayPrivateSubnet1
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateSubnet1RouteTable
       DestinationIpv6CidrBlock: ::/0
       NatGatewayId: !Ref NatGatewayPrivateSubnet1
   EIPNatGatewayPrivateSubnet2:
@@ -155,6 +171,12 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateSubnet2RouteTable
       DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayPrivateSubnet2
+  PrivateSubnet2Ipv6NATRoute:
+    DependsOn: NatGatewayPrivateSubnet2
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateSubnet2RouteTable
       DestinationIpv6CidrBlock: ::/0
       NatGatewayId: !Ref NatGatewayPrivateSubnet2
 
