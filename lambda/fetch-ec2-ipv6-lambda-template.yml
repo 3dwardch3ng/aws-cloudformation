@@ -84,6 +84,6 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-${AWS::Region}-FetchEC2Ipv6FunctionId"
   FetchEC2Ipv6FunctionArn:
-    Value: !Ref FetchEC2Ipv6Function.Arn
+    Value: !GetAtt FetchEC2Ipv6Function.Arn
     Export:
       Name: !Sub "${AWS::StackName}-${AWS::Region}-FetchEC2Ipv6FunctionArn"
