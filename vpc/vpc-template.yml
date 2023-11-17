@@ -276,6 +276,10 @@ Outputs:
     Value: !GetAtt VPC.CidrBlock
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-VPCCIDRBlock'
+  VPCIpv6CIDRBlock:
+    Value: !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ]
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-VPCIpv6CIDRBlock'
   PublicSubnet1Id:
     Value: !Ref PublicSubnet1
     Export:
@@ -285,7 +289,7 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1AvailabilityZone'
   PublicSubnet1Ipv6CidrBlock:
-    Value: !GetAtt PublicSubnet1.Ipv6CidrBlocks
+    Value: !Select [ '0', !GetAtt PublicSubnet1.Ipv6CidrBlocks ]
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1Ipv6CidrBlock'
   PublicSubnet2Id:
