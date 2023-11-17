@@ -7,11 +7,6 @@ Parameters:
     Type: String
 
 Resources:
-  Ipv6Resource:
-    Type: AWS::CloudFormation::CustomResource
-    Properties:
-      ServiceToken: !GetAtt FetchEC2Ipv6Function.Arn
-      ResourceRef: !Ref EC2InstanceId
   # Role
   LambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -83,10 +78,3 @@ Resources:
               logger.error(err)
               responseData = {"Data": str(err)}
               cfnresponse.send(event,context,cfnresponse.FAILED,responseData)
-Outputs:
-  EC2InstanceId:
-    Description: EC2 Instance Id
-    Value: !Ref EC2InstanceId
-  EC2InstanceIpv6Address:
-    Description: EC2 Instance IPv6 Address
-    Value: !GetAtt Ipv6Resource.Ipv6Address
