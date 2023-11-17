@@ -284,6 +284,10 @@ Outputs:
     Value: !GetAtt PublicSubnet1.AvailabilityZone
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1AvailabilityZone'
+  PublicSubnet1Ipv6CidrBlock:
+    Value: !GetAtt PublicSubnet1.Ipv6CidrBlocks
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1Ipv6CidrBlock'
   PublicSubnet2Id:
     Value: !Ref PublicSubnet2
     Export:
