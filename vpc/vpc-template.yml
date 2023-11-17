@@ -420,7 +420,6 @@ Outputs:
         Fn::Sub: "${AWS::StackName}-EIPNatGatewaySubnetA"
   EIPNatGatewaySubnetB:
     Description: Public IP of NAT Gateway Subnet B
-    Condition: CreateProdResources
     Value:
       Ref: EIPNatGatewayPrivateSubnetB
     Export:
