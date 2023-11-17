@@ -1,10 +1,6 @@
 # Ref: https://gist.github.com/martin-garbe/57234836e23c5d53ebfdd157756cc3aa
 # Ref: https://aws.amazon.com/blogs/mt/four-ways-to-retrieve-any-aws-service-property-using-aws-cloudformation-part-1/
 AWSTemplateFormatVersion: '2010-09-09'
-Parameters:
-  EC2InstanceId:
-    Description: EC2 Instance Id
-    Type: String
 
 Resources:
   # Role
@@ -78,3 +74,12 @@ Resources:
               logger.error(err)
               responseData = {"Data": str(err)}
               cfnresponse.send(event,context,cfnresponse.FAILED,responseData)
+Outputs:
+  LambdaExecutionRoleId:
+    Value: !Ref LambdaExecutionRole
+    Export:
+      Name: !Sub "${AWS::StackName}-${AWS::Region}-LambdaExecutionRoleId"
+  FetchEC2Ipv6FunctionId:
+    Value: !Ref FetchEC2Ipv6Function
+    Export:
+      Name: !Sub "${AWS::StackName}-${AWS::Region}-FetchEC2Ipv6FunctionId"
