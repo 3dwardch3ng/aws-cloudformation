@@ -113,11 +113,11 @@ Resources:
           - EIPNatGatewayPrivateSubnet1
           - AllocationId
       SubnetId: !Ref PublicSubnet1
-#    Tags:
-#      - Key: Category
-#        Value: !Ref Category
-#      - Key: Name
-#        Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'NatGateway', 'PrivateSubnet1' ] ]
+      Tags:
+        - Key: Category
+          Value: !Ref Category
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'NatGateway', 'PrivateSubnet1' ] ]
   PrivateSubnet1RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -223,6 +223,7 @@ Resources:
 
   # Public subnet 1 and 2
   PublicSubnet1:
+    DependsOn: IPv6CidrBlock
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
@@ -246,6 +247,7 @@ Resources:
       RouteTableId:
         Ref: PublicSubnet1RouteTable
   PublicSubnet2:
+    DependsOn: IPv6CidrBlock
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
@@ -271,6 +273,7 @@ Resources:
 
   # Private subnet 1 and 2
   PrivateSubnet1:
+    DependsOn: IPv6CidrBlock
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
@@ -298,6 +301,7 @@ Resources:
       SubnetId: !Ref PrivateSubnet1
       RouteTableId: !Ref PrivateSubnet1RouteTable
   PrivateSubnet2:
+    DependsOn: IPv6CidrBlock
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
