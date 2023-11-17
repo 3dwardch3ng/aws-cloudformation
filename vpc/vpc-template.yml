@@ -40,11 +40,6 @@ Resources:
     Properties:
       AmazonProvidedIpv6CidrBlock: true
       VpcId: !Ref VPC
-      Tags:
-        - Key: Category
-          Value: !Ref Category
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Ipv6CidrBlock' ] ]
 
   # Internet Gateway
   InternetGateway:
