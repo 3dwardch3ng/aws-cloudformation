@@ -189,7 +189,6 @@ Resources:
       RuleAction: allow
       Egress: true
       CidrBlock: 0.0.0.0/0
-      Ipv6CidrBlock: ::/0
   PrivateSubnetsNetworkAclIpv6OutboundEntry:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
