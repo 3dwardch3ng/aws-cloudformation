@@ -1,7 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: > 
-  VPC infrastructure stack. A VPC with 3 public and 3 private subnet will be created, in which the subnet 1 will be the 
-  IPv4 and IPv6 dual stack subnet, the subnet 2 will be the IPv4 only subnet and the subnet 3 will be the IPv6 only subnet.
+  VPC infrastructure stack. A VPC with 2 public and 2 private subnet will be created, in which the subnet 1 will be the 
+  IPv4 and IPv6 dual stack subnet, the subnet 2 will be the IPv4 only subnet (The IPv6 only subnet creation is not 
+  supported by CloudFormation yet, only via console or CLI).
 Parameters:
   Category:
     Description: The category of VPC
@@ -20,9 +21,7 @@ Mappings:
       Private1: 10.1.10.0/24
       Private2: 10.1.20.0/24
       Ipv6SubnetPublic1: 01::/64
-      Ipv6SubnetPublic3: 03::/64
       Ipv6SubnetPrivate1: 10::/64
-      Ipv6SubnetPrivate3: 30::/64
 
 Resources:
   # VPC
@@ -62,7 +61,7 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
-  # Routing - public subnet 1, 2 and 3
+  # Routing - public subnet 1 and 2
   PublicSubnet1RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -101,23 +100,9 @@ Resources:
       RouteTableId: !Ref PublicSubnet2RouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
-  PublicSubnet3RouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-      Tags:
-        - Key: Category
-          Value: !Ref Category
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PublicSubnet3' ] ]
-  PublicSubnet3Ipv6Route:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PublicSubnet3RouteTable
-      DestinationIpv6CidrBlock: ::/0
-      GatewayId: !Ref InternetGateway
 
-  # Routing - private subnet 1, 2 and 3
+
+  # Routing - private subnet 1 and 2
   PrivateSubnet1RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -142,21 +127,6 @@ Resources:
           Value: !Ref Category
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PrivateSubnet2' ] ]
-  PrivateSubnet3RouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-      Tags:
-        - Key: Category
-          Value: !Ref Category
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PrivateSubnet3' ] ]
-  PrivateSubnet3Ipv6NATRoute:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PrivateSubnet3RouteTable
-      DestinationIpv6CidrBlock: ::/0
-      EgressOnlyInternetGatewayId: !Ref EgressOnlyInternetGateway
 
   # Access control
   PrivateSubnetsNetworkAcl:
@@ -199,7 +169,7 @@ Resources:
       Egress: true
       Ipv6CidrBlock: ::/0
 
-  # Public subnet 1, 2 and 3
+  # Public subnet 1 and 2
   PublicSubnet1:
     DependsOn: IPv6CidrBlock
     Type: AWS::EC2::Subnet
@@ -243,32 +213,8 @@ Resources:
         Ref: PublicSubnet2
       RouteTableId:
         Ref: PublicSubnet2RouteTable
-  PublicSubnet3:
-    DependsOn: IPv6CidrBlock
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      Ipv6CidrBlock:
-        Fn::Sub:
-          - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
-            SubnetPart: !FindInMap [ SubnetCIDRBlock, Ref: Category, Ipv6SubnetPublic3 ]
-      AssignIpv6AddressOnCreation: true
-      AvailabilityZone: !Sub '${AWS::Region}a'
-      Tags:
-        - Key: Category
-          Value: !Ref Category
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Public3' ] ]
-  PublicSubnet3RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId:
-        Ref: PublicSubnet3
-      RouteTableId:
-        Ref: PublicSubnet3RouteTable
 
-  # Private subnet 1, 2 and 3
+  # Private subnet 1 and 2
   PrivateSubnet1:
     DependsOn: IPv6CidrBlock
     Type: AWS::EC2::Subnet
@@ -320,33 +266,6 @@ Resources:
         Ref: PrivateSubnet2
       RouteTableId:
         Ref: PrivateSubnet2RouteTable
-  PrivateSubnet3:
-    DependsOn: IPv6CidrBlock
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      Ipv6CidrBlock:
-        Fn::Sub:
-          - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
-            SubnetPart: !FindInMap [ SubnetCIDRBlock, Ref: Category, Ipv6SubnetPrivate3 ]
-      AssignIpv6AddressOnCreation: true
-      AvailabilityZone: !Sub '${AWS::Region}a'
-      Tags:
-        - Key: Category
-          Value: !Ref Category
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Private3' ] ]
-  PrivateSubnet3AclAssociation:
-    Type: AWS::EC2::SubnetNetworkAclAssociation
-    Properties:
-      NetworkAclId: !Ref PrivateSubnetsNetworkAcl
-      SubnetId: !Ref PrivateSubnet3
-  PrivateSubnet3RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PrivateSubnet3
-      RouteTableId: !Ref PrivateSubnet3RouteTable
 
 Outputs:
   VPCId:
@@ -394,11 +313,11 @@ Outputs:
     Value: !Ref Category
     Export:
       Name: !Sub '${AWS::StackName}-Category'
-  PublicSubnet1TableId:
+  PublicSubnet1RouteTableId:
     Value: !Ref PublicSubnet1RouteTable
     Export:
       Name: !Sub '${AWS::StackName}-PublicSubnet1RouteTableId'
-  PublicSubnet2TableId:
+  PublicSubnet2RouteTableId:
     Value: !Ref PublicSubnet2RouteTable
     Export:
       Name: !Sub '${AWS::StackName}-PublicSubnet2RouteTableId'
