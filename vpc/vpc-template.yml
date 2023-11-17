@@ -223,7 +223,7 @@ Resources:
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ]]]
+          - VpcPart: !Select [ '0', !Split [ '::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ]]]
             SubnetPart: !FindInMap [ SubnetCIDRBlock, Ref: Category, Ipv6SubnetPublic1 ]
       AvailabilityZone: !Sub '${AWS::Region}a'
       Tags:
@@ -247,7 +247,7 @@ Resources:
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
+          - VpcPart: !Select [ '0', !Split [ '::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
             SubnetPart: !FindInMap [ SubnetCIDRBlock, Ref: Category, Ipv6SubnetPublic2 ]
       AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
@@ -273,7 +273,7 @@ Resources:
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
+          - VpcPart: !Select [ '0', !Split [ '::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
             SubnetPart: !FindInMap [ SubnetCIDRBlock, Ref: Category, Ipv6SubnetPrivate1 ]
       AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Sub '${AWS::Region}a'
@@ -301,7 +301,7 @@ Resources:
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
+          - VpcPart: !Select [ '0', !Split [ '::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
             SubnetPart: !FindInMap [ SubnetCIDRBlock, Ref: Category, Ipv6SubnetPrivate2 ]
       AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Sub '${AWS::Region}b'
