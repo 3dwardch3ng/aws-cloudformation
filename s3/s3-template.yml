@@ -28,22 +28,25 @@ Resources:
         Statement:
           - Sid: DeleteFromS3ActionBucketPolicyDocumentStatement
             Effect: Allow
-            Principal: '*'
+            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
             Action:
               - 's3:GetObject'
               - 's3:ListBucket'
               - 's3:DeleteObject'
             Resource:
-              - Fn::Join:
-                  - ''
-                  - - 'arn:aws:s3:::'
-                    - !Ref DeleteFromS3ActionBucket
-              -
-                Fn::Join:
-                - ''
-                - - 'arn:aws:s3:::'
-                  - !Ref DeleteFromS3ActionBucket
-                  - '/*'
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket, '/*' ] ]
+          - Sid: DeleteFromS3ActionBucketPolicyDocumentStatement2
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
+            Action:
+              - 's3:GetObject'
+              - 's3:ListBucket'
+              - 's3:DeleteObject'
+            Resource:
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket, '/*' ] ]
 
   CloudFormationTemplatesBucket:
     Type: AWS::S3::Bucket
@@ -70,20 +73,22 @@ Resources:
         Statement:
           - Sid: CloudFormationTemplatesBucketPolicyDocumentStatement
             Effect: Allow
-            Principal: '*'
+            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
             Action:
               - 's3:GetObject'
               - 's3:ListBucket'
             Resource:
-              - Fn::Join:
-                  - ''
-                  - - 'arn:aws:s3:::'
-                    - !Ref CloudFormationTemplatesBucket
-              - Fn::Join:
-                  - ''
-                  - - 'arn:aws:s3:::'
-                    - !Ref CloudFormationTemplatesBucket
-                    - '/*'
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ] ]
+          - Sid: CloudFormationTemplatesBucketPutBucketPolicyDocumentStatement
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
+            Action:
+              - 's3:PutBucketPolicy'
+            Resource:
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ] ]
 
 Outputs:
   DeleteFromS3ActionBucketArn:
