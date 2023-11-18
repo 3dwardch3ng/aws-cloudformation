@@ -16,7 +16,6 @@ Resources:
       GroupDescription: Edward Home Security Group
       SecurityGroupIngress:
         - CidrIp: !Ref EdwardHomeSGIngressCidrIp
-          CidrIpv6: !Ref EdwardHomeSGIngressCidrIpv6
           Description: Allow inbound SSH connection from Edward's Home
           IpProtocol: tcp
           FromPort: 22
