@@ -67,6 +67,6 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: ec2-key-pair-stack
-          template: ec2/ec2-key-pair-stack.yml
+          template: ec2/ec2-key-pair-template.yml
           parameter-overrides: 'KeyFormat=${{ github.event.inputs.key-format }},KeyName=${{ github.event.inputs.key-name }},KeyType=${{ github.event.inputs.key-type }}'
           no-fail-on-empty-changeset: "1"
