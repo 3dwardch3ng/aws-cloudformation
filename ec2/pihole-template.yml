@@ -198,7 +198,7 @@ Resources:
             - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
           Ipv4Prefixes:
             - Ipv4Prefix:
-                Fn::FindInMap: [ Ref: Category, Ref: Subnet, Ipv4 ]
+                Fn::FindInMap: [ Ref: VpcCategory, Ref: Subnet, Ipv4 ]
           Ipv6Prefixes:
             - Ipv6Prefix:
                 Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ] ]
