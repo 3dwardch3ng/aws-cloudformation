@@ -38,7 +38,6 @@ Resources:
   PiHoleIAMRole:
     Type: AWS::IAM::Role
     Properties:
-      AssumeRolePolicyDocument: Json
       Description: 'The IAM Role for the PiHole EC2 Instance'
       MaxSessionDuration: 43200
       ManagedPolicyArns:
