@@ -16,7 +16,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       AvailabilityZone:
-        Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-${!Ref Subnet}AvailabilityZone'
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ]]
       LaunchTemplate:
         LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
         Version: !GetAtt PiHoleEC2LaunchTemplate.LatestVersionNumber
@@ -61,7 +61,7 @@ Resources:
       DeviceIndex: 0
       GroupSet:
         - Ref: PiHoleEC2SecurityGroup
-        - Fn::ImportValue: !Sub 'edward-home-ec2-security-group-stack-${AWS::Region}-EdwardHomeSecurityGroupId'
+        - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ]]
       Ipv6AddressCount: 1
       Ipv6Addresses:
         - Fn::Sub:
@@ -70,10 +70,10 @@ Resources:
                 - 0
                 - !Split
                   - '::/64'
-                  - Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-${!Ref Subnet}Ipv6CidrBlock'
+                  - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ]]
               HostPart: '::100/128'
       SubnetId:
-        Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-${!Ref Subnet}Id'
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ]]
 
   # Security Group
   PiHoleEC2SecurityGroup:
@@ -153,7 +153,7 @@ Resources:
         - Key: Name
           Value: PiHole-${AWS::Region}-SecurityGroup
       VpcId:
-        Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-VpcId'
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ]]
 
   # EC2 Launch Template
   PiHoleEC2LaunchTemplate:
@@ -179,7 +179,7 @@ Resources:
           HostnameType: 'resource-name'
         SecurityGroupIds:
           - Ref: PiHoleEC2SecurityGroup
-          - Fn::ImportValue: !Sub 'edward-home-ec2-security-group-stack-${AWS::Region}-EdwardHomeSecurityGroupId'
+          - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, Ref: Subnet, 'EdwardHomeSecurityGroupId' ]]
         UserData: String
       LaunchTemplateName: piHoleEC2LaunchTemplate
       TagSpecifications:
@@ -194,7 +194,7 @@ Resources:
     Properties:
       AutoEnableIO: true
       AvailabilityZone:
-        Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-${!Ref Subnet}AvailabilityZone'
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ]]
       Encrypted: true
       Iops: 3000
       MultiAttachEnabled: false
@@ -210,7 +210,7 @@ Resources:
     Type: AWS::CloudFormation::CustomResource
     Properties:
       ServiceToken:
-        Fn::ImportValue: !Sub 'fetch-ec2-ipv6-lambda-stack-${AWS::Region}-FetchEC2Ipv6FunctionArn'
+        Fn::ImportValue: !Join [ '-', [ 'fetch-ec2-ipv6-lambda-stack', Ref: AWS::Region, 'FetchEC2Ipv6FunctionArn' ]]
       ResourceRef: !Ref PiHoleEC2Instance
 
 Outputs:
