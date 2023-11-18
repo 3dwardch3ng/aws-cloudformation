@@ -27,7 +27,7 @@ Resources:
       CidrBlock:
         Fn::FindInMap
           - VpcCidrBlock
-          - Ref: Category
+          - !Ref Category
           - Ipv4
       Tags:
         - Key: Category
@@ -150,7 +150,7 @@ Resources:
       CidrBlock:
          Fn::FindInMap
            - VpcCidrBlock
-           - Ref: Category
+           - !Ref Category
            - Ipv4
   PrivateSubnetsNetworkAclOutboundEntry:
     Type: AWS::EC2::NetworkAclEntry
@@ -180,7 +180,7 @@ Resources:
       CidrBlock:
         Fn::FindInMap
           - SubnetCidrBlock
-          - Ref: Category
+          - !Ref Category
           - Public1
           - Ipv4
       Ipv6CidrBlock:
@@ -190,7 +190,7 @@ Resources:
             SubnetPart:
               Fn::FindInMap
                 - SubnetCidrBlock
-                - Ref: Category
+                - !Ref Category
                 - Public1
                 - Ipv6
       AssignIpv6AddressOnCreation: true
@@ -212,7 +212,7 @@ Resources:
       CidrBlock:
         Fn::FindInMap
           - SubnetCidrBlock
-          - Ref: Category
+          - !Ref Category
           - Public2
           - Ipv4
       AvailabilityZone: !Sub '${AWS::Region}b'
@@ -236,7 +236,7 @@ Resources:
       CidrBlock:
         Fn::FindInMap
           - SubnetCidrBlock
-          - Ref: Category
+          - !Ref Category
           - Private1
           - Ipv4
       Ipv6CidrBlock:
@@ -246,7 +246,7 @@ Resources:
             SubnetPart:
               Fn::FindInMap
                 - SubnetCidrBlock
-                - Ref: Category
+                - !Ref Category
                 - Private1
                 - Ipv6
       AssignIpv6AddressOnCreation: true
@@ -273,7 +273,7 @@ Resources:
       CidrBlock:
           Fn::FindInMap
             - SubnetCidrBlock
-            - Ref: Category
+            - !Ref Category
             - Private2
             - Ipv4
       AvailabilityZone: !Sub '${AWS::Region}b'
