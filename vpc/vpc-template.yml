@@ -25,10 +25,7 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock:
-        Fn::FindInMap
-          - !Ref Category
-          - Vpc
-          - Ipv4
+        Fn::FindInMap: [ Ref: Category, Vpc, Ipv4 ]
       Tags:
         - Key: Category
           Value: !Ref Category
@@ -148,10 +145,7 @@ Resources:
       RuleAction: allow
       Egress: false
       CidrBlock:
-        Fn::FindInMap
-          - !Ref Category
-          - Vpc
-          - Ipv4
+        Fn::FindInMap: [ Ref: Category, Vpc, Ipv4 ]
   PrivateSubnetsNetworkAclOutboundEntry:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
@@ -178,19 +172,13 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock:
-        Fn::FindInMap
-          - !Ref Category
-          - Public1
-          - Ipv4
+        Fn::FindInMap: [ Ref: Category, Public1, Ipv4 ]
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
           - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ]]]
             SubnetPart:
-              Fn::FindInMap
-                - !Ref Category
-                - Public1
-                - Ipv6
+              Fn::FindInMap: [ Ref: Category, Public1, Ipv6 ]
       AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Sub '${AWS::Region}a'
       Tags:
@@ -208,10 +196,7 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock:
-        Fn::FindInMap
-          - !Ref Category
-          - Public2
-          - Ipv4
+        Fn::FindInMap: [ Ref: Category, Public2, Ipv4 ]
       AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
         - Key: Category
@@ -231,19 +216,13 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock:
-        Fn::FindInMap
-          - !Ref Category
-          - Private1
-          - Ipv4
+        Fn::FindInMap: [ Ref: Category, Private1, Ipv4 ]
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
           - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ] ] ]
             SubnetPart:
-              Fn::FindInMap
-                - !Ref Category
-                - Private1
-                - Ipv6
+              Fn::FindInMap: [ Ref: Category, Private1, Ipv6 ]
       AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Sub '${AWS::Region}a'
       Tags:
@@ -266,10 +245,7 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock:
-          Fn::FindInMap
-            - !Ref Category
-            - Private2
-            - Ipv4
+        Fn::FindInMap: [ Ref: Category, Private2, Ipv4 ]
       AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
         - Key: Category
