@@ -26,16 +26,6 @@ Resources:
         - Key: KeyPair
           Value: !Join [ '-', [ 'EC2KeyPair', Ref: AWS::Region, Ref: KeyFormat, Ref: KeyName, Ref: KeyType ] ]
 
-Outputs:
-  NewKeyPairId:
-    Value: !Ref NewKeyPair
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2KeyPairId'
-  NewKeyPairSpec:
-    Value: !Ref NewKeyPair
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2KeyPair-${KeyFormat}-${KeyName}-${KeyType}'
-
 # Notes:
 # 1. Following CLI command can be used to get the ID of the key pair after it is created:
 # aws ec2 describe-key-pairs --filters Name=key-name,Values=YOUR_KEY_NAME --query KeyPairs[*].KeyPairId --output text
