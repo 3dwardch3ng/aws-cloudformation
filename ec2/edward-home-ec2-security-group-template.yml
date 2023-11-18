@@ -29,7 +29,7 @@ Resources:
         - Key: EdwardHomeSecurityGroup
           Value: PiHole-${AWS::Region}-SecurityGroup
       VpcId:
-        Fn::ImportValue: !Sub 'vpc-stack-${AWS::Region}-VPCId'
+        Fn::ImportValue: !Sub 'vpc-stack-${AWS::Region}-VpcId'
 
 Outputs:
   EdwardHomeSecurityGroupId:
