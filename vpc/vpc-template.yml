@@ -26,7 +26,7 @@ Mappings:
 Resources:
   # VPC
   Vpc:
-    Type: AWS::EC2::Vpc
+    Type: AWS::EC2::VPC
     Properties:
       EnableDnsSupport: true
       EnableDnsHostnames: true
@@ -37,7 +37,7 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Vpc' ]]
   IPv6CidrBlock:
-    Type: AWS::EC2::VpcCidrBlock
+    Type: AWS::EC2::VPCCidrBlock
     Properties:
       AmazonProvidedIpv6CidrBlock: true
       VpcId: !Ref Vpc
@@ -56,7 +56,7 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'InternetGateway' ]]
   InternetGatewayAttachment:
-    Type: AWS::EC2::VpcGatewayAttachment
+    Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref Vpc
       InternetGatewayId: !Ref InternetGateway
@@ -192,7 +192,7 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref PublicSubnet1
-      RouteTableId: !Ref: PublicSubnet1RouteTable
+      RouteTableId: !Ref PublicSubnet1RouteTable
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
@@ -207,8 +207,8 @@ Resources:
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref: PublicSubnet2
-      RouteTableId: !Ref: PublicSubnet2RouteTable
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicSubnet2RouteTable
 
   # Private subnet 1 and 2
   PrivateSubnet1:
@@ -258,8 +258,8 @@ Resources:
   PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref: PrivateSubnet2
-      RouteTableId: !Ref: PrivateSubnet2RouteTable
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateSubnet2RouteTable
 
 Outputs:
   VpcId:
