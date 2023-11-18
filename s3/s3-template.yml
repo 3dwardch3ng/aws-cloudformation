@@ -45,8 +45,52 @@ Resources:
                   - !Ref DeleteFromS3ActionBucket
                   - '/*'
 
+  CloudFormationTemplatesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: cloudformation-templates
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  CloudFormationTemplatesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref CloudFormationTemplatesBucket
+      PolicyDocument:
+        Id: CloudFormationTemplatesBucketPolicyDocument
+        Version: '2012-10-17'
+        Statement:
+          - Sid: PublicReadGetObjectPolicyDocumentStatement
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+              - 's3:ListBucket'
+            Resource:
+              - Fn::Join:
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - !Ref CloudFormationTemplatesBucket
+              - Fn::Join:
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - !Ref CloudFormationTemplatesBucket
+                    - '/*'
+
 Outputs:
   DeleteFromS3ActionBucketArn:
     Value: !GetAtt DeleteFromS3ActionBucket.Arn
     Export:
       Name: DeleteFromS3ActionBucketArn
+  CloudFormationTemplatesBucketArn:
+    Value: !GetAtt CloudFormationTemplatesBucket.Arn
+    Export:
+      Name: CloudFormationTemplatesBucketArn
