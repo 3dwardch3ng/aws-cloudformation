@@ -4,11 +4,11 @@ VpcCidrBlock:
 SubnetCidrBlock:
   GENERAL:
     Public1:
-      Ipv4: 10.1.1.0/24
-      Ipv6: 01::/64
+      - Ipv4: 10.1.1.0/24
+      - Ipv6: 01::/64
     Public2:
-      Ipv4: 10.1.2.0/24
+      - Ipv4: 10.1.2.0/24
     Private1:
-      Ipv6: 10::/64
+      - Ipv6: 10::/64
     Private2:
-      Ipv4: 10.1.20.0/24
+      - Ipv4: 10.1.20.0/24
