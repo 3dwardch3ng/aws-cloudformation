@@ -191,10 +191,8 @@ Resources:
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId:
-        Ref: PublicSubnet1
-      RouteTableId:
-        Ref: PublicSubnet1RouteTable
+      SubnetId: !Ref: PublicSubnet1
+      RouteTableId: !Ref: PublicSubnet1RouteTable
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
@@ -209,10 +207,8 @@ Resources:
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId:
-        Ref: PublicSubnet2
-      RouteTableId:
-        Ref: PublicSubnet2RouteTable
+      SubnetId: !Ref: PublicSubnet2
+      RouteTableId: !Ref: PublicSubnet2RouteTable
 
   # Private subnet 1 and 2
   PrivateSubnet1:
@@ -262,10 +258,8 @@ Resources:
   PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId:
-        Ref: PrivateSubnet2
-      RouteTableId:
-        Ref: PrivateSubnet2RouteTable
+      SubnetId: !Ref: PrivateSubnet2
+      RouteTableId: !Ref: PrivateSubnet2RouteTable
 
 Outputs:
   VPCId:
