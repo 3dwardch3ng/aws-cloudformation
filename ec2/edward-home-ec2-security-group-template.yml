@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create EC2 Security Group with ingress and egress rules from Edward's Home
+
+Parameters:
+  EdwardHomeSGIngressCidrIp:
+    Description: The CidrIp for the SG EdwardHomeSecurityGroup Ingress
+    Type: String
+  EdwardHomeSGIngressCidrIpv6:
+    Description: The CidrIpv6 for the SG EdwardHomeSecurityGroup Ingress
+    Type: String
+
+Resources:
+  EdwardHomeSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Edward Home Security Group
+      SecurityGroupIngress:
+        - CidrIp: !Ref EdwardHomeSGIngressCidrIp
+          CidrIpv6: !Ref EdwardHomeSGIngressCidrIpv6
+          Description: Allow inbound SSH connection from Edward's Home
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+      Tags:
+        - Key: EdwardHomeSecurityGroup
+          Value: PiHole-${AWS::Region}-SecurityGroup
+      VpcId:
+        - Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-VPCId'
+
+Outputs:
+  EdwardHomeSecurityGroupId:
+    Value: !Ref EdwardHomeSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EdwardHomeSecurityGroupId'
