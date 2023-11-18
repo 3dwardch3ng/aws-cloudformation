@@ -277,39 +277,39 @@ Outputs:
   PublicSubnet1Id:
     Value: !Ref PublicSubnet1
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1Id'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1-Id'
   PublicSubnet1AvailabilityZone:
     Value: !GetAtt PublicSubnet1.AvailabilityZone
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1AvailabilityZone'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1-AvailabilityZone'
   PublicSubnet1Ipv6CidrBlock:
     Value: !Select [ '0', !GetAtt PublicSubnet1.Ipv6CidrBlocks ]
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1Ipv6CidrBlock'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1-Ipv6CidrBlock'
   PublicSubnet2Id:
     Value: !Ref PublicSubnet2
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet2Id'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet2-Id'
   PublicSubnet2AvailabilityZone:
     Value: !GetAtt PublicSubnet2.AvailabilityZone
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet2AvailabilityZone'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet2-AvailabilityZone'
   PrivateSubnet1Id:
     Value: !Ref PrivateSubnet1
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet1Id'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet1-Id'
   PrivateSubnet1AvailabilityZone:
     Value: !GetAtt PrivateSubnet1.AvailabilityZone
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet1AvailabilityZone'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet1-AvailabilityZone'
   PrivateSubnet2Id:
     Value: !Ref PrivateSubnet2
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet2Id'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet2-Id'
   PrivateSubnet2AvailabilityZone:
     Value: GetAtt PrivateSubnet2.AvailabilityZone
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet2AvailabilityZone'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet2-AvailabilityZone'
   Category:
     Description: Category name of stack
     Value: !Ref Category
@@ -318,16 +318,16 @@ Outputs:
   PublicSubnet1RouteTableId:
     Value: !Ref PublicSubnet1RouteTable
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1RouteTableId'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1-RouteTableId'
   PublicSubnet2RouteTableId:
     Value: !Ref PublicSubnet2RouteTable
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet2RouteTableId'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet2-RouteTableId'
   PrivateSubnet1RouteTableId:
     Value: !Ref PrivateSubnet1RouteTable
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet1RouteTableId'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet1-RouteTableId'
   PrivateSubnet2RouteTableId:
     Value: !Ref PrivateSubnet2RouteTable
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet2RouteTableId'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet2-RouteTableId'
