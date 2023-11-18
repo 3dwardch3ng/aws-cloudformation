@@ -1,0 +1,259 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a PiHole EC2 instance in AWS
+
+Parameters:
+  Subnet:
+    Description: The Subnet to deploy the EC2 instance into
+    Type: String
+    Default: PublicSubnet1
+    AllowedValues:
+      - PublicSubnet1
+      - PublicSubnet2
+
+Resources:
+  # EC2 Instance
+  PiHoleEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone:
+        Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-${!Ref Subnet}AvailabilityZone'
+#      IamInstanceProfile: String
+#      ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
+#      InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
+#      KeyName: pihole-key
+      LaunchTemplate:
+        LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
+        Version: !GetAtt PiHoleEC2LaunchTemplate.LatestVersionNumber
+#      Monitoring: true
+#      NetworkInterfaces:
+#        - Ref: PiHoleEC2NetworkInterface
+#      PrivateDnsNameOptions:
+#        EnableResourceNameDnsAAAARecord: true
+#        EnableResourceNameDnsARecord: true
+#        HostnameType: 'resource-name'
+      PropagateTagsToVolumeOnCreation: true
+      UserData: String
+      Volumes:
+        - Ref: PiHoleEBSStorage
+      Tags:
+        - Key: Name
+          Value: PiHole-${AWS::Region}-${!Ref Subnet}-EC2
+
+  # IAM Instance Profile
+  PiHoleIAMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: PiHoleIAMInstanceProfile
+      Path: /pihole
+      Roles:
+        - Ref: PiHoleIAMRole
+  PiHoleIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: Json
+      Description: 'The IAM Role for the PiHole EC2 Instance'
+      MaxSessionDuration: 43200
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/IAMReadOnlyAccess
+      Path: /pihole
+      RoleName: 'PiHoleIAMRole'
+      Tags:
+        - Key: Name
+          Value: PiHole-EC2-IAMRole
+
+  # EC2 Network Interface
+  PiHoleEC2NetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      AssociatePublicIpAddress: true
+      DeleteOnTermination: false
+      DeviceIndex: 0
+      GroupSet:
+        - Ref: PiHoleEC2SecurityGroup
+        - Fn::ImportValue: !Sub 'edward-home-ec2-security-group-stack-${AWS::Region}-EdwardHomeSecurityGroupId'
+      Ipv6AddressCount: 1
+      Ipv6Addresses:
+        - Fn::Sub:
+            - '${NetworkPart}${HostPart}'
+            - NetworkPart: !Select
+                - 0
+                - !Split
+                  - '::/64'
+                  - Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-${!Ref Subnet}Ipv6CidrBlock'
+              HostPart: '::100/128'
+      SubnetId:
+        Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-${!Ref Subnet}Id'
+
+  # Security Group
+  PiHoleEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PiHole EC2 Security Group
+      GroupName: PiHoleEC2SecurityGroup
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ICMP (ping)
+          IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+        - CidrIpv6: ::/0
+          Description: Allow inbound ICMPv6 (ping)
+          IpProtocol: icmpv6
+          FromPort: -1
+          ToPort: -1
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6: ::/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS UDP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6: ::/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL DNS UDP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound traffic for pihole-FTL DHCP IPv4 UDP on port 67
+          IpProtocol: udp
+          FromPort: 67
+          ToPort: 67
+        - CidrIpv6: ::/0
+          Description: Allow inbound traffic for pihole-FTL DHCPv6 UDP on port 547
+          IpProtocol: udp
+          FromPort: 547
+          ToPort: 547
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for lighttpd HTTP TCP on port 80
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIpv6: ::/0
+          Description: Allow inbound ipv6 traffic for lighttpd HTTP TCP on port 80
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL TCP on port 4711
+          IpProtocol: tcp
+          FromPort: 4711
+          ToPort: 4711
+        - CidrIpv6: ::/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL TCP on port 4711
+          IpProtocol: tcp
+          FromPort: 4711
+          ToPort: 4711
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all ipv4 outbound traffic by default
+          IpProtocol: -1
+        - CidrIpv6: ::/0
+          Description: Allow all ipv6 outbound traffic by default
+          IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value: PiHole-${AWS::Region}-SecurityGroup
+      VpcId:
+        Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-VpcId'
+
+  # EC2 Launch Template
+  PiHoleEC2LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        IamInstanceProfile: !Ref PiHoleIAMInstanceProfile
+        ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
+        InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
+        KeyName: pihole-key
+        MetadataOptions:
+          HttpEndpoint: enabled
+          HttpProtocolIpv6: enabled
+          HttpPutResponseHopLimit: 5
+          InstanceMetadataTags: enabled
+        Monitoring:
+          Enabled: true
+        NetworkInterfaces:
+          - Ref: PiHoleEC2NetworkInterface
+        PrivateDnsNameOptions:
+          EnableResourceNameDnsAAAARecord: true
+          EnableResourceNameDnsARecord: true
+          HostnameType: 'resource-name'
+        SecurityGroupIds:
+          - Ref: PiHoleEC2SecurityGroup
+          - Fn::ImportValue: !Sub 'edward-home-ec2-security-group-stack-${AWS::Region}-EdwardHomeSecurityGroupId'
+        UserData: String
+      LaunchTemplateName: piHoleEC2LaunchTemplate
+      TagSpecifications:
+        - ResourceType: 'launch-template'
+          Tags:
+            - Key: Name
+              Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2LaunchTemplate', 'piHoleEC2LaunchTemplate' ]]
+
+  # EBS Storage
+  PiHoleEBSStorage:
+    Type: AWS::EC2::Volume
+    Properties:
+      AutoEnableIO: true
+      AvailabilityZone:
+        Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-${!Ref Subnet}AvailabilityZone'
+      Encrypted: true
+      Iops: 3000
+      MultiAttachEnabled: false
+      Size: 16
+      Throughput: 500
+      VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'EBSStorage' ]]
+
+  # Fetch EC2 Ipv6 CloudFormation Custom Resource
+  Ipv6Resource:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceToken:
+        Fn::ImportValue: !Sub 'fetch-ec2-ipv6-lambda-stack-${AWS::Region}-FetchEC2Ipv6FunctionArn'
+      ResourceRef: !Ref PiHoleEC2Instance
+
+Outputs:
+    PiHoleEC2InstanceId:
+      Value: !Ref PiHoleEC2Instance
+      Export:
+        Name: !Sub 'PiHole-${AWS::Region}-EC2-InstanceId'
+    PiHoleEC2InstancePublicIpv4:
+      Value: !GetAtt PiHoleEC2Instance.PublicIp
+      Export:
+        Name: !Sub 'PiHole-${AWS::Region}-EC2-Public-Ipv4'
+    PiHoleEC2InstancePublicIpv6:
+      Value: !GetAtt Ipv6Resource.Ipv6Address
+      Export:
+        Name: !Sub 'PiHole-${AWS::Region}-EC2-Public-Ipv6'
+    PiHoleEC2SecurityGroupId:
+      Value: !Ref PiHoleEC2SecurityGroup
+      Export:
+        Name: !Sub 'PiHole-${AWS::Region}-EC2-SecurityGroupId'
+    PiHoleEC2LaunchTemplateId:
+      Value: !Ref PiHoleEC2LaunchTemplate
+      Export:
+        Name: !Sub 'PiHole-${AWS::Region}-EC2-LaunchTemplateId'
+    PiHoleEBSStorageId:
+      Value: !GetAtt PiHoleEBSStorage.VolumeId
+      Export:
+        Name: !Sub 'PiHole-${AWS::Region}-EBS-StorageId'
+    PiHoleIAMInstanceProfileArn:
+      Value: !GetAtt PiHoleIAMInstanceProfile.Arn
+      Export:
+        Name: !Sub 'PiHole-${AWS::Region}-IAM-InstanceProfileArn'
+    PiHoleIAMRoleId:
+      Value: !Ref PiHoleIAMRole
+      Export:
+        Name: !Sub 'PiHole-${AWS::Region}-EC2IAMRoleId'
