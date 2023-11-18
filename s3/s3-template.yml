@@ -1,6 +1,10 @@
----
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Create S3 Bucket
+
+Parameters:
+  AwsAccountArn:
+    Description: The AWS Account ARN
+    Type: String
 
 Resources:
   DeleteFromS3ActionBucket:
@@ -29,7 +33,7 @@ Resources:
           - Sid: DeleteFromS3ActionBucketPolicyDocumentStatement
             Effect: Allow
             Principal:
-              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
+              AWS: !Ref AwsAccountArn
             Action:
               - 's3:GetObject'
               - 's3:ListBucket'
@@ -40,7 +44,7 @@ Resources:
           - Sid: DeleteFromS3ActionBucketPutBucketPolicyDocumentStatement
             Effect: Allow
             Principal:
-              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
+              AWS: !Ref AwsAccountArn
             Action:
               - 's3:PutBucketPolicy'
             Resource:
@@ -73,7 +77,7 @@ Resources:
           - Sid: CloudFormationTemplatesBucketPolicyDocumentStatement
             Effect: Allow
             Principal:
-              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
+              AWS: !Ref AwsAccountArn
             Action:
               - 's3:GetObject'
               - 's3:ListBucket'
@@ -83,7 +87,7 @@ Resources:
           - Sid: CloudFormationTemplatesBucketPutBucketPolicyDocumentStatement
             Effect: Allow
             Principal:
-              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
+              AWS: !Ref AwsAccountArn
             Action:
               - 's3:PutBucketPolicy'
             Resource:

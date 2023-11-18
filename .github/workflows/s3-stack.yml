@@ -50,4 +50,6 @@ jobs:
         with:
           name: s3-stack
           template: s3/s3-template.yml
+          parameter-overrides: >-
+            AwsAccountArn=${{ secrets.AWS_ACCOUNT_ARN }}
           no-fail-on-empty-changeset: "1"
