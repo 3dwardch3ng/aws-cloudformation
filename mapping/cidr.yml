@@ -1,7 +1,7 @@
-VpcCidrBlock:
+- VpcCidrBlock:
   - GENERAL:
     - Ipv4: 10.1.0.0/16
-SubnetCidrBlock:
+- SubnetCidrBlock:
   - GENERAL:
     - Public1:
       - Ipv4: 10.1.1.0/24
