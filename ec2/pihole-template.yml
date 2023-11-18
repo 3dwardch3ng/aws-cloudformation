@@ -154,7 +154,9 @@ Resources:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateData:
-        IamInstanceProfile: !Ref PiHoleIAMInstanceProfile
+        IamInstanceProfile:
+          Arn: !GetAtt PiHoleIAMInstanceProfile.Arn
+          Name: PiHoleIAMInstanceProfile
         ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
         InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
         KeyName: pihole-key
@@ -166,22 +168,22 @@ Resources:
         Monitoring:
           Enabled: true
         NetworkInterfaces:
-          AssociatePublicIpAddress: true
-          DeleteOnTermination: false
-          Description: "PiHole EC2 Network Interface 0"
-          DeviceIndex: 0
-          Groups:
-            - Ref: PiHoleEC2SecurityGroup
-            - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
-          Ipv4Prefixes:
-            - Ipv4Prefix:
-                Fn::FindInMap: [ Ref: VpcCategory, Ref: Subnet, Ipv4 ]
-          Ipv6Prefixes:
-            - Ipv6Prefix:
-                Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ] ]
-          NetworkCardIndex: 0
-          SubnetId:
-            Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
+          - AssociatePublicIpAddress: true
+            DeleteOnTermination: false
+            Description: "PiHole EC2 Network Interface 0"
+            DeviceIndex: 0
+            Groups:
+              - Ref: PiHoleEC2SecurityGroup
+              - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
+            Ipv4Prefixes:
+              - Ipv4Prefix:
+                  Fn::FindInMap: [ Ref: VpcCategory, Ref: Subnet, Ipv4 ]
+            Ipv6Prefixes:
+              - Ipv6Prefix:
+                  Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ] ]
+            NetworkCardIndex: 0
+            SubnetId:
+              Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
         PrivateDnsNameOptions:
           EnableResourceNameDnsAAAARecord: true
           EnableResourceNameDnsARecord: true
