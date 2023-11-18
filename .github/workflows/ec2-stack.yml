@@ -73,6 +73,6 @@ jobs:
           template: ec2/${{ github.event.inputs.template-name }}-template.yml
           capabilities: CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND
           parameter-overrides: >-
-            VpcCategory=${{ github.event.inputs.vpc-category }}
+            VpcCategory=${{ github.event.inputs.vpc-category }},
             Subnet=${{ github.event.inputs.subnet }}
           no-fail-on-empty-changeset: "1"
