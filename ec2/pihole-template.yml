@@ -33,7 +33,6 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: PiHoleIAMInstanceProfile
-      Path: /pihole
       Roles:
         - Ref: PiHoleIAMRole
   PiHoleIAMRole:
@@ -46,7 +45,6 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/IAMReadOnlyAccess
-      Path: /pihole
       RoleName: 'PiHoleIAMRole'
       Tags:
         - Key: Name
