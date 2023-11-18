@@ -20,6 +20,22 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
       Path: "/"
+      Policies:
+        - PolicyDocument: {
+            "Version" : "2012-10-17",
+            "Id": "SuperAdminPutBucketPolicyDocument",
+            "Statement" : [
+              {
+                "Sid" : "SuperAdminPutBucketPolicy",
+                "Effect" : "Allow",
+                "Action" : [
+                  "s3:PutBucketPolicy"
+                ],
+                "Resource": "arn:aws:s3:::*"
+              }
+            ]
+          }
+          PolicyName: SuperAdminPutBucketPolicy
 
   ECSuperUserAccessKey:
     Type: AWS::IAM::AccessKey
@@ -27,9 +43,3 @@ Resources:
       Serial: 1
       Status: Active
       UserName: !Ref ECSuperUser
-
-  ECSuperUserAccessKeySecretsManagerStored:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: ec-super-user-access-key
-      SecretString: !Sub '{"ACCESS_KEY":"${ECSuperUserAccessKey}","SECRET_KEY":"${ECSuperUserAccessKey.SecretAccessKey}"}'
