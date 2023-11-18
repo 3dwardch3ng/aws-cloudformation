@@ -73,7 +73,8 @@ Resources:
         Statement:
           - Sid: CloudFormationTemplatesBucketPolicyDocumentStatement
             Effect: Allow
-            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
             Action:
               - 's3:GetObject'
               - 's3:ListBucket'
