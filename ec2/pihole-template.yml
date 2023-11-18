@@ -179,7 +179,7 @@ Resources:
           HostnameType: 'resource-name'
         SecurityGroupIds:
           - Ref: PiHoleEC2SecurityGroup
-          - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, Ref: Subnet, 'EdwardHomeSecurityGroupId' ]]
+          - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ]]
         UserData: String
       LaunchTemplateName: piHoleEC2LaunchTemplate
       TagSpecifications:
