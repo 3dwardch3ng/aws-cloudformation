@@ -69,29 +69,6 @@ Resources:
         - Key: Name
           Value: PiHole-EC2-IAMRole
 
-  # EC2 Network Interface
-  PiHoleEC2NetworkInterface:
-    Type: AWS::EC2::NetworkInterface
-    Properties:
-      AssociatePublicIpAddress: true
-      DeleteOnTermination: false
-      DeviceIndex: 0
-      GroupSet:
-        - Ref: PiHoleEC2SecurityGroup
-        - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ]]
-      Ipv6AddressCount: 1
-      Ipv6Addresses:
-        - Fn::Sub:
-            - '${NetworkPart}${HostPart}'
-            - NetworkPart: !Select
-                - 0
-                - !Split
-                  - '::/64'
-                  - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ]]
-              HostPart: '::100/128'
-      SubnetId:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ]]
-
   # Security Group
   PiHoleEC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
