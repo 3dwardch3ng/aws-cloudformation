@@ -1,4 +1,4 @@
-name: Fetch EC2 Ipv6 Lambda Stack
+name: EC2 Create Key Pair Stack
 
 on:
   workflow_dispatch:
@@ -48,8 +48,8 @@ permissions:
   contents: write
 
 jobs:
-  create-and-execute-lambda:
-    name: Create / Update Lambda Stack and Execute
+  create-new-key-pair:
+    name: Create New EC2 Key Pair
     runs-on: ubuntu-latest
     environment: AWS
     steps:
