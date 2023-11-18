@@ -56,5 +56,7 @@ jobs:
         with:
           name: edward-home-ec2-security-group-stack
           template: ec2/edward-home-ec2-security-group-template.yml
-          parameter-overrides: 'EdwardHomeSGIngressCidrIp=${{ github.event.inputs.ingress-cidr-ip }},EdwardHomeSGIngressCidrIpv6=${{ github.event.inputs.ingress-cidr-ipv6 }}'
+          parameter-overrides: >-
+            EdwardHomeSGIngressCidrIp=${{ github.event.inputs.ingress-cidr-ip }},
+            EdwardHomeSGIngressCidrIpv6=${{ github.event.inputs.ingress-cidr-ipv6 }}
           no-fail-on-empty-changeset: "1"
