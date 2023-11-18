@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a EC2 Key Pair and saved it to AWS Systems Manager Parameter Store with format /ec2/keypair/key_pair_id
+
+Parameters:
+  KeyFormat:
+    Description: The format of the key pair.
+    Type: String
+    Default: pem
+  KeyName:
+    Description: Name of the EC2 Key Pair
+    Type: String
+    Default: ec2-key-pair
+  KeyType:
+    Description: The type of key pair to create.
+    Type: String
+    Default: rsa
+
+Resources:
+  NewKeyPair:
+    Type: 'AWS::EC2::KeyPair'
+    Properties:
+      KeyFormat: !Ref KeyFormat
+      KeyName: !Ref KeyName
+      KeyType: !Ref KeyType
+      Tags:
+        - Key: KeySpec
+          Value: !Join [ '-', [ 'EC2KeyPair', Ref: AWS::Region, Ref: KeyFormat, Ref: KeyName, Ref: KeyType ] ]
+        - Key: KeyPairId
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2KeyPair', Ref: NewKeyPair ] ]
+
+Outputs:
+  NewKeyPairId:
+    Value: !Ref NewKeyPair
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2KeyPairId'
+  NewKeyPairSpec:
+    Value: !Ref NewKeyPair
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2KeyPair-${KeyFormat}-${KeyName}-${KeyType}'
