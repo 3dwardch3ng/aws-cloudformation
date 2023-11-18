@@ -42,7 +42,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ github.event.inputs.region}}
+          aws-region: ${{ github.event.inputs.region }}
       - name: Deploy IAM stack with CloudFormation
         id: iam-user-role-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
