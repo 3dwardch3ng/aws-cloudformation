@@ -21,7 +21,6 @@ Resources:
         LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
         Version: !GetAtt PiHoleEC2LaunchTemplate.LatestVersionNumber
       PropagateTagsToVolumeOnCreation: true
-      UserData: String
       Volumes:
         - Ref: PiHoleEBSStorage
       Tags:
@@ -177,7 +176,6 @@ Resources:
         SecurityGroupIds:
           - Ref: PiHoleEC2SecurityGroup
           - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ]]
-        UserData: String
       LaunchTemplateName: piHoleEC2LaunchTemplate
       TagSpecifications:
         - ResourceType: 'launch-template'
