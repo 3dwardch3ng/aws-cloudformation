@@ -17,20 +17,9 @@ Resources:
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Sub 'vpc-template-${AWS::Region}-${!Ref Subnet}AvailabilityZone'
-#      IamInstanceProfile: String
-#      ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
-#      InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
-#      KeyName: pihole-key
       LaunchTemplate:
         LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
         Version: !GetAtt PiHoleEC2LaunchTemplate.LatestVersionNumber
-#      Monitoring: true
-#      NetworkInterfaces:
-#        - Ref: PiHoleEC2NetworkInterface
-#      PrivateDnsNameOptions:
-#        EnableResourceNameDnsAAAARecord: true
-#        EnableResourceNameDnsARecord: true
-#        HostnameType: 'resource-name'
       PropagateTagsToVolumeOnCreation: true
       UserData: String
       Volumes:
