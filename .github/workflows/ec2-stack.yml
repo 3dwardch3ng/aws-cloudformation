@@ -30,6 +30,12 @@ on:
         default: 'pihole'
         options:
           - 'pihole'
+      vpc-category:
+        description: 'The category of the VPC to deploy the EC2 instance into'
+        type: choice
+        default: 'GENERAL'
+        options:
+          - 'GENERAL'
       subnet:
         description: 'The subnet to deploy the EC2 instance into'
         type: choice
@@ -65,7 +71,8 @@ jobs:
         with:
           name: ${{ github.event.inputs.template-name }}-stack
           template: ec2/${{ github.event.inputs.template-name }}-template.yml
-          capabilities: CAPABILITY_NAMED_IAM
+          capabilities: CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND
           parameter-overrides: >-
+            VpcCategory=${{ github.event.inputs.vpc-category }}
             Subnet=${{ github.event.inputs.subnet }}
           no-fail-on-empty-changeset: "1"
