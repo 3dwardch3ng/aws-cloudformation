@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: > 
-  VPC infrastructure stack. A VPC with 2 public and 2 private subnet will be created, in which the subnet 1 will be the 
+Description: >
+  VPC infrastructure stack. A Vpc with 2 public and 2 private subnet will be created, in which the subnet 1 will be the 
   IPv4 and IPv6 dual stack subnet, the subnet 2 will be the IPv4 only subnet (The IPv6 only subnet creation is not 
   supported by CloudFormation yet, only via console or CLI).
 Parameters:
@@ -11,10 +11,10 @@ Parameters:
     AllowedValues:
       - GENERAL
 Mappings:
-  VPCCIDRBlock:
+  VpcCidrBlock:
     GENERAL:
-      CIDRBlock: 10.1.0.0/16
-  SubnetCIDRBlock:
+      CidrBlock: 10.1.0.0/16
+  SubnetCidrBlock:
     GENERAL:
       Public1: 10.1.1.0/24
       Public2: 10.1.2.0/24
@@ -25,26 +25,26 @@ Mappings:
 
 Resources:
   # VPC
-  VPC:
-    Type: AWS::EC2::VPC
+  Vpc:
+    Type: AWS::EC2::Vpc
     Properties:
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      CidrBlock: !FindInMap [ VPCCIDRBlock, Ref: Category, CIDRBlock ]
+      CidrBlock: !FindInMap [ VpcCidrBlock, Ref: Category, CidrBlock ]
       Tags:
         - Key: Category
           Value: !Ref Category
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'VPC' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Vpc' ]]
   IPv6CidrBlock:
-    Type: AWS::EC2::VPCCidrBlock
+    Type: AWS::EC2::VpcCidrBlock
     Properties:
       AmazonProvidedIpv6CidrBlock: true
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
   EgressOnlyInternetGateway:
     Type: AWS::EC2::EgressOnlyInternetGateway
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
 
   # Internet Gateway
   InternetGateway:
@@ -56,16 +56,16 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'InternetGateway' ]]
   InternetGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
+    Type: AWS::EC2::VpcGatewayAttachment
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       InternetGatewayId: !Ref InternetGateway
 
   # Routing - public subnet 1 and 2
   PublicSubnet1RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       Tags:
         - Key: Category
           Value: !Ref Category
@@ -87,7 +87,7 @@ Resources:
   PublicSubnet2RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       Tags:
         - Key: Category
           Value: !Ref Category
@@ -106,7 +106,7 @@ Resources:
   PrivateSubnet1RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       Tags:
         - Key: Category
           Value: !Ref Category
@@ -121,7 +121,7 @@ Resources:
   PrivateSubnet2RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       Tags:
         - Key: Category
           Value: !Ref Category
@@ -132,7 +132,7 @@ Resources:
   PrivateSubnetsNetworkAcl:
     Type: AWS::EC2::NetworkAcl
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref Vpc
       Tags:
         - Key: Category
           Value: !Ref Category
@@ -149,7 +149,7 @@ Resources:
       Protocol: 6 # TCP
       RuleAction: allow
       Egress: false
-      CidrBlock: !FindInMap [ VPCCIDRBlock, Ref: Category, CIDRBlock ]
+      CidrBlock: !FindInMap [ VpcCidrBlock, Ref: Category, CidrBlock ]
   PrivateSubnetsNetworkAclOutboundEntry:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
@@ -174,13 +174,13 @@ Resources:
     DependsOn: IPv6CidrBlock
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !FindInMap [ SubnetCIDRBlock, Ref: Category, Public1 ]
+      VpcId: !Ref Vpc
+      CidrBlock: !FindInMap [ SubnetCidrBlock, Ref: Category, Public1 ]
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ]]]
-            SubnetPart: !FindInMap [ SubnetCIDRBlock, Ref: Category, Ipv6SubnetPublic1 ]
+          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ]]]
+            SubnetPart: !FindInMap [ SubnetCidrBlock, Ref: Category, Ipv6SubnetPublic1 ]
       AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Sub '${AWS::Region}a'
       Tags:
@@ -191,13 +191,13 @@ Resources:
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref: PublicSubnet1
+      SubnetId: !Ref PublicSubnet1
       RouteTableId: !Ref: PublicSubnet1RouteTable
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !FindInMap [ SubnetCIDRBlock, Ref: Category, Public2 ]
+      VpcId: !Ref Vpc
+      CidrBlock: !FindInMap [ SubnetCidrBlock, Ref: Category, Public2 ]
       AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
         - Key: Category
@@ -215,13 +215,13 @@ Resources:
     DependsOn: IPv6CidrBlock
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !FindInMap [ SubnetCIDRBlock, Ref: Category, Private1 ]
+      VpcId: !Ref Vpc
+      CidrBlock: !FindInMap [ SubnetCidrBlock, Ref: Category, Private1 ]
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ] ] ]
-            SubnetPart: !FindInMap [ SubnetCIDRBlock, Ref: Category, Ipv6SubnetPrivate1 ]
+          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ] ] ]
+            SubnetPart: !FindInMap [ SubnetCidrBlock, Ref: Category, Ipv6SubnetPrivate1 ]
       AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Sub '${AWS::Region}a'
       Tags:
@@ -242,8 +242,8 @@ Resources:
   PrivateSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !FindInMap [ SubnetCIDRBlock, Ref: Category, Private2 ]
+      VpcId: !Ref Vpc
+      CidrBlock: !FindInMap [ SubnetCidrBlock, Ref: Category, Private2 ]
       AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
         - Key: Category
@@ -262,18 +262,18 @@ Resources:
       RouteTableId: !Ref: PrivateSubnet2RouteTable
 
 Outputs:
-  VPCId:
-    Value: !Ref VPC
+  VpcId:
+    Value: !Ref Vpc
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-VPCId'
-  VPCCIDRBlock:
-    Value: !GetAtt VPC.CidrBlock
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-VpcId'
+  VpcCidrBlock:
+    Value: !GetAtt Vpc.CidrBlock
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-VPCCIDRBlock'
-  VPCIpv6CIDRBlock:
-    Value: !Select [ '0', !GetAtt VPC.Ipv6CidrBlocks ]
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-VpcCidrBlock'
+  VpcIpv6CidrBlock:
+    Value: !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ]
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-VPCIpv6CIDRBlock'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-VpcIpv6CidrBlock'
   PublicSubnet1Id:
     Value: !Ref PublicSubnet1
     Export:
