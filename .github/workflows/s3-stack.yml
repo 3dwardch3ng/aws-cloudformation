@@ -51,5 +51,5 @@ jobs:
           name: s3-stack
           template: s3/s3-template.yml
           parameter-overrides: >-
-            AwsAccountArn=${{ secrets.AWS_ACCOUNT_ARN }}
+            AwsAccountNum=${{ secrets.AWS_ACCOUNT_NUM }}
           no-fail-on-empty-changeset: "1"
