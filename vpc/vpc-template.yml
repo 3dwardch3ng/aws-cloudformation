@@ -15,7 +15,7 @@ Mappings:
   Fn::Transform:
     Name: AWS::Include
     Parameters:
-      Location: ../mapping/cidr.yml
+      Location: s3://cloudformation-templates-shared-files/mapping/cidr.yml
 
 Resources:
   # VPC
