@@ -37,6 +37,15 @@ Resources:
   PiHoleIAMRole:
     Type: AWS::IAM::Role
     Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
       Description: 'The IAM Role for the PiHole EC2 Instance'
       MaxSessionDuration: 43200
       ManagedPolicyArns:
