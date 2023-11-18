@@ -2,6 +2,12 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a PiHole EC2 instance in AWS
 
 Parameters:
+  VpcCategory:
+    Description: The VPC Category to deploy the EC2 instance into
+    Type: String
+    Default: GENERAL
+    AllowedValues:
+      - GENERAL
   Subnet:
     Description: The Subnet to deploy the EC2 instance into
     Type: String
@@ -9,6 +15,12 @@ Parameters:
     AllowedValues:
       - PublicSubnet1
       - PublicSubnet2
+
+Mappings:
+  Fn::Transform:
+    Name: AWS::Include
+    Parameters:
+      Location: s3://cloudformation-templates-shared-files/mapping/cidr.yml
 
 Resources:
   # EC2 Instance
@@ -177,7 +189,22 @@ Resources:
         Monitoring:
           Enabled: true
         NetworkInterfaces:
-          - Ref: PiHoleEC2NetworkInterface
+          AssociatePublicIpAddress: true
+          DeleteOnTermination: false
+          Description: "PiHole EC2 Network Interface 0"
+          DeviceIndex: 0
+          Groups:
+            - Ref: PiHoleEC2SecurityGroup
+            - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
+          Ipv4Prefixes:
+            - Ipv4Prefix:
+                Fn::FindInMap: [ Ref: Category, Ref: Subnet, Ipv4 ]
+          Ipv6Prefixes:
+            - Ipv6Prefix:
+              Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ] ]
+          NetworkCardIndex: 0
+          SubnetId:
+            Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
         PrivateDnsNameOptions:
           EnableResourceNameDnsAAAARecord: true
           EnableResourceNameDnsARecord: true
