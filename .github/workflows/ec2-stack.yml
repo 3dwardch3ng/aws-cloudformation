@@ -65,5 +65,7 @@ jobs:
         with:
           name: ${{ github.event.inputs.template-name }}-stack
           template: ec2/${{ github.event.inputs.template-name }}-template.yml
-          parameter-overrides: 'Subnet=${{ github.event.inputs.subnet }}'
+          capabilities: CAPABILITY_NAMED_IAM
+          parameter-overrides: >-
+            Subnet=${{ github.event.inputs.subnet }}
           no-fail-on-empty-changeset: "1"
