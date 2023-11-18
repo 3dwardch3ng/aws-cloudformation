@@ -271,11 +271,11 @@ Outputs:
   VpcCidrBlock:
     Value: !GetAtt Vpc.CidrBlock
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-VpcCidrBlock'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-Vpc-CidrBlock'
   VpcIpv6CidrBlock:
     Value: !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ]
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-VpcIpv6CidrBlock'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-Vpc-Ipv6CidrBlock'
   PublicSubnet1Id:
     Value: !Ref PublicSubnet1
     Export:
