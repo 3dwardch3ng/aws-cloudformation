@@ -1,0 +1,20 @@
+name: Upload shared mapping files to S3
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload:
+    name: Upload shared mapping files to S3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Upload shared mapping files to S3
+        uses: 3dwardCh3nG/s3-to-upload-action@v1.6.1
+        with:
+          aws_access_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket_name: cloudformation-templates-shared-files
+          source: mapping
+          destination: mapping

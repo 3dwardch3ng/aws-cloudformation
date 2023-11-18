@@ -48,7 +48,7 @@ Resources:
   CloudFormationTemplatesBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: cloudformation-templates
+      BucketName: cloudformation-templates-shared-files
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
