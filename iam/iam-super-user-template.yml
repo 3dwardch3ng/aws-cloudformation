@@ -17,24 +17,8 @@ Resources:
           - "-"
           - - "super-admin-group"
             - !Ref "AWS::Region"
-      Policies:
-        - PolicyName:
-            Fn::Join:
-              - "-"
-              - - "super-admin-policy"
-                - !Ref "AWS::Region"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action: "*"
-                Resource: "*"
-              - Effect: Allow
-                Action: "s3:PutBucketPolicy"
-                Resource: arn:aws:s3:::*
-              - Effect: Allow
-                Action: "sts:AssumeRoleWithWebIdentity"
-                Resource: "*"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
       Path: "/"
 
   ECSuperUserAccessKey:
