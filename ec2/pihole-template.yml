@@ -163,7 +163,7 @@ Resources:
         Monitoring:
           Enabled: true
         NetworkInterfaces:
-          - AssociatePublicIpAddress: true
+          - AssociatePublicIpAddress: false
             DeleteOnTermination: false
             Description: "PiHole EC2 Network Interface 0"
             DeviceIndex: 0
