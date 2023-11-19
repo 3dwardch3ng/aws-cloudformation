@@ -62,10 +62,13 @@ Resources:
       Ipv6Addresses:
         - Fn::Sub:
             - '${NetworkPart}${HostPart}'
-            - NetworkPart: !Select [ '0', !Split [ '/64', !ImportValue Fn::Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ]]]]
+            - NetworkPart:
+                Fn::Select:
+                  - '0'
+                  - Fn::Split:
+                    - '/64'
+                    - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ]]
               HostPart: 100/128
-#              SubnetIpv6CidrBlock:
-#                Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ]]
       KeyName: pihole-key
 #      LaunchTemplate:
 #        LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
@@ -85,10 +88,13 @@ Resources:
       PrivateIpAddress:
         Fn::Sub:
           - '${NetworkPart}${HostPart}'
-          - NetworkPart: !Select [ '0', !Split [ '0/24', Ref: SubnetCidrBlock ] ]
+          - NetworkPart:
+              Fn::Select:
+                - '0'
+                - Fn::Split:
+                    - '0/24'
+                    - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'CidrBlock' ]]
             HostPart: 100/32
-            SubnetCidrBlock:
-              Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'CidrBlock' ] ]
       PropagateTagsToVolumeOnCreation: true
       SecurityGroupIds:
         - Ref: PiHoleEC2SecurityGroup
