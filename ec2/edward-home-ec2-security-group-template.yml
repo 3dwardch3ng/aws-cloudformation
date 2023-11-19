@@ -27,7 +27,7 @@ Resources:
           ToPort: 22
       Tags:
         - Key: EdwardHomeSecurityGroup
-          Value: PiHole-${AWS::Region}-SecurityGroup
+          Value: !Sub 'PiHole-${AWS::Region}-SecurityGroup'
       VpcId:
         Fn::ImportValue: !Sub 'vpc-stack-${AWS::Region}-VpcId'
 
