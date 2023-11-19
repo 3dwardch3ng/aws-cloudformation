@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a PiHole EC2 Network Resources in AWS
+
+Resources:
+  PiHoleNetworkInterface0:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: 'PiHole EC2 Network Interface 0'
+      GroupSet:
+        - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'PiHole-EC2-Security-Group-Id' ] ]
+        - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHome-EC2-SecurityGroup-Id' ] ]
+      Ipv6Addresses:
+        - Ipv6Address:
+            Fn::Sub:
+              - '${NetworkPart}${HostPart}'
+              - NetworkPart:
+                  Fn::Select:
+                    - '0'
+                    - Fn::Split:
+                        - '/64'
+                        - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'Ipv6CidrBlock' ] ]
+                HostPart: 10
+      PrivateIpAddress:
+        Fn::Sub:
+          - '${NetworkPart}${HostPart}'
+          - NetworkPart:
+              Fn::Select:
+                - '0'
+                - Fn::Split:
+                    - '0/24'
+                    - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'CidrBlock' ] ]
+            HostPart: 100
+      SourceDestCheck: true
+      SubnetId:
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'Id' ] ]
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'NetworkInterfaces' ]]
+
+Outputs:
+  PiHoleNetworkInterface0Id:
+    Value: !GetAtt PiHoleNetworkInterface0.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-NetworkInterface-0-Id'
+  PiHoleNetworkInterface0PrimaryPrivateIpAddress:
+    Value: !GetAtt PiHoleNetworkInterface0.PrimaryPrivateIpAddress
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-NetworkInterface-0-PrimaryPrivateIpAddress'

@@ -24,21 +24,6 @@ on:
           - 'eu-west-2'
           - 'eu-west-3'
           - 'eu-north-1'
-      vpc-category:
-        description: 'The category of the VPC to deploy the EC2 instance into'
-        type: choice
-        default: 'GENERAL'
-        options:
-          - 'GENERAL'
-      subnet:
-        description: 'The subnet to deploy the EC2 instance into'
-        type: choice
-        default: 'PrivateSubnet1'
-        options:
-          - 'PublicSubnet1'
-          - 'PublicSubnet2'
-          - 'PrivateSubnet1'
-          - 'PrivateSubnet2'
 
 permissions:
   id-token: write
@@ -65,5 +50,15 @@ jobs:
         with:
           name: pihole-security-stack
           template: ec2/pihole/pihole-security-template.yml
+          capabilities: CAPABILITY_NAMED_IAM
+          no-fail-on-empty-changeset: "1"
+      - name: Deploy PiHole Network Stack via CloudFormation
+        id: pihole-network-stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: pihole-network-stack
+          template: ec2/pihole/pihole-network-template.yml
+          parameter-overrides: >-
+            Subnet=PublicSubnet1
           capabilities: CAPABILITY_NAMED_IAM
           no-fail-on-empty-changeset: "1"
