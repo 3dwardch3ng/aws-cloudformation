@@ -77,7 +77,7 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         - AssociatePublicIpAddress: false
-          DeleteOnTermination: false
+          DeleteOnTermination: true
           Description: 'PiHole EC2 Network Interface 0'
           DeviceIndex: 0
           SubnetId:
