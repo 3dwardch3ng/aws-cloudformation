@@ -17,9 +17,10 @@ Parameters:
       - PublicSubnet2
 
 Mappings:
-  EC2ResourceName: PiHoleEC2Instance
-  ResourcePath: Resources.PiHoleEC2Instance.Metadata.AWS::CloudFormation::Init
-  CloudformationLogGroupName: CloudformationLogGroup
+  Properties:
+    EC2ResourceName: PiHoleEC2Instance
+    ResourcePath: Resources.PiHoleEC2Instance.Metadata.AWS::CloudFormation::Init
+    CloudformationLogGroupName: CloudformationLogGroup
 
 Resources:
   # EC2 Instance
