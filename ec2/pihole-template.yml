@@ -77,9 +77,6 @@ Resources:
         EnableResourceNameDnsARecord: true
         HostnameType: 'resource-name'
       PropagateTagsToVolumeOnCreation: true
-      SecurityGroupIds:
-        - Ref: PiHoleEC2SecurityGroup
-        - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
       Volumes:
         - Device: /dev/xvda
           VolumeId: !Ref PiHoleEBSStorage
