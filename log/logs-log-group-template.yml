@@ -5,10 +5,10 @@ Resources:
   CloudFormationLogGroup:
     Type: "AWS::Logs::LogGroup"
     Properties:
-        RetentionInDays: 7
-    Tags:
-      - Key: Name
-        Value: CloudFormationLogGroup
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: CloudFormationLogGroup
 
 Outputs:
   CloudFormationLogGroupId:
