@@ -175,7 +175,7 @@ Resources:
           VolumeId: !Ref PiHoleEBSStorage
       Tags:
         - Key: Name
-          Value: PiHole-${AWS::Region}-${!Ref Subnet}-EC2
+          Value: !Sub 'PiHole-${AWS::Region}-${!Ref Subnet}-EC2'
 
   # IAM Instance Profile
   PiHoleIAMInstanceProfile:
