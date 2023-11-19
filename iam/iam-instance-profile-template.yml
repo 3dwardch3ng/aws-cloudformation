@@ -36,4 +36,4 @@ Resources:
                   - Fn::Join:
                       - ''
                       - - 'arn:aws:'
-                        - ':logs:*:*:*'
+                        - 'logs:*:*:*'
