@@ -194,9 +194,9 @@ Resources:
     PiHoleEC2EIPAssociation:
       Type: AWS::EC2::EIPAssociation
       Properties:
-        AllocationId: eipalloc-08f5d292ed1f35853
+        AllocationId:
+          Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ]]
         InstanceId: !Ref PiHoleEC2Instance
-        NetworkInterfaceId: !GetAtt PiHoleEC2Instance.NetworkInterfaces.0.NetworkInterfaceId
 
   # EBS Storage
   PiHoleEBSStorage:
