@@ -9,31 +9,31 @@ Resources:
       Roles:
         - Ref: LogRole
   
-    LogRole:
-      Type: AWS::IAM::Role
-      Properties:
-        AssumeRolePolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            - Effect: 'Allow'
-              Principal:
-                Service: 'ec2.amazonaws.com'
-          Action:
-            - 'sts:AssumeRole'
-        Path: /
-        Policies:
-          - PolicyName: 'LogRolePolicy'
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: 'Allow'
-                  Action:
-                    - 'logs:CreateLogGroup'
-                    - 'logs:CreateLogStream'
-                    - 'logs:PutLogEvents'
-                    - 'logs:DescribeLogStreams'
-                  Resource:
-                    - Fn::Join:
-                        - ''
-                        - - 'arn:aws:'
-                          - ':logs:*:*:*'
+  LogRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'ec2.amazonaws.com'
+        Action:
+          - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: 'LogRolePolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'logs:DescribeLogStreams'
+                Resource:
+                  - Fn::Join:
+                      - ''
+                      - - 'arn:aws:'
+                        - ':logs:*:*:*'
