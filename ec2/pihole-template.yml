@@ -70,6 +70,67 @@ Resources:
         - Key: Name
           Value: PiHole-EC2-IAMRole
 
+  # EC2 Launch Template
+  PiHoleEC2LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        IamInstanceProfile:
+          Arn: !GetAtt PiHoleIAMInstanceProfile.Arn
+        ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
+        InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
+        KeyName: pihole-key
+        Monitoring:
+          Enabled: true
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: false
+            DeleteOnTermination: false
+            Description: "PiHole EC2 Network Interface 0"
+            DeviceIndex: 0
+            Groups:
+              - Ref: PiHoleEC2SecurityGroup
+              - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
+            Ipv4PrefixCount: 1
+            Ipv6PrefixCount: 1
+            NetworkCardIndex: 0
+            SubnetId:
+              Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
+        PrivateDnsNameOptions:
+          EnableResourceNameDnsAAAARecord: true
+          EnableResourceNameDnsARecord: true
+          HostnameType: 'resource-name'
+      LaunchTemplateName: piHoleEC2LaunchTemplate
+      TagSpecifications:
+        - ResourceType: 'launch-template'
+          Tags:
+            - Key: Name
+              Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2LaunchTemplate', 'piHoleEC2LaunchTemplate' ]]
+
+  # EC2 EIP Association
+  PiHoleEC2EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ]]
+      InstanceId: !Ref PiHoleEC2Instance
+
+  # EBS Storage
+  PiHoleEBSStorage:
+    Type: AWS::EC2::Volume
+    Properties:
+      AutoEnableIO: true
+      AvailabilityZone:
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ]]
+      Encrypted: true
+      Iops: 3000
+      MultiAttachEnabled: false
+      Size: 16
+      Throughput: 500
+      VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'EBSStorage' ]]
+
   # Security Group
   PiHoleEC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -148,72 +209,7 @@ Resources:
         - Key: Name
           Value: PiHole-${AWS::Region}-SecurityGroup
       VpcId:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ]]
-
-  # EC2 Launch Template
-  PiHoleEC2LaunchTemplate:
-    Type: AWS::EC2::LaunchTemplate
-    Properties:
-      LaunchTemplateData:
-        IamInstanceProfile:
-          Arn: !GetAtt PiHoleIAMInstanceProfile.Arn
-        ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
-        InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
-        KeyName: pihole-key
-        Monitoring:
-          Enabled: true
-        NetworkInterfaces:
-          - AssociatePublicIpAddress: false
-            DeleteOnTermination: false
-            Description: "PiHole EC2 Network Interface 0"
-            DeviceIndex: 0
-            Groups:
-              - Ref: PiHoleEC2SecurityGroup
-              - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
-            Ipv4Prefixes:
-              - Ipv4Prefix:
-                  Fn::FindInMap: [ Ref: VpcCategory, Ref: Subnet, Ipv4 ]
-            Ipv6Prefixes:
-              - Ipv6Prefix:
-                  Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ] ]
-            NetworkCardIndex: 0
-            SubnetId:
-              Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
-        PrivateDnsNameOptions:
-          EnableResourceNameDnsAAAARecord: true
-          EnableResourceNameDnsARecord: true
-          HostnameType: 'resource-name'
-      LaunchTemplateName: piHoleEC2LaunchTemplate
-      TagSpecifications:
-        - ResourceType: 'launch-template'
-          Tags:
-            - Key: Name
-              Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2LaunchTemplate', 'piHoleEC2LaunchTemplate' ]]
-
-  # EC2 EIP Association
-  PiHoleEC2EIPAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId:
-        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ]]
-      InstanceId: !Ref PiHoleEC2Instance
-
-  # EBS Storage
-  PiHoleEBSStorage:
-    Type: AWS::EC2::Volume
-    Properties:
-      AutoEnableIO: true
-      AvailabilityZone:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ]]
-      Encrypted: true
-      Iops: 3000
-      MultiAttachEnabled: false
-      Size: 16
-      Throughput: 500
-      VolumeType: gp3
-      Tags:
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'EBSStorage' ]]
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ] ]
 
   # Fetch EC2 Ipv6 CloudFormation Custom Resource
   Ipv6Resource:
