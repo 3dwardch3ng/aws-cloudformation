@@ -60,15 +60,16 @@ Resources:
       ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       Ipv6Addresses:
-        - Fn::Sub:
-            - '${NetworkPart}${HostPart}'
-            - NetworkPart:
-                Fn::Select:
-                  - '0'
-                  - Fn::Split:
-                    - '/64'
-                    - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ]]
-              HostPart: 100/128
+        - Ipv6Address:
+            Fn::Sub:
+              - '${NetworkPart}${HostPart}'
+              - NetworkPart:
+                  Fn::Select:
+                    - '0'
+                    - Fn::Split:
+                      - '/64'
+                      - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ]]
+                HostPart: 100/128
       KeyName: pihole-key
 #      LaunchTemplate:
 #        LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
