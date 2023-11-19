@@ -59,17 +59,6 @@ Resources:
       IamInstanceProfile: !Ref PiHoleIAMInstanceProfile
       ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
-      Ipv6Addresses:
-        - Ipv6Address:
-            Fn::Sub:
-              - '${NetworkPart}${HostPart}'
-              - NetworkPart:
-                  Fn::Select:
-                    - '0'
-                    - Fn::Split:
-                      - '/64'
-                      - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ]]
-                HostPart: 100/128
       KeyName: pihole-key
 #      LaunchTemplate:
 #        LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
@@ -77,25 +66,16 @@ Resources:
       Monitoring: true
       NetworkInterfaces:
         - AssociatePublicIpAddress: false
-          DeleteOnTermination: true
+          DeleteOnTermination: false
           Description: 'PiHole EC2 Network Interface 0'
           DeviceIndex: 0
+          NetworkInterfaceId: !Ref PiHoleNetworkInterfaces
           SubnetId:
             Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
       PrivateDnsNameOptions:
         EnableResourceNameDnsAAAARecord: true
         EnableResourceNameDnsARecord: true
         HostnameType: 'resource-name'
-      PrivateIpAddress:
-        Fn::Sub:
-          - '${NetworkPart}${HostPart}'
-          - NetworkPart:
-              Fn::Select:
-                - '0'
-                - Fn::Split:
-                    - '0/24'
-                    - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'CidrBlock' ]]
-            HostPart: 100/32
       PropagateTagsToVolumeOnCreation: true
       SecurityGroupIds:
         - Ref: PiHoleEC2SecurityGroup
@@ -140,13 +120,34 @@ Resources:
   PiHoleNetworkInterfaces:
     Type: AWS::EC2::NetworkInterface
     Properties:
-
-      Description: A nice description.
-      SourceDestCheck: 'false'
+      Description: 'PiHole EC2 Network Interface 0'
       GroupSet:
-        - sg-75zzz219
-      SubnetId: subnet-3z648z53
-      PrivateIpAddress: 10.0.0.16
+        - Ref: PiHoleEC2SecurityGroup
+        - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
+      Ipv6Addresses:
+        - Ipv6Address:
+            Fn::Sub:
+              - '${NetworkPart}${HostPart}'
+              - NetworkPart:
+                  Fn::Select:
+                    - '0'
+                    - Fn::Split:
+                        - '/64'
+                        - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ] ]
+                HostPart: 100/128
+      PrivateIpAddress:
+        Fn::Sub:
+          - '${NetworkPart}${HostPart}'
+          - NetworkPart:
+              Fn::Select:
+                - '0'
+                - Fn::Split:
+                    - '0/24'
+                    - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'CidrBlock' ] ]
+            HostPart: 100/32
+      SourceDestCheck: true
+      SubnetId:
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'NetworkInterfaces' ]]
