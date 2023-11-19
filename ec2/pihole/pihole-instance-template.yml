@@ -19,12 +19,6 @@ Resources:
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key
       Monitoring: true
-#      NetworkInterfaces:
-#        - AssociatePublicIpAddress: false
-#          DeleteOnTermination: false
-#          Description: 'PiHole EC2 Network Interface 0'
-#          DeviceIndex: 0
-#          NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
       PrivateDnsNameOptions:
         EnableResourceNameDnsAAAARecord: true
         EnableResourceNameDnsARecord: true
@@ -37,8 +31,19 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
 
+  PiHoleEC2NetworkInterfaceAttachment:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      DeleteOnTermination: false
+      DeviceIndex: 0
+      InstanceId: !Ref PiHoleEC2Instance
+      NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
+
   # Fetch EC2 Ipv6 CloudFormation Custom Resource
   Ipv6Resource:
+    DependsOn:
+      - PiHoleEC2Instance
+      - PiHoleEC2NetworkInterfaceAttachment
     Type: AWS::CloudFormation::CustomResource
     Properties:
       ServiceToken:
@@ -70,6 +75,14 @@ Outputs:
     Value: !GetAtt PiHoleEC2Instance.PublicIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
+  PiHoleEC2NetworkInterfaceAttachmentRef:
+    Value: !Ref PiHoleEC2NetworkInterfaceAttachment
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-Ref'
+  PiHoleEC2NetworkInterfaceAttachmentId:
+    Value: !GetAtt PiHoleEC2NetworkInterfaceAttachment.AttachmentId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-AttachmentId'
   Ipv6ResourceIpv6Address:
     Value: !GetAtt Ipv6Resource.Ipv6Address
     Export:
