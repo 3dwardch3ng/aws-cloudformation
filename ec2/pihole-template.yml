@@ -161,7 +161,7 @@ Resources:
       AvailabilityZone:
         Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ]]
       BlockDeviceMappings:
-        - DeviceName: /dev/xvdh
+        - DeviceName: /dev/xvda
           Ebs:
             DeleteOnTermination: true
             VolumeSize: 16
@@ -171,7 +171,7 @@ Resources:
         Version: !GetAtt PiHoleEC2LaunchTemplate.LatestVersionNumber
       PropagateTagsToVolumeOnCreation: true
       Volumes:
-        - Device: /dev/xvdh
+        - Device: /dev/xvda
           VolumeId: !Ref PiHoleEBSStorage
       Tags:
         - Key: Name
