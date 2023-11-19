@@ -242,30 +242,30 @@ Resources:
 #      ResourceRef: !Ref PiHoleEC2Instance
 
 Outputs:
-    PiHoleEC2InstanceId:
-      Value: !Ref PiHoleEC2Instance
-      Export:
-        Name: !Sub 'PiHole-${AWS::Region}-EC2-InstanceId'
-    PiHoleEC2InstancePublicIpv4:
-      Value: !GetAtt PiHoleEC2Instance.PublicIp
-      Export:
-        Name: !Sub 'PiHole-${AWS::Region}-EC2-Public-Ipv4'
-    PiHoleEC2InstancePublicIpv6:
-      Value: !GetAtt Ipv6Resource.Ipv6Address
-      Export:
-        Name: !Sub 'PiHole-${AWS::Region}-EC2-Public-Ipv6'
-    PiHoleEC2SecurityGroupId:
-      Value: !Ref PiHoleEC2SecurityGroup
-      Export:
-        Name: !Sub 'PiHole-${AWS::Region}-EC2-SecurityGroupId'
-    PiHoleEC2LaunchTemplateId:
-      Value: !Ref PiHoleEC2LaunchTemplate
-      Export:
-        Name: !Sub 'PiHole-${AWS::Region}-EC2-LaunchTemplateId'
-    PiHoleEBSStorageId:
-      Value: !GetAtt PiHoleEBSStorage.VolumeId
-      Export:
-        Name: !Sub 'PiHole-${AWS::Region}-EBS-StorageId'
+#    PiHoleEC2InstanceId:
+#      Value: !Ref PiHoleEC2Instance
+#      Export:
+#        Name: !Sub 'PiHole-${AWS::Region}-EC2-InstanceId'
+#    PiHoleEC2InstancePublicIpv4:
+#      Value: !GetAtt PiHoleEC2Instance.PublicIp
+#      Export:
+#        Name: !Sub 'PiHole-${AWS::Region}-EC2-Public-Ipv4'
+#    PiHoleEC2InstancePublicIpv6:
+#      Value: !GetAtt Ipv6Resource.Ipv6Address
+#      Export:
+#        Name: !Sub 'PiHole-${AWS::Region}-EC2-Public-Ipv6'
+#    PiHoleEC2SecurityGroupId:
+#      Value: !Ref PiHoleEC2SecurityGroup
+#      Export:
+#        Name: !Sub 'PiHole-${AWS::Region}-EC2-SecurityGroupId'
+#    PiHoleEC2LaunchTemplateId:
+#      Value: !Ref PiHoleEC2LaunchTemplate
+#      Export:
+#        Name: !Sub 'PiHole-${AWS::Region}-EC2-LaunchTemplateId'
+#    PiHoleEBSStorageId:
+#      Value: !GetAtt PiHoleEBSStorage.VolumeId
+#      Export:
+#        Name: !Sub 'PiHole-${AWS::Region}-EBS-StorageId'
     PiHoleIAMInstanceProfileArn:
       Value: !GetAtt PiHoleIAMInstanceProfile.Arn
       Export:
