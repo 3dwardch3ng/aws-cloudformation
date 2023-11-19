@@ -134,7 +134,7 @@ Resources:
                     - Fn::Split:
                         - '/64'
                         - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ] ]
-                HostPart: 100/128
+                HostPart: 10
       PrivateIpAddress:
         Fn::Sub:
           - '${NetworkPart}${HostPart}'
@@ -144,7 +144,7 @@ Resources:
                 - Fn::Split:
                     - '0/24'
                     - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'CidrBlock' ] ]
-            HostPart: 100/32
+            HostPart: 100
       SourceDestCheck: true
       SubnetId:
         Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
