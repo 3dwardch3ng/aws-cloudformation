@@ -6,7 +6,8 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
-      Roles: !Ref LogRole
+      Roles:
+        - Ref: LogRole
   
     LogRole:
       Type: AWS::IAM::Role
