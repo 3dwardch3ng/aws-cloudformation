@@ -23,8 +23,8 @@ Outputs:
   PiHoleEBSStorageRef:
     Value: !Ref PiHoleEBSStorage
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Volume-Ref'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-Ref'
   PiHoleEBSStorageVolumeId:
     Value: !GetAtt PiHoleEBSStorage.VolumeId
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Volume-Id'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-Id'

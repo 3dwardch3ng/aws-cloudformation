@@ -116,33 +116,33 @@ Outputs:
   PiHoleIAMInstanceProfileRef:
     Value: !Ref PiHoleIAMInstanceProfile
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-InstanceProfile-Ref'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
   PiHoleIAMInstanceProfileArn:
     Value: !GetAtt PiHoleIAMInstanceProfile.Arn
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-InstanceProfile-Arn'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Arn'
   PiHoleIAMRoleRef:
     Value: !Ref PiHoleIAMRole
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-Role-Ref'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-PiHoleIAMRole-Ref'
   PiHoleIAMRoleArn:
     Value: !GetAtt PiHoleIAMRole.Arn
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-Role-Arn'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-PiHoleIAMRole-Arn'
   PiHoleIAMRoleId:
     Value: !GetAtt PiHoleIAMRole.RoleId
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-Role-Id'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-PiHoleIAMRole-Id'
   PiHoleEC2SecurityGroupRef:
     Value: !Ref PiHoleEC2SecurityGroup
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Security-Group-Ref'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-PiHoleEC2SecurityGroup-Ref'
   PiHoleEC2SecurityGroupId:
     Value: !GetAtt PiHoleEC2SecurityGroup.GroupId
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Security-Group-Id'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-PiHoleEC2SecurityGroup-Id'
   PiHoleEC2SecurityGroupVpcId:
     Value: !GetAtt PiHoleEC2SecurityGroup.VpcId
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Security-Group-VpcId'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-PiHoleEC2SecurityGroup-VpcId'
 

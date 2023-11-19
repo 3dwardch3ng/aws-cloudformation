@@ -7,7 +7,7 @@ Resources:
     Properties:
       Description: 'PiHole EC2 Network Interface 0'
       GroupSet:
-        - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'PiHole-EC2-Security-Group-Id' ] ]
+        - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'EC2-Security-Group-PiHoleEC2SecurityGroup-Id' ] ]
         - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHome-EC2-SecurityGroup-Id' ] ]
       Ipv6Addresses:
         - Ipv6Address:
@@ -41,12 +41,12 @@ Outputs:
   PiHoleNetworkInterface0Ref:
     Value: !Ref PiHoleNetworkInterface0
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-NetworkInterface-0-Ref'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Ref'
   PiHoleNetworkInterface0Id:
     Value: !GetAtt PiHoleNetworkInterface0.Id
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-NetworkInterface-0-Id'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
   PiHoleNetworkInterface0PrimaryPrivateIpAddress:
     Value: !GetAtt PiHoleNetworkInterface0.PrimaryPrivateIpAddress
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-NetworkInterface-0-PrimaryPrivateIpAddress'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-PrimaryPrivateIpAddress'

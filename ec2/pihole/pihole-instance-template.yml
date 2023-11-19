@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a PiHole EC2 Security Resources in AWS
+
+Resources:
+  # EC2 Instance
+  PiHoleEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone:
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'AvailabilityZone' ] ]
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 16
+            VolumeType: gp3
+      IamInstanceProfile: !Sub 'pihole-security-stack-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
+      ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
+      InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
+      KeyName: pihole-key
+      Monitoring: true
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: false
+          DeleteOnTermination: false
+          Description: 'PiHole EC2 Network Interface 0'
+          DeviceIndex: 0
+          NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
+      PrivateDnsNameOptions:
+        EnableResourceNameDnsAAAARecord: true
+        EnableResourceNameDnsARecord: true
+        HostnameType: 'resource-name'
+      PropagateTagsToVolumeOnCreation: true
+      SubnetId:
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'Id' ] ]
+      Volumes:
+        - Device: /dev/xvda
+          VolumeId: !Sub 'pihole-data-stack-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-Id'
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ] ]
+
+  # EC2 EIP Association
+  PiHoleEC2EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ]]
+      InstanceId: !Ref PiHoleEC2Instance
+
+
+  # Fetch EC2 Ipv6 CloudFormation Custom Resource
+  Ipv6Resource:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceToken:
+        Fn::ImportValue: !Join [ '-', [ 'fetch-ec2-ipv6-lambda-stack', Ref: AWS::Region, 'FetchEC2Ipv6FunctionArn' ]]
+      ResourceRef: !Ref PiHoleEC2Instance
+
+Outputs:
+  PiHoleEC2InstanceRef:
+    Value: !Ref PiHoleEC2Instance
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-Ref'
+
+  PiHoleEC2InstanceAvailabilityZone:
+    Value: !GetAtt PiHoleEC2Instance.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-AvailabilityZone'
+
+  PiHoleEC2InstanceId:
+    Value: !GetAtt PiHoleEC2Instance.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-Id'
+
+  PiHoleEC2InstancePrivateDnsName:
+    Value: !GetAtt PiHoleEC2Instance.PrivateDnsName
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateDnsName'
+
+  PiHoleEC2InstancePrivateIp:
+    Value: !GetAtt PiHoleEC2Instance.PrivateIp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
+
+  PiHoleEC2InstancePublicDnsName:
+    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
+
+  PiHoleEC2InstancePublicIp:
+    Value: !GetAtt PiHoleEC2Instance.PublicIp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
+
+  PiHoleEC2EIPAssociationRef:
+    Value: !Ref PiHoleEC2EIPAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Ref'
+
+  PiHoleEC2EIPAssociationId:
+    Value: !GetAtt PiHoleEC2EIPAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'
+
+  Ipv6ResourceIpv6Address:
+    Value: !GetAtt Ipv6Resource.Ipv6Address
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-CloudFormation-CustomResource-Ipv6Resource-Ipv6Address'
+
