@@ -360,7 +360,7 @@ Resources:
           IpProtocol: -1
       Tags:
         - Key: Name
-          Value: PiHole-${AWS::Region}-SecurityGroup
+          Value: !Sub 'PiHole-${AWS::Region}-SecurityGroup'
       VpcId:
         Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ] ]
 
