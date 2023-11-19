@@ -49,5 +49,5 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: logs-log-group-stack
-          template: logs/logs-log-group-template.yml
+          template: log/logs-log-group-template.yml
           no-fail-on-empty-changeset: "1"
