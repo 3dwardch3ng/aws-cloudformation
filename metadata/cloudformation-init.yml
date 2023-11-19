@@ -25,11 +25,14 @@ AWS::CloudFormation::Init:
             - ''
             - - '[cfn-auto-reloader-hook]\n'
               - 'triggers=post.update\n'
-              - 'path=Resources.JumpBoxInstance.Metadata.AWS::CloudFormation::Init\n'
+              - 'path='
+              - Fn::FindInMap: [ ResourcePath ]
+              - '\n'
               - 'action=/opt/aws/bin/cfn-init -v '
               - '         --stack '
               - Ref: AWS::StackName
-              - '         --resource WebServerInstance '
+              - '         --resource '
+              - Fn::FindInMap: [ EC2ResourceName ]
               - '         --configsets install_all '
               - '         --region '
               - Ref: AWS::Region
@@ -59,40 +62,44 @@ AWS::CloudFormation::Init:
               - 'state_file= /var/lib/awslogs/agent-state\n'
               - '[/var/log/cloud-init.log]\n'
               - 'file = /var/log/cloud-init.log\n'
-              - 'log_group_name = CloudFormationLogs\n'
+              - 'log_group_name = '
+              - Fn::FindInMap: [ CloudformationLogGroupName ]
+              - '\n'
               - '\n'
               - 'log_stream_name = {instance_id}/cloud-init-output.log\n'
               - 'datetime_format = \n'
               - '[/var/log/cfn-init.log]\n'
               - 'file = /var/log/cfn-init.log\n'
-              - 'log_group_name = CloudFormationLogs\n'
+              - 'log_group_name = '
+              - Fn::FindInMap: [ CloudformationLogGroupName ]
+              - '\n'
               - 'log_stream_name = {instance_id}/cloud-init-output.log\n'
               - 'datetime_format = \n'
               - '[/var/log/cfn-init.log]\n'
               - 'file = /var/log/cfn-init.log\n'
               - 'log_group_name = '
-              - Ref: CloudFormationLogs
+              - Fn::FindInMap: [ CloudformationLogGroupName ]
               - '\n'
               - 'log_stream_name = {instance_id}/cfn-init.log\n'
               - 'datetime_format = \n'
               - '[/var/log/cfn-hup.log]\n'
               - 'file = /var/log/cfn-hup.log\n'
               - 'log_group_name = '
-              - Ref: CloudFormationLogs
+              - Fn::FindInMap: [ CloudformationLogGroupName ]
               - '\n'
               - 'log_stream_name = {instance_id}/cfn-hup.log\n'
               - 'datetime_format = \n'
               - '[/var/log/cfn-wire.log]\n'
               - 'file = /var/log/cfn-wire.log\n'
               - 'log_group_name = '
-              - Ref: CloudFormationLogs
+              - Fn::FindInMap: [ CloudformationLogGroupName ]
               - '\n'
               - 'log_stream_name = {instance_id}/cfn-wire.log\n'
               - 'datetime_format = \n'
               - '[/var/log/httpd]\n'
               - 'file = /var/log/httpd/*\n'
               - 'log_group_name = '
-              - Ref: CloudFormationLogs
+              - Fn::FindInMap: [ CloudformationLogGroupName ]
               - '\n'
               - 'log_stream_name = {instance_id}/httpd\n'
               - 'datetime_format = %d/%b/%Y:%H:%M:%S\n'
