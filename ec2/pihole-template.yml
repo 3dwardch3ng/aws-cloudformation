@@ -194,7 +194,7 @@ Resources:
     PiHoleEC2EIPAssociation:
       Type: AWS::EC2::EIPAssociation
       Properties:
-        AllocationId: eipalloc-0a0a0a0a0a0a0a0a0
+        AllocationId: eipalloc-08f5d292ed1f35853
         InstanceId: !Ref PiHoleEC2Instance
         NetworkInterfaceId: !GetAtt PiHoleEC2Instance.NetworkInterfaces.0.NetworkInterfaceId
 
