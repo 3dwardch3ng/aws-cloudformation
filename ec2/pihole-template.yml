@@ -219,7 +219,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: PiHole EC2 Security Group
-      GroupName: PiHoleEC2SecurityGroup
+#      GroupName: PiHoleEC2SecurityGroup
       SecurityGroupIngress:
         - CidrIp: 0.0.0.0/0
           Description: Allow inbound ICMP (ping)
