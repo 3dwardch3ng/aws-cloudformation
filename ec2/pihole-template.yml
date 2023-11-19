@@ -191,12 +191,12 @@ Resources:
               Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2LaunchTemplate', 'piHoleEC2LaunchTemplate' ]]
 
   # EC2 EIP Association
-    PiHoleEC2EIPAssociation:
-      Type: AWS::EC2::EIPAssociation
-      Properties:
-        AllocationId:
-          Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ]]
-        InstanceId: !Ref PiHoleEC2Instance
+  PiHoleEC2EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ]]
+      InstanceId: !Ref PiHoleEC2Instance
 
   # EBS Storage
   PiHoleEBSStorage:
