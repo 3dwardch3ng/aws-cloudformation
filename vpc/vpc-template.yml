@@ -284,6 +284,10 @@ Outputs:
     Value: !GetAtt PublicSubnet1.AvailabilityZone
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1-AvailabilityZone'
+  PublicSubnet1CidrBlock:
+    Value: !Select [ '0', !GetAtt PublicSubnet1.CidrBlock ]
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet1-CidrBlock'
   PublicSubnet1Ipv6CidrBlock:
     Value: !Select [ '0', !GetAtt PublicSubnet1.Ipv6CidrBlocks ]
     Export:
@@ -296,6 +300,10 @@ Outputs:
     Value: !GetAtt PublicSubnet2.AvailabilityZone
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet2-AvailabilityZone'
+  PublicSubnet2CidrBlock:
+    Value: !Select [ '0', !GetAtt PublicSubnet2.CidrBlock ]
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PublicSubnet2-CidrBlock'
   PrivateSubnet1Id:
     Value: !Ref PrivateSubnet1
     Export:
@@ -304,6 +312,14 @@ Outputs:
     Value: !GetAtt PrivateSubnet1.AvailabilityZone
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet1-AvailabilityZone'
+  PrivateSubnet1CidrBlock:
+    Value: !Select [ '0', !GetAtt PrivateSubnet1.CidrBlock ]
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet1-CidrBlock'
+  PrivateSubnet1Ipv6CidrBlock:
+    Value: !Select [ '0', !GetAtt PrivateSubnet1.Ipv6CidrBlocks ]
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet1-Ipv6CidrBlock'
   PrivateSubnet2Id:
     Value: !Ref PrivateSubnet2
     Export:
@@ -312,6 +328,10 @@ Outputs:
     Value: GetAtt PrivateSubnet2.AvailabilityZone
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet2-AvailabilityZone'
+  PrivateSubnet2CidrBlock:
+    Value: !Select [ '0', !GetAtt PrivateSubnet2.CidrBlock ]
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PrivateSubnet2-CidrBlock'
   Category:
     Description: Category name of stack
     Value: !Ref Category
