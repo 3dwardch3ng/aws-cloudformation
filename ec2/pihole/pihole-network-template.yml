@@ -7,7 +7,7 @@ Resources:
     Properties:
       Description: 'PiHole EC2 Network Interface 0'
       GroupSet:
-        - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'EC2-SecuritysGroup-PiHoleEC2SecurityGroup-Id' ] ]
+        - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'EC2-SecurityGroup-PiHoleEC2SecurityGroup-Id' ] ]
         - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHome-EC2-SecurityGroup-Id' ] ]
       Ipv6Addresses:
         - Ipv6Address:
