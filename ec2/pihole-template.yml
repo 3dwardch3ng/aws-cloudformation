@@ -160,6 +160,12 @@ Resources:
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ]]
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvdh
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 16
+            VolumeType: gp3
       LaunchTemplate:
         LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
         Version: !GetAtt PiHoleEC2LaunchTemplate.LatestVersionNumber
