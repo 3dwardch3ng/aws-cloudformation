@@ -8,7 +8,7 @@ Resources:
     Properties:
       AutoEnableIO: true
       AvailabilityZone:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ] ]
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'AvailabilityZone' ] ]
       Encrypted: true
       Iops: 3000
       MultiAttachEnabled: false
