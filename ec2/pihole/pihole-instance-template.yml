@@ -17,12 +17,12 @@ Resources:
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key
       Monitoring: true
-      NetworkInterfaces:
-        - AssociatePublicIpAddress: false
-          DeleteOnTermination: false
-          Description: 'PiHole EC2 Network Interface 0'
-          DeviceIndex: 0
-          NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
+#      NetworkInterfaces:
+#        - AssociatePublicIpAddress: false
+#          DeleteOnTermination: false
+#          Description: 'PiHole EC2 Network Interface 0'
+#          DeviceIndex: 0
+#          NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
       PrivateDnsNameOptions:
         EnableResourceNameDnsAAAARecord: true
         EnableResourceNameDnsARecord: true
