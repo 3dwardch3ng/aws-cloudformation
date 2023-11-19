@@ -12,7 +12,7 @@ Resources:
             DeleteOnTermination: true
             VolumeSize: 16
             VolumeType: gp3
-      IamInstanceProfile: !Sub 'pihole-security-stack-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
+      IamInstanceProfile: !Sub 'pihole-security-stack-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Name'
       ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key

@@ -121,6 +121,10 @@ Outputs:
     Value: !GetAtt PiHoleIAMInstanceProfile.Arn
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Arn'
+  PiHoleIAMInstanceProfileName:
+    Value: PiHoleIAMInstanceProfile
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Name'
   PiHoleIAMRoleRef:
     Value: !Ref PiHoleIAMRole
     Export:
