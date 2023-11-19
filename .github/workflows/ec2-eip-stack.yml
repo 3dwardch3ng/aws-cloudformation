@@ -44,7 +44,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ github.event.inputs.region }}
-      - name: Create / Update EdwardHomeSecurityGroup via CloudFormation
+      - name: Create / Update EC2 EIP via CloudFormation
         id: ec2-eip-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
