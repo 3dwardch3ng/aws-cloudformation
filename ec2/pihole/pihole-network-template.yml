@@ -31,6 +31,8 @@ Resources:
                     - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'CidrBlock' ] ]
             HostPart: 100
       SourceDestCheck: true
+      SubnetId:
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'Id' ] ]
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'NetworkInterfaces' ]]
