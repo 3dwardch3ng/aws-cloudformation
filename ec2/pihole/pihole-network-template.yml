@@ -58,3 +58,11 @@ Outputs:
     Value: !GetAtt PiHoleNetworkInterface0.PrimaryPrivateIpAddress
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-PrimaryPrivateIpAddress'
+  PiHoleEC2EIPAssociationRef:
+    Value: !Ref PiHoleEC2EIPAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Ref'
+  PiHoleEC2EIPAssociationId:
+    Value: !GetAtt PiHoleEC2EIPAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'

@@ -48,42 +48,26 @@ Outputs:
     Value: !Ref PiHoleEC2Instance
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-Ref'
-
   PiHoleEC2InstanceAvailabilityZone:
     Value: !GetAtt PiHoleEC2Instance.AvailabilityZone
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-AvailabilityZone'
-
   PiHoleEC2InstancePrivateDnsName:
     Value: !GetAtt PiHoleEC2Instance.PrivateDnsName
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateDnsName'
-
   PiHoleEC2InstancePrivateIp:
     Value: !GetAtt PiHoleEC2Instance.PrivateIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
-
   PiHoleEC2InstancePublicDnsName:
     Value: !GetAtt PiHoleEC2Instance.PublicDnsName
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
-
   PiHoleEC2InstancePublicIp:
     Value: !GetAtt PiHoleEC2Instance.PublicIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
-
-  PiHoleEC2EIPAssociationRef:
-    Value: !Ref PiHoleEC2EIPAssociation
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Ref'
-
-  PiHoleEC2EIPAssociationId:
-    Value: !GetAtt PiHoleEC2EIPAssociation.Id
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'
-
   Ipv6ResourceIpv6Address:
     Value: !GetAtt Ipv6Resource.Ipv6Address
     Export:
