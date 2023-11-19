@@ -93,9 +93,6 @@ Resources:
             DeleteOnTermination: false
             Description: 'PiHole EC2 Network Interface 0'
             DeviceIndex: 0
-            Groups:
-              - Ref: PiHoleEC2SecurityGroup
-              - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
             Ipv4PrefixCount: 1
             Ipv6PrefixCount: 1
             NetworkCardIndex: 0
@@ -105,22 +102,9 @@ Resources:
           EnableResourceNameDnsAAAARecord: true
           EnableResourceNameDnsARecord: true
           HostnameType: 'resource-name'
-        UserData:
-          Fn::Base64:
-            Fn::Join:
-              - ''
-              - - '"#!/bin/bash -xe\n'
-                - 'yum update -y aws-cfn-bootstrap\n'
-                - '/opt/aws/bin/cfn-init -v '
-                - '         --stack '
-                - Ref: AWS::StackName
-                - '\n'
-                - '/opt/aws/bin/cfn-signal -e $? '
-                - '         --stack '
-                - Ref: AWS::StackName
-                - '         --resource WebServerInstance '
-                - '         --region '
-                - Ref: AWS::Region
+        SecurityGroupIds:
+          - Ref: PiHoleEC2SecurityGroup
+          - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
       LaunchTemplateName: piHoleEC2LaunchTemplate
       TagSpecifications:
         - ResourceType: 'launch-template'
