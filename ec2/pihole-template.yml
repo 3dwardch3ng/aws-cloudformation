@@ -18,9 +18,10 @@ Parameters:
 
 Mappings:
   Properties:
-    EC2ResourceName: PiHoleEC2Instance
-    ResourcePath: 'Resources.PiHoleEC2Instance.Metadata.AWS::CloudFormation::Init'
-    CloudformationLogGroupName: CloudformationLogGroup
+    CouldFormationInit:
+      EC2ResourceName: PiHoleEC2Instance
+      ResourcePath: Resources.PiHoleEC2Instance.Metadata.AWS::CloudFormation::Init
+      CloudformationLogGroupName: CloudformationLogGroup
 
 Resources:
   # EC2 Instance
