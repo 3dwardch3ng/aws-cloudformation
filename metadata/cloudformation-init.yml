@@ -27,7 +27,7 @@ AWS::CloudFormation::Init:
               - 'triggers=post.update\n'
               - 'path='
               - Fn::FindInMap: [ Properties, CouldFormationInit, ResourcePath ]
-              - '\n'
+              - ' \n'
               - 'action=/opt/aws/bin/cfn-init -v '
               - '         --stack '
               - Ref: AWS::StackName
