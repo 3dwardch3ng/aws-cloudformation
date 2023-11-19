@@ -58,6 +58,4 @@ jobs:
         with:
           name: pihole-network-stack
           template: ec2/pihole/pihole-network-template.yml
-          parameter-overrides: >-
-            Subnet=PublicSubnet1
           no-fail-on-empty-changeset: "1"
