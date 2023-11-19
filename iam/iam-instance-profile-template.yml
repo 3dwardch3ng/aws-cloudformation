@@ -1,12 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Create Instance Profiles
 
-Mappings:
-  Fn::Transform:
-    Name: AWS::Include
-    Parameters:
-      Location: s3://cloudformation-templates-shared-files/mapping/region-to-principal.yml
-
 Resources:
   LogRoleInstanceProfile:
     Type: AWS::IAM::InstanceProfile
