@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a PiHole EC2 Security Resources in AWS
+
+Resources:
+  # IAM Instance Profile
+  PiHoleIAMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: PiHoleIAMInstanceProfile
+      Roles:
+        - Ref: PiHoleIAMRole
+  PiHoleIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Description: 'The IAM Role for the PiHole EC2 Instance'
+      MaxSessionDuration: 43200
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/IAMReadOnlyAccess
+      RoleName: 'PiHoleIAMRole'
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'IAMRole' ]]
+
+  # Security Group
+  PiHoleEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PiHole EC2 Security Group
+      GroupName: PiHoleEC2SecurityGroup
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ICMP (ping)
+          IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+        - CidrIpv6: ::/0
+          Description: Allow inbound ICMPv6 (ping)
+          IpProtocol: icmpv6
+          FromPort: -1
+          ToPort: -1
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6: ::/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS UDP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6: ::/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL DNS UDP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound traffic for pihole-FTL DHCP IPv4 UDP on port 67
+          IpProtocol: udp
+          FromPort: 67
+          ToPort: 67
+        - CidrIpv6: ::/0
+          Description: Allow inbound traffic for pihole-FTL DHCPv6 UDP on port 547
+          IpProtocol: udp
+          FromPort: 547
+          ToPort: 547
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for lighttpd HTTP TCP on port 80
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIpv6: ::/0
+          Description: Allow inbound ipv6 traffic for lighttpd HTTP TCP on port 80
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL TCP on port 4711
+          IpProtocol: tcp
+          FromPort: 4711
+          ToPort: 4711
+        - CidrIpv6: ::/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL TCP on port 4711
+          IpProtocol: tcp
+          FromPort: 4711
+          ToPort: 4711
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all ipv4 outbound traffic by default
+          IpProtocol: -1
+        - CidrIpv6: ::/0
+          Description: Allow all ipv6 outbound traffic by default
+          IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'SecurityGroup' ] ]
+      VpcId:
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ] ]
