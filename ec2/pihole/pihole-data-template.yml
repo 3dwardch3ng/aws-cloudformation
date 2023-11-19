@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a PiHole EC2 Security Resources in AWS
+
+Resources:
+  # EBS Storage
+  PiHoleEBSStorage:
+    Type: AWS::EC2::Volume
+    Properties:
+      AutoEnableIO: true
+      AvailabilityZone:
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ] ]
+      Encrypted: true
+      Iops: 3000
+      MultiAttachEnabled: false
+      Size: 16
+      Throughput: 500
+      VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'EBSStorage' ] ]
+
+Outputs:
+  PiHoleEBSStorageVolumeId:
+    Value: !GetAtt PiHoleEBSStorage.VolumeId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Volume-Id'
