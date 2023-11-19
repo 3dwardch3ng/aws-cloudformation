@@ -66,3 +66,10 @@ jobs:
           name: pihole-data-stack
           template: ec2/pihole/pihole-data-template.yml
           no-fail-on-empty-changeset: "1"
+      - name: Deploy PiHole Instance Stack via CloudFormation
+        id: pihole-instance-stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: pihole-instance-stack
+          template: ec2/pihole/pihole-instance-template.yml
+          no-fail-on-empty-changeset: "1"
