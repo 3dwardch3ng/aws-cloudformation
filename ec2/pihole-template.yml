@@ -70,8 +70,6 @@ Resources:
           Description: 'PiHole EC2 Network Interface 0'
           DeviceIndex: 0
           NetworkInterfaceId: !Ref PiHoleNetworkInterfaces
-          SubnetId:
-            Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
       PrivateDnsNameOptions:
         EnableResourceNameDnsAAAARecord: true
         EnableResourceNameDnsARecord: true
