@@ -6,7 +6,7 @@ Resources:
   PiHoleEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      "AvailabilityZone":
+      AvailabilityZone:
         Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'AvailabilityZone' ]]
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
