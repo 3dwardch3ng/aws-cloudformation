@@ -35,7 +35,7 @@ Resources:
           VolumeId: !Sub 'pihole-data-stack-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-Id'
       Tags:
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
 
   # Fetch EC2 Ipv6 CloudFormation Custom Resource
   Ipv6Resource:

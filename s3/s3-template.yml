@@ -39,8 +39,8 @@ Resources:
               - 's3:ListBucket'
               - 's3:DeleteObject'
             Resource:
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket ] ]
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket, '/*' ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket ]]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket, '/*' ]]
           - Sid: DeleteFromS3ActionBucketPutBucketPolicyDocumentStatement
             Effect: Allow
             Principal:
@@ -48,8 +48,8 @@ Resources:
             Action:
               - 's3:PutBucketPolicy'
             Resource:
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket ] ]
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket, '/*' ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket ]]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref DeleteFromS3ActionBucket, '/*' ]]
 
   CloudFormationTemplatesBucket:
     Type: AWS::S3::Bucket
@@ -82,8 +82,8 @@ Resources:
               - 's3:GetObject'
               - 's3:ListBucket'
             Resource:
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ] ]
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ]]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ]]
           - Sid: CloudFormationTemplatesBucketPutBucketPolicyDocumentStatement
             Effect: Allow
             Principal:
@@ -91,8 +91,8 @@ Resources:
             Action:
               - 's3:PutBucketPolicy'
             Resource:
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ] ]
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ]]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ]]
 
 Outputs:
   DeleteFromS3ActionBucketArn:

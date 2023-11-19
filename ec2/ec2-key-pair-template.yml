@@ -24,7 +24,7 @@ Resources:
       KeyType: !Ref KeyType
       Tags:
         - Key: KeyPair
-          Value: !Join [ '-', [ 'EC2KeyPair', Ref: AWS::Region, Ref: KeyFormat, Ref: KeyName, Ref: KeyType ] ]
+          Value: !Join [ '-', [ 'EC2KeyPair', Ref: AWS::Region, Ref: KeyFormat, Ref: KeyName, Ref: KeyType ]]
 
 Outputs:
   NewKeyPairId:

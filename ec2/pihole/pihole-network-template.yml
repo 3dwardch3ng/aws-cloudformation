@@ -7,8 +7,8 @@ Resources:
     Properties:
       Description: 'PiHole EC2 Network Interface 0'
       GroupSet:
-        - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'EC2-SecurityGroup-PiHoleEC2SecurityGroup-Id' ] ]
-        - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHome-EC2-SecurityGroup-Id' ] ]
+        - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'EC2-SecurityGroup-PiHoleEC2SecurityGroup-Id' ]]
+        - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHome-EC2-SecurityGroup-Id' ]]
       Ipv6Addresses:
         - Ipv6Address:
             Fn::Sub:
@@ -18,7 +18,7 @@ Resources:
                     - '0'
                     - Fn::Split:
                         - '/64'
-                        - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'Ipv6CidrBlock' ] ]
+                        - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'Ipv6CidrBlock' ]]
                 HostPart: 10
       PrivateIpAddress:
         Fn::Sub:
@@ -28,11 +28,11 @@ Resources:
                 - '0'
                 - Fn::Split:
                     - '0/24'
-                    - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'CidrBlock' ] ]
+                    - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'CidrBlock' ]]
             HostPart: 100
       SourceDestCheck: true
       SubnetId:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'Id' ] ]
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'Id' ]]
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'NetworkInterfaces' ]]
@@ -42,7 +42,7 @@ Resources:
     Type: AWS::EC2::EIPAssociation
     Properties:
       AllocationId:
-        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ] ]
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ]]
       NetworkInterfaceId: !GetAtt PiHoleNetworkInterface0.Id
 
 Outputs:

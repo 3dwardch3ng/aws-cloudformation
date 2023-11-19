@@ -106,7 +106,7 @@ Resources:
         - Key: Category
           Value: !Ref Category
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PrivateSubnet1' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PrivateSubnet1' ]]
   PrivateSubnet1Ipv6Route:
     Type: AWS::EC2::Route
     Properties:
@@ -121,7 +121,7 @@ Resources:
         - Key: Category
           Value: !Ref Category
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PrivateSubnet2' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'RouteTable', 'PrivateSubnet2' ]]
 
   # Access control
   PrivateSubnetsNetworkAcl:
@@ -220,7 +220,7 @@ Resources:
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ] ] ]
+          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ]] ]
             SubnetPart:
               Fn::FindInMap: [ Ref: Category, PrivateSubnet1, Ipv6 ]
       AssignIpv6AddressOnCreation: true

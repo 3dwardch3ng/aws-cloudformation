@@ -108,9 +108,9 @@ Resources:
           IpProtocol: -1
       Tags:
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'SecurityGroup' ] ]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'SecurityGroup' ]]
       VpcId:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ] ]
+        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ]]
 
 Outputs:
   PiHoleIAMInstanceProfileRef:
