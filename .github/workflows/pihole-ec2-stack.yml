@@ -60,5 +60,4 @@ jobs:
           template: ec2/pihole/pihole-network-template.yml
           parameter-overrides: >-
             Subnet=PublicSubnet1
-          capabilities: CAPABILITY_NAMED_IAM
           no-fail-on-empty-changeset: "1"
