@@ -125,3 +125,12 @@ Outputs:
     Value: !GetAtt PiHoleIAMRole.RoleId
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-Role-Id'
+  PiHoleEC2SecurityGroupId:
+    Value: !GetAtt PiHoleEC2SecurityGroup.GroupId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Security-Group-Id'
+  PiHoleEC2SecurityGroupVpcId:
+    Value: !GetAtt PiHoleEC2SecurityGroup.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Security-Group-VpcId'
+
