@@ -20,6 +20,10 @@ Resources:
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'EBSStorage' ] ]
 
 Outputs:
+  PiHoleEBSStorageRef:
+    Value: !Ref PiHoleEBSStorage
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Volume-Ref'
   PiHoleEBSStorageVolumeId:
     Value: !GetAtt PiHoleEBSStorage.VolumeId
     Export:

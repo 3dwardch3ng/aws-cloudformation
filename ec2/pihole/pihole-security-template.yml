@@ -113,10 +113,18 @@ Resources:
         Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ] ]
 
 Outputs:
+  PiHoleIAMInstanceProfileRef:
+    Value: !Ref PiHoleIAMInstanceProfile
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-InstanceProfile-Ref'
   PiHoleIAMInstanceProfileArn:
     Value: !GetAtt PiHoleIAMInstanceProfile.Arn
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-InstanceProfile-Arn'
+  PiHoleIAMRoleRef:
+    Value: !Ref PiHoleIAMRole
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-Role-Ref'
   PiHoleIAMRoleArn:
     Value: !GetAtt PiHoleIAMRole.Arn
     Export:
@@ -125,6 +133,10 @@ Outputs:
     Value: !GetAtt PiHoleIAMRole.RoleId
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-IAM-Role-Id'
+  PiHoleEC2SecurityGroupRef:
+    Value: !Ref PiHoleEC2SecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Security-Group-Ref'
   PiHoleEC2SecurityGroupId:
     Value: !GetAtt PiHoleEC2SecurityGroup.GroupId
     Export:

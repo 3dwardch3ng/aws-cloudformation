@@ -38,6 +38,10 @@ Resources:
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'NetworkInterfaces' ]]
 
 Outputs:
+  PiHoleNetworkInterface0Ref:
+    Value: !Ref PiHoleNetworkInterface0
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-NetworkInterface-0-Ref'
   PiHoleNetworkInterface0Id:
     Value: !GetAtt PiHoleNetworkInterface0.Id
     Export:
