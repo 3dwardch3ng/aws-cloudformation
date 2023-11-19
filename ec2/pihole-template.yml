@@ -167,6 +167,9 @@ Resources:
             DeleteOnTermination: false
             Description: "PiHole EC2 Network Interface 0"
             DeviceIndex: 0
+            Groups:
+              - Ref: PiHoleEC2SecurityGroup
+              - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
             Ipv4Prefixes:
               - Ipv4Prefix:
                   Fn::FindInMap: [ Ref: VpcCategory, Ref: Subnet, Ipv4 ]
@@ -180,9 +183,6 @@ Resources:
           EnableResourceNameDnsAAAARecord: true
           EnableResourceNameDnsARecord: true
           HostnameType: 'resource-name'
-        SecurityGroupIds:
-          - Ref: PiHoleEC2SecurityGroup
-          - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ]]
       LaunchTemplateName: piHoleEC2LaunchTemplate
       TagSpecifications:
         - ResourceType: 'launch-template'
