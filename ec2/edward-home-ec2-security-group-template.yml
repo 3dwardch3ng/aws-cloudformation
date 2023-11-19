@@ -35,4 +35,4 @@ Outputs:
   EdwardHomeSecurityGroupId:
     Value: !Ref EdwardHomeSecurityGroup
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EdwardHomeSecurityGroupId'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EdwardHome-EC2-SecurityGroup-Id'
