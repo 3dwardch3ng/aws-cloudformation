@@ -172,20 +172,20 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock:
-        Fn::FindInMap: [ Ref: Category, Public1, Ipv4 ]
+        Fn::FindInMap: [ Ref: Category, PublicSubnet1, Ipv4 ]
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
           - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ]]]
             SubnetPart:
-              Fn::FindInMap: [ Ref: Category, Public1, Ipv6 ]
+              Fn::FindInMap: [ Ref: Category, PublicSubnet1, Ipv6 ]
       AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Sub '${AWS::Region}a'
       Tags:
         - Key: Category
           Value: !Ref Category
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Public1' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'PublicSubnet1' ]]
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -196,13 +196,13 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock:
-        Fn::FindInMap: [ Ref: Category, Public2, Ipv4 ]
+        Fn::FindInMap: [ Ref: Category, PublicSubnet2, Ipv4 ]
       AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
         - Key: Category
           Value: !Ref Category
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Public2' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'PublicSubnet2' ]]
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -216,20 +216,20 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock:
-        Fn::FindInMap: [ Ref: Category, Private1, Ipv4 ]
+        Fn::FindInMap: [ Ref: Category, PrivateSubnet1, Ipv4 ]
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
           - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ] ] ]
             SubnetPart:
-              Fn::FindInMap: [ Ref: Category, Private1, Ipv6 ]
+              Fn::FindInMap: [ Ref: Category, PrivateSubnet1, Ipv6 ]
       AssignIpv6AddressOnCreation: true
       AvailabilityZone: !Sub '${AWS::Region}a'
       Tags:
         - Key: Category
           Value: !Ref Category
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Private1' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'PrivateSubnet1' ]]
   PrivateSubnet1AclAssociation:
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
@@ -245,13 +245,13 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock:
-        Fn::FindInMap: [ Ref: Category, Private2, Ipv4 ]
+        Fn::FindInMap: [ Ref: Category, PrivateSubnet2, Ipv4 ]
       AvailabilityZone: !Sub '${AWS::Region}b'
       Tags:
         - Key: Category
           Value: !Ref Category
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'Private2' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: Category, 'Subnet', 'PrivateSubnet2' ]]
   PrivateSubnet2AclAssociation:
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
