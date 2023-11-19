@@ -34,7 +34,8 @@ Resources:
         Version: !GetAtt PiHoleEC2LaunchTemplate.LatestVersionNumber
       PropagateTagsToVolumeOnCreation: true
       Volumes:
-        - Ref: PiHoleEBSStorage
+        - Device: /dev/xvdh
+          VolumeId: !Ref PiHoleEBSStorage
       Tags:
         - Key: Name
           Value: PiHole-${AWS::Region}-${!Ref Subnet}-EC2
