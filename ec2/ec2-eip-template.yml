@@ -4,10 +4,11 @@ Description: Creates the EC2 Elastic IP Addresses
 Resources:
   ElasticIP1:
     Type: AWS::EC2::EIP
-    Domain: standard
-    Tags:
-      - Key: Name
-        Value: !Sub '${AWS::StackName}-ElasticIP1'
+    Properties:
+      Domain: standard
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-ElasticIP1'
 
 Outputs:
   EIPAllocationId1:

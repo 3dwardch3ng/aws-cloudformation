@@ -190,6 +190,14 @@ Resources:
             - Key: Name
               Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2LaunchTemplate', 'piHoleEC2LaunchTemplate' ]]
 
+  # EC2 EIP Association
+    PiHoleEC2EIPAssociation:
+      Type: AWS::EC2::EIPAssociation
+      Properties:
+        AllocationId: eipalloc-0a0a0a0a0a0a0a0a0
+        InstanceId: !Ref PiHoleEC2Instance
+        NetworkInterfaceId: !GetAtt PiHoleEC2Instance.NetworkInterfaces.0.NetworkInterfaceId
+
   # EBS Storage
   PiHoleEBSStorage:
     Type: AWS::EC2::Volume
