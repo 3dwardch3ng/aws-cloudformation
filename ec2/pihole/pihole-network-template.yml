@@ -31,11 +31,17 @@ Resources:
                     - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'CidrBlock' ] ]
             HostPart: 100
       SourceDestCheck: true
-      SubnetId:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'Id' ] ]
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'NetworkInterfaces' ]]
+
+  # EC2 EIP Association
+  PiHoleEC2EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ] ]
+      NetworkInterfaceId: !GetAtt PiHoleNetworkInterface0.Id
 
 Outputs:
   PiHoleNetworkInterface0Ref:

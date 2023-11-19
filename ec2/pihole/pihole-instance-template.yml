@@ -37,15 +37,6 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ] ]
 
-  # EC2 EIP Association
-  PiHoleEC2EIPAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId:
-        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ]]
-      InstanceId: !Ref PiHoleEC2Instance
-
-
   # Fetch EC2 Ipv6 CloudFormation Custom Resource
   Ipv6Resource:
     Type: AWS::CloudFormation::CustomResource
