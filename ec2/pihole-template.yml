@@ -105,7 +105,7 @@ Resources:
           VolumeId: !Ref PiHoleEBSStorage
       Tags:
         - Key: Name
-          Value: !Sub 'PiHole-${AWS::Region}-${!Ref Subnet}-EC2'
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'EC2Instance' ]]
 
   # IAM Instance Profile
   PiHoleIAMInstanceProfile:
@@ -135,7 +135,21 @@ Resources:
       RoleName: 'PiHoleIAMRole'
       Tags:
         - Key: Name
-          Value: PiHole-EC2-IAMRole
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'IAMRole' ]]
+
+  PiHoleNetworkInterfaces:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+
+      Description: A nice description.
+      SourceDestCheck: 'false'
+      GroupSet:
+        - sg-75zzz219
+      SubnetId: subnet-3z648z53
+      PrivateIpAddress: 10.0.0.16
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'NetworkInterfaces' ]]
 
   # EC2 Launch Template
 #  PiHoleEC2LaunchTemplate:
@@ -280,7 +294,7 @@ Resources:
           IpProtocol: -1
       Tags:
         - Key: Name
-          Value: !Sub 'PiHole-${AWS::Region}-SecurityGroup'
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'SecurityGroup' ]]
       VpcId:
         Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ] ]
 
