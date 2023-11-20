@@ -16,8 +16,8 @@ Parameters:
     Default: rsa
 
 Resources:
-  NewKeyPair:
-    Type: 'AWS::EC2::KeyPair'
+  EC2KeyPair:
+    Type: AWS::EC2::KeyPair
     Properties:
       KeyFormat: !Ref KeyFormat
       KeyName: !Ref KeyName
@@ -27,10 +27,18 @@ Resources:
           Value: !Join [ '-', [ 'EC2KeyPair', Ref: AWS::Region, Ref: KeyFormat, Ref: KeyName, Ref: KeyType ]]
 
 Outputs:
-  NewKeyPairId:
-    Value: !GetAtt NewKeyPair.KeyPairId
+  EC2KeyPairRef:
+    Value: !Ref NewKeyPair
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-KeyPairId'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-KeyPair-EC2KeyPair-Ref'
+  EC2KeyPairKeyFingerprint:
+    Value: !GetAtt NewKeyPair.KeyFingerprint
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-KeyPair-EC2KeyPair-KeyFingerprint'
+  EC2KeyPairKeyPairId:
+    Value: !GetAtt EC2KeyPair.KeyPairId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-KeyPair-EC2KeyPair-KeyPairId'
 
 # Notes:
 # 1. Following CLI command can be used to get the ID of the key pair after it is created:
