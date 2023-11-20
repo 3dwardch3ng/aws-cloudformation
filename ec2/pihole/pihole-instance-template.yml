@@ -17,39 +17,88 @@ Resources:
     Type: AWS::EC2::Instance
     Metadata:
       AWS::CloudFormation::Init:
-        config:
+        configSets:
+          default:
+            - 01_setupCfnHup
+            - 02_config-amazon-cloudwatch-agent
+            - 03_restart_amazon-cloudwatch-agent
+          UpdateEnvironment:
+            - 02_config-amazon-cloudwatch-agent
+            - 03_restart_amazon-cloudwatch-agent
+        # Definition of json configuration of AmazonCloudWatchAgent, you can change the configuration below.
+        02_config-amazon-cloudwatch-agent:
+          files:
+            '/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json':
+              content: !Sub |
+                {
+                  "metrics": {
+                    "append_dimensions": {
+                      "AutoScalingGroupName": "${!aws:AutoScalingGroupName}",
+                      "ImageId": "${!aws:ImageId}",
+                      "InstanceId": "${!aws:InstanceId}",
+                      "InstanceType": "${!aws:InstanceType}"
+                    },
+                    "metrics_collected": {
+                      "mem": {
+                        "measurement": [
+                          "mem_used_percent"
+                        ]
+                      },
+                      "swap": {
+                        "measurement": [
+                          "swap_used_percent"
+                        ]
+                      }
+                    }
+                  }
+                }
+        # Invoke amazon-cloudwatch-agent-ctl to restart the AmazonCloudWatchAgent.
+        03_restart_amazon-cloudwatch-agent:
+          commands:
+            01_stop_service:
+              command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a stop
+            02_start_service:
+              command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+        # Cfn-hup setting, it is to monitor the change of metadata.
+        # When there is change in the contents of json file in the metadata section, cfn-hup will call cfn-init to restart the AmazonCloudWatchAgent.
+        01_setupCfnHup:
           files:
             '/etc/cfn/cfn-hup.conf':
-              content: !Join
-                - ''
-                - - |
-                    [main]
-                  - stack=
-                  - !Ref 'AWS::StackId'
-                  - |+
-                  - region=
-                  - !Ref 'AWS::Region'
-                  - |+
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+                interval=1
               mode: '000400'
               owner: root
               group: root
-            '/etc/cfn/hooks.d/cfn-auto-reloader.conf':
-              content: !Join
-                - ''
-                - - |
-                    [cfn-auto-reloader-hook]
-                  - |
-                    triggers=post.update
-                  - >
-                    path=Resources.PiHoleEC2Instance.Metadata.AWS::CloudFormation::Init
-                  - 'action=/opt/aws/bin/cfn-init -s '
-                  - !Ref 'AWS::StackId'
-                  - ' -r PiHoleEC2Instance '
-                  - ' --region     '
-                  - !Ref 'AWS::Region'
-                  - |+
-                  - |
-                    runas=root
+            '/etc/cfn/hooks.d/amazon-cloudwatch-agent-auto-reloader.conf':
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.EC2Instance.Metadata.AWS::CloudFormation::Init.02_config-amazon-cloudwatch-agent
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region} --configsets UpdateEnvironment
+                runas=root
+              mode: '000400'
+              owner: root
+              group: root
+            "/lib/systemd/system/cfn-hup.service":
+              content: !Sub |
+                [Unit]
+                Description=cfn-hup daemon
+                [Service]
+                Type=simple
+                ExecStart=/opt/aws/bin/cfn-hup
+                Restart=always
+                [Install]
+                WantedBy=multi-user.target
+          commands:
+            01enable_cfn_hup:
+              command: !Sub |
+                systemctl enable cfn-hup.service
+            02start_cfn_hup:
+              command: !Sub |
+                systemctl start cfn-hup.service
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
@@ -85,7 +134,6 @@ Resources:
                             - '/64'
                             - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-Ipv6CidrBlock' ] ]
                     HostPart: !Ref Ipv6HostNumber
-#          NetworkInterfaceId: String
           PrivateIpAddress:
             Fn::Sub:
               - '${NetworkPart}${HostPart}'
@@ -103,79 +151,19 @@ Resources:
         EnableResourceNameDnsARecord: true
         HostnameType: 'resource-name'
       PropagateTagsToVolumeOnCreation: true
-#      SubnetId:
-#        Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-SubnetId'
-#      Volumes:
-#        - Device: /dev/xvda
-#          VolumeId:
-#            Fn::ImportValue: !Sub 'pihole-data-stack-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-VolumeId'
-      UserData: !Base64
-        Fn::Join:
-          - ''
-          - - |
-              #!/bin/bash -xe
-            - |
-              # Get the latest CloudFormation package
-            - |
-              sudo apt-get -y install python-setuptools
-            - |
-              mkdir aws-cfn-bootstrap-latest
-            - |
-              curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz | tar xz -C aws-cfn-bootstrap-latest --strip-components 1
-            - |
-              sudo easy_install aws-cfn-bootstrap-latest
-            - |
-              ln -s /root/aws-cfn-bootstrap-latest/init/ubuntu/cfn-hup /etc/init.d/cfn-hup
-            - |
-              # Start cfn-init
-            - '/usr/local/bin/cfn-init -s '
-            - !Ref 'AWS::StackId'
-            - ' -r PiHoleEC2Instance '
-            - ' --region '
-            - !Ref 'AWS::Region'
-            - |2
-               || error_exit 'Failed to run cfn-init'
-            - >
-              # Start up the cfn-hup daemon to listen for changes to the EC2
-              instance metadata
-            - |
-              /usr/local/bin/cfn-hup || error_exit 'Failed to start cfn-hup'
-            - |
-              # Get the CloudWatch Logs agent
-            - >
-              wget
-              https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
-            - |
-              # Install the CloudWatch Logs agent
-            - 'python awslogs-agent-setup.py -n -r '
-            - !Ref 'AWS::Region'
-            - |2
-               -c /tmp/cwlogs/apacheaccess.conf || error_exit 'Failed to run CloudWatch Logs agent setup'
-            - |
-              # All done so signal success
-            - '/usr/local/bin/cfn-signal -e $? '
-            - '         --stack '
-            - !Ref 'AWS::StackName'
-            - '         --resource PiHoleEC2Instance '
-            - '         --region '
-            - !Ref 'AWS::Region'
-            - |
-              # Install the EC2 Instance Connect
-            - |
-              sudo apt-get install ec2-instance-connect
-            - |+
+      UserData:
+        # This script below is to install AmazonCloudWatchAgent, restart AmazonCloudWatchAgent and tell the result to cloudformation.
+        # Also, installs the EC2 Instance Connect
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          rpm -Uvh https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region} --configsets default
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region}
+          sudo apt-get update
+          sudo apt-get install ec2-instance-connect
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
-
-  # EC2 NetworkInterfaceAttachment
-#  PiHoleEC2NetworkInterfaceAttachment:
-#    Type: AWS::EC2::NetworkInterfaceAttachment
-#    Properties:
-#      DeleteOnTermination: false
-#      DeviceIndex: 0
-#      InstanceId: !Ref PiHoleEC2Instance
-#      NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
 
   # EC2 EIP Association
   PiHoleEC2EIPAssociation:
@@ -192,17 +180,6 @@ Resources:
       InstanceProfileName: PiHoleIAMInstanceProfile
       Roles:
         - Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-Role-PiHoleIAMRole-Ref'
-
-  # Fetch EC2 Ipv6 CloudFormation Custom Resource
-#  Ipv6Resource:
-#    DependsOn:
-#      - PiHoleEC2Instance
-#      - PiHoleEC2NetworkInterfaceAttachment
-#    Type: AWS::CloudFormation::CustomResource
-#    Properties:
-#      ServiceToken:
-#        Fn::ImportValue: !Join [ '-', [ 'fetch-ec2-ipv6-lambda-stack', Ref: AWS::Region, 'FetchEC2Ipv6FunctionArn' ]]
-#      ResourceRef: !Ref PiHoleEC2Instance
 
 Outputs:
   PiHoleEC2InstanceRef:
@@ -221,26 +198,14 @@ Outputs:
     Value: !GetAtt PiHoleEC2Instance.PrivateIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
-#  PiHoleEC2InstancePublicDnsName:
-#    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
-#  PiHoleEC2InstancePublicIp:
-#    Value: !GetAtt PiHoleEC2Instance.PublicIp
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
-#  PiHoleEC2NetworkInterfaceAttachmentRef:
-#    Value: !Ref PiHoleEC2NetworkInterfaceAttachment
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-Ref'
-#  PiHoleEC2NetworkInterfaceAttachmentId:
-#    Value: !GetAtt PiHoleEC2NetworkInterfaceAttachment.AttachmentId
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-AttachmentId'
-#  Ipv6ResourceIpv6Address:
-#    Value: !GetAtt Ipv6Resource.Ipv6Address
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-CloudFormation-CustomResource-Ipv6Resource-Ipv6Address'
+  PiHoleEC2InstancePublicDnsName:
+    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
+  PiHoleEC2InstancePublicIp:
+    Value: !GetAtt PiHoleEC2Instance.PublicIp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
   PiHoleEC2EIPAssociationRef:
     Value: !Ref PiHoleEC2EIPAssociation
     Export:
