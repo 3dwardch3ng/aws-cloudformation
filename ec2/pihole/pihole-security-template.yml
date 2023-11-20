@@ -21,6 +21,19 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/IAMReadOnlyAccess
+      Policies:
+        - PolicyName: LogRolePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:Create*'
+                  - 'logs:PutLogEvents'
+                  - 's3:GetObject'
+                Resource:
+                  - 'arn:aws:logs:*:*:*'
+                  - 'arn:aws:s3:::*'
       RoleName: 'PiHoleIAMRole'
       Tags:
         - Key: Name
