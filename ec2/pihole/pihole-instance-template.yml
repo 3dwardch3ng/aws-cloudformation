@@ -42,7 +42,7 @@ Resources:
                     runas=root
     Properties:
       AvailabilityZone:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'AvailabilityZone' ]]
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'AvailabilityZone' ]]
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
