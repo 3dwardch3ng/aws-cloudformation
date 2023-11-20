@@ -149,7 +149,7 @@ Resources:
 #        Fn::ImportValue: !Join [ '-', [ 'fetch-ec2-ipv6-lambda-stack', Ref: AWS::Region, 'FetchEC2Ipv6FunctionArn' ]]
 #      ResourceRef: !Ref PiHoleEC2Instance
 
-Outputs:
+#Outputs:
 #  PiHoleEC2InstanceRef:
 #    Value: !Ref PiHoleEC2Instance
 #    Export:
