@@ -3,12 +3,12 @@ Description: Creates a PiHole EC2 Security Resources in AWS
 
 Resources:
   # IAM Instance Profile
-  PiHoleIAMInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      InstanceProfileName: PiHoleIAMInstanceProfile
-      Roles:
-        - Ref: PiHoleIAMRole
+#  PiHoleIAMInstanceProfile:
+#    Type: AWS::IAM::InstanceProfile
+#    Properties:
+#      InstanceProfileName: PiHoleIAMInstanceProfile
+#      Roles:
+#        - Ref: PiHoleIAMRole
 
   # IAM Role
   PiHoleIAMRole:
