@@ -165,7 +165,7 @@ Resources:
       Ipv6CidrBlock:
         Fn::Sub:
           - '${VpcPart}${SubnetPart}'
-          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ]]]
+          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt GeneralVpc.Ipv6CidrBlocks ]]]
             SubnetPart:
               Fn::FindInMap: [ 'GeneralVpc', PublicSubnet1, Ipv6 ]
       AssignIpv6AddressOnCreation: true
