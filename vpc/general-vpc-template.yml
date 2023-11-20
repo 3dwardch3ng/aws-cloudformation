@@ -77,7 +77,7 @@ Resources:
       VpcId: !Ref GeneralVpc
       Tags:
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'PublicSubnet2', 'RouteTable' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'GeneralVpc', 'PublicSubnet2', 'RouteTable' ]]
 
   GeneralVpcPublicSubnet2Route:
     DependsOn: GeneralVpcInternetGatewayAttachment
@@ -94,7 +94,7 @@ Resources:
       VpcId: !Ref GeneralVpc
       Tags:
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'PrivateSubnet1', 'RouteTable' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'GeneralVpc', 'PrivateSubnet1', 'RouteTable' ]]
 
   GeneralVpcPrivateSubnet1Ipv6Route:
     Type: AWS::EC2::Route
@@ -109,7 +109,7 @@ Resources:
       VpcId: !Ref GeneralVpc
       Tags:
         - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'PrivateSubnet2', 'RouteTable' ]]
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'GeneralVpc', 'PrivateSubnet2', 'RouteTable' ]]
 
   # Access control
   GeneralVpcPrivateSubnetsNetworkAcl:
