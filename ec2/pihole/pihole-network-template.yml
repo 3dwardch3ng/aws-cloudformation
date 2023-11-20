@@ -18,7 +18,7 @@ Resources:
                     - '0'
                     - Fn::Split:
                         - '/64'
-                        - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-Ipv6CidrBlock' ]]
+                        - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-Ipv6CidrBlock' ]]
                 HostPart: 10
       PrivateIpAddress:
         Fn::Sub:
@@ -28,7 +28,7 @@ Resources:
                 - '0'
                 - Fn::Split:
                     - '0/24'
-                    - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-CidrBlock' ]]
+                    - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-CidrBlock' ]]
             HostPart: 100
       SourceDestCheck: true
       SubnetId:
