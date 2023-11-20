@@ -60,13 +60,6 @@ jobs:
           template: ec2/pihole/pihole-security-template.yml
           capabilities: CAPABILITY_NAMED_IAM
           no-fail-on-empty-changeset: "1"
-      - name: Deploy PiHole Network Stack via CloudFormation
-        id: pihole-network-stack
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        with:
-          name: pihole-network-stack
-          template: ec2/pihole/pihole-network-template.yml
-          no-fail-on-empty-changeset: "1"
       - name: Deploy PiHole Instance Stack via CloudFormation
         id: pihole-instance-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
