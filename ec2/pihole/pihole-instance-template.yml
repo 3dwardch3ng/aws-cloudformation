@@ -56,13 +56,49 @@ Resources:
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key
       Monitoring: true
+      NetworkInterfaces:
+        - AssociateCarrierIpAddress: false
+          AssociatePublicIpAddress: false
+          DeleteOnTermination: true
+          Description: 'PiHole EC2 Network Interface 0'
+          DeviceIndex: 0
+#          GroupSet:
+#            - String
+#          Ipv6AddressCount: Integer
+          Ipv6Addresses:
+            - Ipv6Address:
+                Fn::Sub:
+                  - '${NetworkPart}${HostPart}'
+                  - NetworkPart:
+                      Fn::Select:
+                        - '0'
+                        - Fn::Split:
+                            - '/64'
+                            - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-Ipv6CidrBlock' ] ]
+                    HostPart: 10
+#          NetworkInterfaceId: String
+          PrivateIpAddress:
+            Fn::Sub:
+              - '${NetworkPart}${HostPart}'
+              - NetworkPart:
+                  Fn::Select:
+                    - '0'
+                    - Fn::Split:
+                        - '0/24'
+                        - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-CidrBlock' ] ]
+                HostPart: 100
+#          PrivateIpAddresses:
+#            - PrivateIpAddressSpecification
+#          SecondaryPrivateIpAddressCount: Integer
+          SubnetId:
+            Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-SubnetId'
       PrivateDnsNameOptions:
         EnableResourceNameDnsAAAARecord: true
         EnableResourceNameDnsARecord: true
         HostnameType: 'resource-name'
       PropagateTagsToVolumeOnCreation: true
-      SubnetId:
-        Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-SubnetId'
+#      SubnetId:
+#        Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-SubnetId'
 #      Volumes:
 #        - Device: /dev/xvda
 #          VolumeId:
