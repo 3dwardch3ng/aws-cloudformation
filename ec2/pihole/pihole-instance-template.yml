@@ -29,7 +29,8 @@ Resources:
         Fn::ImportValue: !Sub 'vpc-stack-${AWS::Region}-PublicSubnet1-Id'
       Volumes:
         - Device: /dev/xvda
-          VolumeId: !Sub 'pihole-data-stack-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-Id'
+          VolumeId:
+            Fn::ImportValue: !Sub 'pihole-data-stack-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-Id'
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
