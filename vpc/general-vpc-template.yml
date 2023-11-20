@@ -421,10 +421,6 @@ Outputs:
     Value: !GetAtt GeneralVpcPrivateSubnet2.CidrBlock
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-CidrBlock'
-  GeneralVpcPrivateSubnet2Ipv6CidrBlock:
-    Value: !GetAtt GeneralVpcPrivateSubnet2.Ipv6CidrBlocks
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-Ipv6CidrBlocks'
   GeneralVpcPrivateSubnet2SubnetId:
     Value: !GetAtt GeneralVpcPrivateSubnet2.SubnetId
     Export:
