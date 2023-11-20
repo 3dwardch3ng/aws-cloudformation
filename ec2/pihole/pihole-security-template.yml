@@ -9,6 +9,8 @@ Resources:
       InstanceProfileName: PiHoleIAMInstanceProfile
       Roles:
         - Ref: PiHoleIAMRole
+
+  # IAM Role
   PiHoleIAMRole:
     Type: AWS::IAM::Role
     Properties:
@@ -113,18 +115,18 @@ Resources:
         Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ]]
 
 Outputs:
-  PiHoleIAMInstanceProfileRef:
-    Value: !Ref PiHoleIAMInstanceProfile
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
-  PiHoleIAMInstanceProfileArn:
-    Value: !GetAtt PiHoleIAMInstanceProfile.Arn
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Arn'
-  PiHoleIAMInstanceProfileName:
-    Value: PiHoleIAMInstanceProfile
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Name'
+#  PiHoleIAMInstanceProfileRef:
+#    Value: !Ref PiHoleIAMInstanceProfile
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
+#  PiHoleIAMInstanceProfileArn:
+#    Value: !GetAtt PiHoleIAMInstanceProfile.Arn
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Arn'
+#  PiHoleIAMInstanceProfileName:
+#    Value: PiHoleIAMInstanceProfile
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Name'
   PiHoleIAMRoleRef:
     Value: !Ref PiHoleIAMRole
     Export:
