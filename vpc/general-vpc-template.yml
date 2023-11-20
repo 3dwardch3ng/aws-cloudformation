@@ -180,7 +180,7 @@ Resources:
       SubnetId: !Ref GeneralVpcPublicSubnet1
       RouteTableId: !Ref GeneralVpcPublicSubnet1RouteTable
 
-  GeneralVpcVpcPublicSubnet2:
+  GeneralVpcPublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref GeneralVpc
