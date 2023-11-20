@@ -75,7 +75,7 @@ Resources:
                         - Fn::Split:
                             - '/64'
                             - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-Ipv6CidrBlock' ] ]
-                    HostPart: 10
+                    HostPart: 15
 #          NetworkInterfaceId: String
           PrivateIpAddress:
             Fn::Sub:
@@ -86,7 +86,7 @@ Resources:
                     - Fn::Split:
                         - '0/24'
                         - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-CidrBlock' ] ]
-                HostPart: 100
+                HostPart: 110
 #          PrivateIpAddresses:
 #            - PrivateIpAddressSpecification
 #          SecondaryPrivateIpAddressCount: Integer
