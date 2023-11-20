@@ -25,6 +25,8 @@ Resources:
         EnableResourceNameDnsARecord: true
         HostnameType: 'resource-name'
       PropagateTagsToVolumeOnCreation: true
+      SubnetId:
+        Fn::ImportValue: !Sub 'vpc-stack-${AWS::Region}-PublicSubnet1-Id'
       Volumes:
         - Device: /dev/xvda
           VolumeId: !Sub 'pihole-data-stack-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-Id'
