@@ -1,4 +1,4 @@
-name: General VPC Stack
+name: VPC Stack
 
 on:
   workflow_dispatch:
