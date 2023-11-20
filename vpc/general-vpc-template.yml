@@ -261,14 +261,14 @@ Outputs:
     Value: !GetAtt GeneralVpc.CidrBlock
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-CidrBlock'
-  GeneralVpcCidrBlockAssociations:
-    Value: !GetAtt GeneralVpc.CidrBlockAssociations
+  GeneralVpcCidrBlockAssociation:
+    Value: !Select [ '0', !GetAtt GeneralVpc.CidrBlockAssociations ]
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-CidrBlockAssociations'
-#  GeneralVpcIpv6CidrBlock:
-#    Value: !Select [ '0', !GetAtt GeneralVpc.Ipv6CidrBlocks ]
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-Ipv6CidrBlock'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-CidrBlockAssociation'
+  GeneralVpcIpv6CidrBlock:
+    Value: !Select [ '0', !GetAtt GeneralVpc.Ipv6CidrBlocks ]
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-Ipv6CidrBlock'
   GeneralVpcVpcId:
     Value: !GetAtt GeneralVpc.VpcId
     Export:
