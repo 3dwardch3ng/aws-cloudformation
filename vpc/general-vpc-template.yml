@@ -357,6 +357,10 @@ Outputs:
     Value: !Ref GeneralVpcPublicSubnet1
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-Ref'
+  GeneralVpcPublicSubnet1AvailabilityZone:
+    Value: !GetAtt GeneralVpcPublicSubnet1.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
   GeneralVpcPublicSubnet1AvailabilityZoneId:
     Value: !GetAtt GeneralVpcPublicSubnet1.AvailabilityZoneId
     Export:
@@ -377,6 +381,10 @@ Outputs:
     Value: !Ref GeneralVpcPublicSubnet2
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-Ref'
+  GeneralVpcPublicSubnet2AvailabilityZone:
+    Value: !GetAtt GeneralVpcPublicSubnet2.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-AvailabilityZone'
   GeneralVpcPublicSubnet2AvailabilityZoneId:
     Value: !GetAtt GeneralVpcPublicSubnet2.AvailabilityZoneId
     Export:
@@ -393,6 +401,10 @@ Outputs:
     Value: !Ref GeneralVpcPrivateSubnet1
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-Ref'
+  GeneralVpcPrivateSubnet1AvailabilityZone:
+    Value: !GetAtt GeneralVpcPrivateSubnet1.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-AvailabilityZone'
   GeneralVpcPrivateSubnet1AvailabilityZoneId:
     Value: !GetAtt GeneralVpcPrivateSubnet1.AvailabilityZoneId
     Export:
@@ -413,6 +425,10 @@ Outputs:
     Value: !Ref GeneralVpcPrivateSubnet2
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-Ref'
+  GeneralVpcPrivateSubnet2AvailabilityZone:
+    Value: !GetAtt GeneralVpcPrivateSubnet2.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-AvailabilityZone'
   GeneralVpcPrivateSubnet2AvailabilityZoneId:
     Value: !GetAtt GeneralVpcPrivateSubnet2.AvailabilityZoneId
     Export:
