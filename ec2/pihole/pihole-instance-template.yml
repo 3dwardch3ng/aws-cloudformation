@@ -47,6 +47,8 @@ Resources:
         - DeviceName: /dev/xvda
           Ebs:
             DeleteOnTermination: true
+            Encrypted: true
+            Iops: 3000
             VolumeSize: 16
             VolumeType: gp3
       IamInstanceProfile: !Ref PiHoleIAMInstanceProfile
@@ -61,10 +63,10 @@ Resources:
       PropagateTagsToVolumeOnCreation: true
       SubnetId:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-SubnetId'
-      Volumes:
-        - Device: /dev/xvda
-          VolumeId:
-            Fn::ImportValue: !Sub 'pihole-data-stack-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-VolumeId'
+#      Volumes:
+#        - Device: /dev/xvda
+#          VolumeId:
+#            Fn::ImportValue: !Sub 'pihole-data-stack-${AWS::Region}-EC2-Volume-PiHoleEBSStorage-VolumeId'
       UserData: !Base64
         Fn::Join:
           - ''
