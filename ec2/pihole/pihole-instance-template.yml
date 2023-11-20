@@ -123,13 +123,13 @@ Resources:
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
 
   # EC2 NetworkInterfaceAttachment
-  PiHoleEC2NetworkInterfaceAttachment:
-    Type: AWS::EC2::NetworkInterfaceAttachment
-    Properties:
-      DeleteOnTermination: false
-      DeviceIndex: 0
-      InstanceId: !Ref PiHoleEC2Instance
-      NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
+#  PiHoleEC2NetworkInterfaceAttachment:
+#    Type: AWS::EC2::NetworkInterfaceAttachment
+#    Properties:
+#      DeleteOnTermination: false
+#      DeviceIndex: 0
+#      InstanceId: !Ref PiHoleEC2Instance
+#      NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
 
   # IAM Instance Profile
   PiHoleIAMInstanceProfile:
