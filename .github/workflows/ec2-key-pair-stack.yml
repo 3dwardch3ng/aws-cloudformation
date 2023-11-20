@@ -48,7 +48,7 @@ permissions:
   contents: write
 
 jobs:
-  create-new-key-pair:
+  create-ec2-key-pair:
     name: Create New EC2 Key Pair
     runs-on: ubuntu-latest
     environment: AWS
@@ -62,7 +62,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ github.event.inputs.region }}
-      - name: Create EC2 Key Pair with CloudFormation
+      - name: Create EC2 Key Pair via CloudFormation
         id: ec2-key-pair-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
