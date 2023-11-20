@@ -2,14 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a PiHole EC2 Security Resources in AWS
 
 Resources:
-  # IAM Instance Profile
-#  PiHoleIAMInstanceProfile:
-#    Type: AWS::IAM::InstanceProfile
-#    Properties:
-#      InstanceProfileName: PiHoleIAMInstanceProfile
-#      Roles:
-#        - Ref: PiHoleIAMRole
-
   # IAM Role
   PiHoleIAMRole:
     Type: AWS::IAM::Role
@@ -112,21 +104,9 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'SecurityGroup' ]]
       VpcId:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ]]
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpc-VpcId' ]]
 
 Outputs:
-#  PiHoleIAMInstanceProfileRef:
-#    Value: !Ref PiHoleIAMInstanceProfile
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
-#  PiHoleIAMInstanceProfileArn:
-#    Value: !GetAtt PiHoleIAMInstanceProfile.Arn
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Arn'
-#  PiHoleIAMInstanceProfileName:
-#    Value: PiHoleIAMInstanceProfile
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Name'
   PiHoleIAMRoleRef:
     Value: !Ref PiHoleIAMRole
     Export:
