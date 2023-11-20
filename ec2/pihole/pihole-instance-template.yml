@@ -175,14 +175,14 @@ Outputs:
     Value: !GetAtt PiHoleEC2Instance.PublicIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
-  PiHoleEC2NetworkInterfaceAttachmentRef:
-    Value: !Ref PiHoleEC2NetworkInterfaceAttachment
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-Ref'
-  PiHoleEC2NetworkInterfaceAttachmentId:
-    Value: !GetAtt PiHoleEC2NetworkInterfaceAttachment.AttachmentId
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-AttachmentId'
+#  PiHoleEC2NetworkInterfaceAttachmentRef:
+#    Value: !Ref PiHoleEC2NetworkInterfaceAttachment
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-Ref'
+#  PiHoleEC2NetworkInterfaceAttachmentId:
+#    Value: !GetAtt PiHoleEC2NetworkInterfaceAttachment.AttachmentId
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-AttachmentId'
 #  Ipv6ResourceIpv6Address:
 #    Value: !GetAtt Ipv6Resource.Ipv6Address
 #    Export:
