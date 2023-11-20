@@ -29,7 +29,7 @@ Resources:
         - Key: EdwardHomeSecurityGroup
           Value: !Join [ '-', [ Ref: AWS::StackName, 'SecurityGroup', 'EdwardHome' ]]
       VpcId:
-        Fn::ImportValue: !Sub 'vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpc-VpcId'
+        Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpc-VpcId'
 
 Outputs:
   EdwardHomeSecurityGroupRef:
