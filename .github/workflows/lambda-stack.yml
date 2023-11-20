@@ -1,4 +1,4 @@
-name: Fetch EC2 Ipv6 Lambda Stack
+name: Lambda Stack
 
 on:
   workflow_dispatch:
@@ -30,8 +30,8 @@ permissions:
   contents: write
 
 jobs:
-  create-and-execute-lambda:
-    name: Create / Update Lambda Stack and Execute
+  create-lambda-stack:
+    name: Create / Update Lambda Stack
     runs-on: ubuntu-latest
     environment: AWS
     steps:
@@ -44,7 +44,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ github.event.inputs.region }}
-      - name: Deploy and execute Lambda function with CloudFormation
+      - name: Deploy La Stack via CloudFormation
         id: fetch-ec2-ipv6-lambda-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:

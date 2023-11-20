@@ -1,20 +1,22 @@
-name: Upload shared mapping files to S3
+name: Sync shared static files to S3
 
 on:
   workflow_dispatch:
 
 jobs:
   upload:
-    name: Upload shared mapping files to S3
+    name: Sync shared static files to S3
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Upload shared mapping files to S3
-        uses: 3dwardCh3nG/upload-to-s3-action@v1.6.1
+      - name: Sync shared static files to S3
+        uses: jakejarvis/s3-sync-action@v0.5.1
         with:
-          aws_access_key_id: ${{ secrets.AWS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket_name: cloudformation-templates-shared-files
-          source: /mapping
-          destination: /mapping
+          args: --follow-symlinks --delete --exclude 'README.md'
+        env:
+          AWS_S3_BUCKET: 'cloudformation-templates-shared-files'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'ap-southeast-2'
+          SOURCE_DIR: 's3-static-files'
