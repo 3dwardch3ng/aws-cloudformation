@@ -1,4 +1,4 @@
-GENERAL:
+GeneralVpc:
   Vpc:
     Ipv4: 10.1.0.0/16
   PublicSubnet1:

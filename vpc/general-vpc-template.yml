@@ -1,0 +1,600 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  VPC infrastructure stack. A Vpc with 2 public and 2 private subnet will be created, in which the subnet 1 will be the 
+  IPv4 and IPv6 dual stack subnet, the subnet 2 will be the IPv4 only subnet (The IPv6 only subnet creation is not 
+  supported by CloudFormation yet, only via console or CLI).
+Mappings:
+  Fn::Transform:
+    Name: AWS::Include
+    Parameters:
+      Location: s3://cloudformation-templates-shared-files/mapping/cidr.yml
+
+Resources:
+  # VPC
+  GeneralVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock:
+        Fn::FindInMap: [ 'General', Vpc, Ipv4 ]
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'Vpc' ]]
+
+  GeneralVpcIPv6CidrBlock:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref GeneralVpc
+
+  GeneralVpcEgressOnlyInternetGateway:
+    Type: AWS::EC2::EgressOnlyInternetGateway
+    Properties:
+      VpcId: !Ref GeneralVpc
+
+  # Internet Gateway
+  GeneralVpcInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'InternetGateway' ]]
+
+  GeneralVpcInternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref GeneralVpc
+      InternetGatewayId: !Ref GeneralVpcInternetGateway
+
+  # Routing - public subnet 1 and 2
+  GeneralVpcPublicSubnet1RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref GeneralVpc
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'RouteTable', 'PublicSubnet1' ]]
+
+  GeneralVpcPublicSubnet1Route:
+    DependsOn: GeneralVpcInternetGatewayAttachment
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref GeneralVpcPublicSubnet1RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref GeneralVpcInternetGateway
+
+  GeneralVpcPublicSubnet1Ipv6Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref GeneralVpcPublicSubnet1RouteTable
+      DestinationIpv6CidrBlock: ::/0
+      GatewayId: !Ref GeneralVpcInternetGateway
+
+  GeneralVpcPublicSubnet2RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref GeneralVpc
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'RouteTable', 'PublicSubnet2' ]]
+
+  GeneralVpcPublicSubnet2Route:
+    DependsOn: GeneralVpcInternetGatewayAttachment
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref GeneralVpcPublicSubnet2RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref GeneralVpcInternetGateway
+
+  # Routing - private subnet 1 and 2
+  GeneralVpcPrivateSubnet1RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref GeneralVpc
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'RouteTable', 'PrivateSubnet1' ]]
+
+  GeneralVpcPrivateSubnet1Ipv6Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref GeneralVpcPrivateSubnet1RouteTable
+      DestinationIpv6CidrBlock: ::/0
+      EgressOnlyInternetGatewayId: !Ref GeneralVpcEgressOnlyInternetGateway
+
+  GeneralVpcPrivateSubnet2RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref GeneralVpc
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'RouteTable', 'PrivateSubnet2' ]]
+
+  # Access control
+  GeneralVpcPrivateSubnetsNetworkAcl:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      VpcId: !Ref GeneralVpc
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'NetworkAcl' ]]
+
+  GeneralVpcPrivateSubnetsNetworkAclInboundEntry:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref GeneralVpcPrivateSubnetsNetworkAcl
+      RuleNumber: 1
+      PortRange:
+        From: 22 # SSH
+        To: 22
+      Protocol: 6 # TCP
+      RuleAction: allow
+      Egress: false
+      CidrBlock:
+        Fn::FindInMap: [ 'General', Vpc, Ipv4 ]
+
+  GeneralVpcPrivateSubnetsNetworkAclOutboundEntry:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref GeneralVpcPrivateSubnetsNetworkAcl
+      RuleNumber: 2
+      Protocol: -1
+      RuleAction: allow
+      Egress: true
+      CidrBlock: 0.0.0.0/0
+
+  GeneralVpcPrivateSubnetsNetworkAclIpv6OutboundEntry:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !Ref GeneralVpcPrivateSubnetsNetworkAcl
+      RuleNumber: 3
+      Protocol: -1
+      RuleAction: allow
+      Egress: true
+      Ipv6CidrBlock: ::/0
+
+  # Public subnet 1 and 2
+  GeneralVpcPublicSubnet1:
+    DependsOn: GeneralVpcIPv6CidrBlock
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref GeneralVpc
+      CidrBlock:
+        Fn::FindInMap: [ 'GeneralVpc', PublicSubnet1, Ipv4 ]
+      Ipv6CidrBlock:
+        Fn::Sub:
+          - '${VpcPart}${SubnetPart}'
+          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt Vpc.Ipv6CidrBlocks ]]]
+            SubnetPart:
+              Fn::FindInMap: [ 'GeneralVpc', PublicSubnet1, Ipv6 ]
+      AssignIpv6AddressOnCreation: true
+      AvailabilityZone: !Sub '${AWS::Region}a'
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'Subnet', 'PublicSubnet1' ]]
+
+  GeneralVpcPublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref GeneralVpcPublicSubnet1
+      RouteTableId: !Ref GeneralVpcPublicSubnet1RouteTable
+
+  GeneralVpcVpcPublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref GeneralVpc
+      CidrBlock:
+        Fn::FindInMap: [ 'GeneralVpc', PublicSubnet2, Ipv4 ]
+      AvailabilityZone: !Sub '${AWS::Region}b'
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'Subnet', 'PublicSubnet2' ]]
+
+  GeneralVpcPublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref GeneralVpcPublicSubnet2
+      RouteTableId: !Ref GeneralVpcPublicSubnet2RouteTable
+
+  # Private subnet 1 and 2
+  GeneralVpcPrivateSubnet1:
+    DependsOn: GeneralVpcIPv6CidrBlock
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref GeneralVpc
+      CidrBlock:
+        Fn::FindInMap: [ 'GeneralVpc', PrivateSubnet1, Ipv4 ]
+      Ipv6CidrBlock:
+        Fn::Sub:
+          - '${VpcPart}${SubnetPart}'
+          - VpcPart: !Select [ '0', !Split [ '00::/56', !Select [ '0', !GetAtt GeneralVpc.GeneralVpcIpv6CidrBlocks ]] ]
+            SubnetPart:
+              Fn::FindInMap: [ 'GeneralVpc', PrivateSubnet1, Ipv6 ]
+      AssignIpv6AddressOnCreation: true
+      AvailabilityZone: !Sub '${AWS::Region}a'
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'Subnet', 'PrivateSubnet1' ]]
+
+  GeneralVpcPrivateSubnet1AclAssociation:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref GeneralVpcPrivateSubnetsNetworkAcl
+      SubnetId: !Ref GeneralVpcPrivateSubnet1
+
+  GeneralVpcPrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref GeneralVpcPrivateSubnet1
+      RouteTableId: !Ref GeneralVpcPrivateSubnet1RouteTable
+
+  GeneralVpcPrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref GeneralVpc
+      CidrBlock:
+        Fn::FindInMap: [ 'GeneralVpc', PrivateSubnet2, Ipv4 ]
+      AvailabilityZone: !Sub '${AWS::Region}b'
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'GeneralVpc', 'Subnet', 'PrivateSubnet2' ]]
+
+  GeneralVpcPrivateSubnet2AclAssociation:
+    Type: AWS::EC2::SubnetNetworkAclAssociation
+    Properties:
+      NetworkAclId: !Ref GeneralVpcPrivateSubnetsNetworkAcl
+      SubnetId: !Ref GeneralVpcPrivateSubnet2
+
+  GeneralVpcPrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref GeneralVpcPrivateSubnet2
+      RouteTableId: !Ref GeneralVpcPrivateSubnet2RouteTable
+
+Outputs:
+  GeneralVpcRef:
+    Value: !Ref GeneralVpc
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-Ref'
+  GeneralVpcCidrBlock:
+    Value: !GetAtt GeneralVpc.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-CidrBlock'
+  GeneralVpcCidrBlockAssociations:
+    Value: !GetAtt GeneralVpc.CidrBlockAssociations
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-CidrBlockAssociations'
+  GeneralVpcDefaultNetworkAcl:
+    Value: !GetAtt GeneralVpc.DefaultNetworkAcl
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-DefaultNetworkAcl'
+  GeneralVpcDefaultSecurityGroup:
+    Value: !GetAtt GeneralVpc.DefaultSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-DefaultSecurityGroup'
+  GeneralVpcIpv6CidrBlocks:
+    Value: !GetAtt GeneralVpc.Ipv6CidrBlocks
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-Ipv6CidrBlocks'
+  GeneralVpcVpcId:
+    Value: !GetAtt GeneralVpc.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-VpcId'
+  GeneralVpcIPv6CidrBlockRef:
+    Value: !Ref GeneralVpcIPv6CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcIPv6CidrBlock-Ref'
+  GeneralVpcEgressOnlyInternetGatewayRef:
+    Value: !Ref GeneralVpcEgressOnlyInternetGateway
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcEgressOnlyInternetGateway-Ref'
+  GeneralVpcEgressOnlyInternetGatewayId:
+    Value: !GetAtt GeneralVpcEgressOnlyInternetGateway.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcEgressOnlyInternetGateway-Id'
+  GeneralVpcInternetGatewayRef:
+    Value: !Ref GeneralVpcInternetGateway
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInternetGateway-Ref'
+  GeneralVpcInternetGatewayInternetGatewayId:
+    Value: !GetAtt GeneralVpcInternetGateway.InternetGatewayId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInternetGateway-InternetGatewayId'
+  GeneralVpcInternetGatewayAttachmentRef:
+    Value: !Ref GeneralVpcInternetGatewayAttachment
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInternetGatewayAttachment-Ref'
+  GeneralVpcInternetGatewayAttachmentAttachmentType:
+    Value: !GetAtt GeneralVpcInternetGatewayAttachment.AttachmentType
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInternetGatewayAttachment-AttachmentType'
+  GeneralVpcPublicSubnet1RouteTableRef:
+    Value: !Ref GeneralVpcPublicSubnet1RouteTable
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1RouteTable-Ref'
+  GeneralVpcPublicSubnet1RouteTableRouteTableId:
+    Value: !GetAtt GeneralVpcPublicSubnet1RouteTable.RouteTableId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1RouteTable-RouteTableId'
+  GeneralVpcPublicSubnet1RouteRef:
+    Value: !Ref GeneralVpcPublicSubnet1Route
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1Route-Ref'
+  GeneralVpcPublicSubnet1RouteCidrBlock:
+    Value: !GetAtt GeneralVpcPublicSubnet1Route.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1Route-CidrBlock'
+  GeneralVpcPublicSubnet1Ipv6RouteRef:
+    Value: !Ref GeneralVpcPublicSubnet1Ipv6Route
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1Ipv6Route-Ref'
+  GeneralVpcPublicSubnet1Ipv6RouteCidrBlock:
+    Value: !GetAtt GeneralVpcPublicSubnet1Ipv6Route.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1Ipv6Route-CidrBlock'
+  GeneralVpcPublicSubnet2RouteTableRef:
+    Value: !Ref GeneralVpcPublicSubnet2RouteTable
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2RouteTable-Ref'
+  GeneralVpcPublicSubnet2RouteTableRouteTableId:
+    Value: !GetAtt GeneralVpcPublicSubnet2RouteTable.RouteTableId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2RouteTable-RouteTableId'
+  GeneralVpcPublicSubnet2RouteRef:
+    Value: !Ref GeneralVpcPublicSubnet2Route
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2Route-Ref'
+  GeneralVpcPublicSubnet2RouteCidrBlock:
+    Value: !GetAtt GeneralVpcPublicSubnet2Route.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2Route-CidrBlock'
+  GeneralVpcPrivateSubnet1RouteTableRef:
+    Value: !Ref GeneralVpcPrivateSubnet1RouteTable
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1RouteTable-Ref'
+  GeneralVpcPrivateSubnet1RouteTableRouteTableId:
+    Value: !GetAtt GeneralVpcPrivateSubnet1RouteTable.RouteTableId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1RouteTable-RouteTableId'
+  GeneralVpcPrivateSubnet1Ipv6RouteRef:
+    Value: !Ref GeneralVpcPrivateSubnet1Ipv6Route
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1Ipv6Route-Ref'
+  GeneralVpcPrivateSubnet1Ipv6RouteCidrBlock:
+    Value: !GetAtt GeneralVpcPrivateSubnet1Ipv6Route.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1Ipv6Route-CidrBlock'
+  GeneralVpcPrivateSubnet2RouteTableRef:
+    Value: !Ref GeneralVpcPrivateSubnet2RouteTable
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2RouteTable-Ref'
+  GeneralVpcPrivateSubnet2RouteTableRouteTableId:
+    Value: !GetAtt GeneralVpcPrivateSubnet2RouteTable.RouteTableId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2RouteTable-RouteTableId'
+  GeneralVpcPrivateSubnetsNetworkAclRef:
+    Value: !Ref GeneralVpcPrivateSubnetsNetworkAcl
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnetsNetworkAcl-Ref'
+  GeneralVpcPrivateSubnetsNetworkAclId:
+    Value: !GetAtt GeneralVpcPrivateSubnetsNetworkAcl.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnetsNetworkAcl-Id'
+  GeneralVpcPrivateSubnetsNetworkAclInboundEntryRef:
+    Value: !Ref GeneralVpcPrivateSubnetsNetworkAclInboundEntry
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnetsNetworkAclInboundEntry-Ref'
+  GeneralVpcPrivateSubnetsNetworkAclInboundEntryId:
+    Value: !GetAtt GeneralVpcPrivateSubnetsNetworkAclInboundEntry.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnetsNetworkAclInboundEntry-Id'
+  GeneralVpcPrivateSubnetsNetworkAclOutboundEntryRef:
+    Value: !Ref GeneralVpcPrivateSubnetsNetworkAclOutboundEntry
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnetsNetworkAclOutboundEntry-Ref'
+  GeneralVpcPrivateSubnetsNetworkAclOutboundEntryId:
+    Value: !GetAtt GeneralVpcPrivateSubnetsNetworkAclOutboundEntry.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnetsNetworkAclOutboundEntry-Id'
+  GeneralVpcPrivateSubnetsNetworkAclIpv6OutboundEntry:
+    Value: !Ref GeneralVpcPrivateSubnetsNetworkAclIpv6OutboundEntry
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnetsNetworkAclIpv6OutboundEntry-Ref'
+  GeneralVpcPrivateSubnetsNetworkAclIpv6OutboundEntryId:
+    Value: !GetAtt GeneralVpcPrivateSubnetsNetworkAclIpv6OutboundEntry.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnetsNetworkAclIpv6OutboundEntry-Id'
+  GeneralVpcPublicSubnet1Ref:
+    Value: !Ref GeneralVpcPublicSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-Ref'
+  GeneralVpcPublicSubnet1AvailabilityZone:
+    Value: !GetAtt GeneralVpcPublicSubnet1.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
+  GeneralVpcPublicSubnet1AvailabilityZoneId:
+    Value: !GetAtt GeneralVpcPublicSubnet1.AvailabilityZoneId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZoneId'
+  GeneralVpcPublicSubnet1CidrBlock:
+    Value: !GetAtt GeneralVpcPublicSubnet1.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-CidrBlock'
+  GeneralVpcPublicSubnet1Ipv6CidrBlock:
+    Value: !GetAtt GeneralVpcPublicSubnet1.Ipv6CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-Ipv6CidrBlock'
+  GeneralVpcPublicSubnet1NetworkAclAssociationId:
+    Value: !GetAtt GeneralVpcPublicSubnet1.NetworkAclAssociationId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-NetworkAclAssociationId'
+  GeneralVpcPublicSubnet1OutpostArn:
+    Value: !GetAtt GeneralVpcPublicSubnet1.OutpostArn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-OutpostArn'
+  GeneralVpcPublicSubnet1SubnetId:
+    Value: !GetAtt GeneralVpcPublicSubnet1.SubnetId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-SubnetId'
+  GeneralVpcPublicSubnet1VpcId:
+    Value: !GetAtt GeneralVpcPublicSubnet1.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-VpcId'
+  GeneralVpcPublicSubnet1RouteTableAssociationRef:
+    Value: !Ref GeneralVpcPublicSubnet1RouteTableAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1RouteTableAssociation-Ref'
+  GeneralVpcPublicSubnet1RouteTableAssociationId:
+    Value: !GetAtt GeneralVpcPublicSubnet1RouteTableAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1RouteTableAssociation-Id'
+  GeneralVpcPublicSubnet2Ref:
+    Value: !Ref GeneralVpcPublicSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-Ref'
+  GeneralVpcPublicSubnet2AvailabilityZone:
+    Value: !GetAtt GeneralVpcPublicSubnet2.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-AvailabilityZone'
+  GeneralVpcPublicSubnet2AvailabilityZoneId:
+    Value: !GetAtt GeneralVpcPublicSubnet2.AvailabilityZoneId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-AvailabilityZoneId'
+  GeneralVpcPublicSubnet2CidrBlock:
+    Value: !GetAtt GeneralVpcPublicSubnet2.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-CidrBlock'
+  GeneralVpcPublicSubnet2Ipv6CidrBlock:
+    Value: !GetAtt GeneralVpcPublicSubnet2.Ipv6CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-Ipv6CidrBlock'
+  GeneralVpcPublicSubnet2NetworkAclAssociationId:
+    Value: !GetAtt GeneralVpcPublicSubnet2.NetworkAclAssociationId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-NetworkAclAssociationId'
+  GeneralVpcPublicSubnet2OutpostArn:
+    Value: !GetAtt GeneralVpcPublicSubnet2.OutpostArn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-OutpostArn'
+  GeneralVpcPublicSubnet2SubnetId:
+    Value: !GetAtt GeneralVpcPublicSubnet2.SubnetId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-SubnetId'
+  GeneralVpcPublicSubnet2VpcId:
+    Value: !GetAtt GeneralVpcPublicSubnet2.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2-VpcId'
+  GeneralVpcPublicSubnet2RouteTableAssociationRef:
+    Value: !Ref GeneralVpcPublicSubnet2RouteTableAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2RouteTableAssociation-Ref'
+  GeneralVpcPublicSubnet2RouteTableAssociationId:
+    Value: !GetAtt GeneralVpcPublicSubnet2RouteTableAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet2RouteTableAssociation-Id'
+  GeneralVpcPrivateSubnet1Ref:
+    Value: !Ref GeneralVpcPrivateSubnet1
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-Ref'
+  GeneralVpcPrivateSubnet1AvailabilityZone:
+    Value: !GetAtt GeneralVpcPrivateSubnet1.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-AvailabilityZone'
+  GeneralVpcPrivateSubnet1AvailabilityZoneId:
+    Value: !GetAtt GeneralVpcPrivateSubnet1.AvailabilityZoneId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-AvailabilityZoneId'
+  GeneralVpcPrivateSubnet1CidrBlock:
+    Value: !GetAtt GeneralVpcPrivateSubnet1.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-CidrBlock'
+  GeneralVpcPrivateSubnet1Ipv6CidrBlock:
+    Value: !GetAtt GeneralVpcPrivateSubnet1.Ipv6CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-Ipv6CidrBlock'
+  GeneralVpcPrivateSubnet1NetworkAclAssociationId:
+    Value: !GetAtt GeneralVpcPrivateSubnet1.NetworkAclAssociationId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-NetworkAclAssociationId'
+  GeneralVpcPrivateSubnet1OutpostArn:
+    Value: !GetAtt GeneralVpcPrivateSubnet1.OutpostArn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-OutpostArn'
+  GeneralVpcPrivateSubnet1SubnetId:
+    Value: !GetAtt GeneralVpcPrivateSubnet1.SubnetId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-SubnetId'
+  GeneralVpcPrivateSubnet1VpcId:
+    Value: !GetAtt GeneralVpcPrivateSubnet1.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-VpcId'
+  GeneralVpcPrivateSubnet1AclAssociationRef:
+    Value: !Ref GeneralVpcPrivateSubnet1AclAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1AclAssociation-Ref'
+  GeneralVpcPrivateSubnet1AclAssociationAssociationId:
+    Value: !GetAtt GeneralVpcPrivateSubnet1AclAssociation.AssociationId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1AclAssociation-AssociationId'
+  GeneralVpcPrivateSubnet1RouteTableAssociationRef:
+    Value: !Ref GeneralVpcPrivateSubnet1RouteTableAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1RouteTableAssociation-Ref'
+  GeneralVpcPrivateSubnet1RouteTableAssociationId:
+    Value: !GetAtt GeneralVpcPrivateSubnet1RouteTableAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1RouteTableAssociation-Id'
+  
+  GeneralVpcPrivateSubnet2Ref:
+    Value: !Ref GeneralVpcPrivateSubnet2
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-Ref'
+  GeneralVpcPrivateSubnet2AvailabilityZone:
+    Value: !GetAtt GeneralVpcPrivateSubnet2.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-AvailabilityZone'
+  GeneralVpcPrivateSubnet2AvailabilityZoneId:
+    Value: !GetAtt GeneralVpcPrivateSubnet2.AvailabilityZoneId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-AvailabilityZoneId'
+  GeneralVpcPrivateSubnet2CidrBlock:
+    Value: !GetAtt GeneralVpcPrivateSubnet2.CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-CidrBlock'
+  GeneralVpcPrivateSubnet2Ipv6CidrBlock:
+    Value: !GetAtt GeneralVpcPrivateSubnet2.Ipv6CidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-Ipv6CidrBlock'
+  GeneralVpcPrivateSubnet2NetworkAclAssociationId:
+    Value: !GetAtt GeneralVpcPrivateSubnet2.NetworkAclAssociationId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-NetworkAclAssociationId'
+  GeneralVpcPrivateSubnet2OutpostArn:
+    Value: !GetAtt GeneralVpcPrivateSubnet2.OutpostArn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-OutpostArn'
+  GeneralVpcPrivateSubnet2SubnetId:
+    Value: !GetAtt GeneralVpcPrivateSubnet2.SubnetId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-SubnetId'
+  GeneralVpcPrivateSubnet2VpcId:
+    Value: !GetAtt GeneralVpcPrivateSubnet2.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-VpcId'
+  GeneralVpcPrivateSubnet2AclAssociationRef:
+    Value: !Ref GeneralVpcPrivateSubnet2AclAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2AclAssociation-Ref'
+  GeneralVpcPrivateSubnet2AclAssociationAssociationId:
+    Value: !GetAtt GeneralVpcPrivateSubnet2AclAssociation.AssociationId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2AclAssociation-AssociationId'
+  GeneralVpcPrivateSubnet2RouteTableAssociationRef:
+    Value: !Ref GeneralVpcPrivateSubnet2RouteTableAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2RouteTableAssociation-Ref'
+  GeneralVpcPrivateSubnet2RouteTableAssociationId:
+    Value: !GetAtt GeneralVpcPrivateSubnet2RouteTableAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2RouteTableAssociation-Id'
