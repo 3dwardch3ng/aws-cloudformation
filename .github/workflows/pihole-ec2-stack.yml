@@ -72,4 +72,5 @@ jobs:
         with:
           name: pihole-instance-stack
           template: ec2/pihole/pihole-instance-template.yml
+          capabilities: CAPABILITY_NAMED_IAM
           no-fail-on-empty-changeset: "1"
