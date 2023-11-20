@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Create IAM Roles
+
+Resources:
+  LogRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: LogRolePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:Create*'
+                  - 'logs:PutLogEvents'
+                  - 's3:GetObject'
+                Resource:
+                  - 'arn:aws:logs:*:*:*'
+                  - 'arn:aws:s3:::*'
+
+Outputs:
+  LogRoleRef:
+    Value: !Ref LogRole
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-LogRole-Ref'
+  LogRoleArn:
+    Value: !GetAtt LogRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-LogRole-Arn'
+  LogRoleRoleId:
+    Value: !GetAtt LogRole.RoleId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-LogRole-RoleId'

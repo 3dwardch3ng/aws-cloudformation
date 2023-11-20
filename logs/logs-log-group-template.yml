@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create LogGroups
+
+Resources:
+  CloudFormationLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: CloudFormationLogGroup
+  EC2LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: EC2LogGroup
+
+Outputs:
+  CloudFormationLogGroupRef:
+    Value: !Ref CloudFormationLogGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-Logs-LogGroup-CloudFormationLogGroup-Ref'
+  CloudFormationLogGroupArn:
+    Value: !GetAtt CloudFormationLogGroup.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-Logs-LogGroup-CloudFormationLogGroup-Arn'
+  EC2LogGroupRef:
+    Value: !Ref EC2LogGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-Logs-LogGroup-EC2LogGroup-Ref'
+  EC2LogGroupArn:
+    Value: !GetAtt EC2LogGroup.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-Logs-LogGroup-EC2LogGroup-Arn'

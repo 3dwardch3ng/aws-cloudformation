@@ -1,4 +1,4 @@
-name: Logs LogGroup Stack
+name: IAM Role Stack
 
 on:
   workflow_dispatch:
@@ -30,8 +30,8 @@ permissions:
   contents: write
 
 jobs:
-  create-update-stack:
-    name: Create / Update Logs LogGroup Stack
+  create-and-execute-lambda:
+    name: Create / Update IAM Role Stack
     runs-on: ubuntu-latest
     environment: AWS
     steps:
@@ -44,10 +44,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ github.event.inputs.region }}
-      - name: Create / Update Logs LogGroup Stack
+      - name: Create / Update IAM Role Stack
         id: logs-log-group-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: logs-log-group-stack
-          template: logs/logs-log-group-template.yml
+          name: iam-role-stack
+          template: iam/iam-role-template.yml
           no-fail-on-empty-changeset: "1"

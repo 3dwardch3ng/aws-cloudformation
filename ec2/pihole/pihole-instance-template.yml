@@ -5,6 +5,13 @@ Resources:
   # EC2 Instance
   PiHoleEC2Instance:
     Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          cloud-watch-logs:
+            - install-cloud-watch-logs-agent
+        install-cloud-watch-logs-agent:
+
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'PublicSubnet1', 'AvailabilityZone' ]]

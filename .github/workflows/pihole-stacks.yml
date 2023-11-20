@@ -1,4 +1,4 @@
-name: PiHole EC2 Stack
+name: PiHole Stacks
 
 on:
   workflow_dispatch:
@@ -30,8 +30,8 @@ permissions:
   contents: write
 
 jobs:
-  create-ec2:
-    name: Create / Update EC2 Resources
+  create-update-stacks:
+    name: Create / Update PiHole Stacks
     runs-on: ubuntu-latest
     environment: AWS
     steps:
@@ -44,7 +44,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ github.event.inputs.region }}
-      - name: Deploy PiHole Security Stack via CloudFormation
+      - name: Create / Update PiHole Stacks
         id: pihole-security-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
