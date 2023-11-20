@@ -28,11 +28,11 @@ Resources:
 
 Outputs:
   EC2KeyPairRef:
-    Value: !Ref NewKeyPair
+    Value: !Ref EC2KeyPair
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-KeyPair-EC2KeyPair-Ref'
   EC2KeyPairKeyFingerprint:
-    Value: !GetAtt NewKeyPair.KeyFingerprint
+    Value: !GetAtt EC2KeyPair.KeyFingerprint
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-KeyPair-EC2KeyPair-KeyFingerprint'
   EC2KeyPairKeyPairId:
