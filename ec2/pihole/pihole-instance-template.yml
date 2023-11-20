@@ -1,6 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a PiHole EC2 Security Resources in AWS
 
+Parameters:
+  Ipv4HostNumber:
+    Description: The host value of the public IPv4 address for the new instance
+    Type: String
+    Default: 100
+  Ipv6HostNumber:
+    Description: The host value of the public IPv6 address for the new instance
+    Type: String
+    Default: 10
+
 Resources:
   # EC2 Instance
   PiHoleEC2Instance:
@@ -57,14 +67,10 @@ Resources:
       KeyName: pihole-key
       Monitoring: true
       NetworkInterfaces:
-#        - AssociateCarrierIpAddress: false
         - AssociatePublicIpAddress: false
           DeleteOnTermination: true
           Description: 'PiHole EC2 Network Interface 0'
           DeviceIndex: 0
-#          GroupSet:
-#            - String
-#          Ipv6AddressCount: Integer
           Ipv6Addresses:
             - Ipv6Address:
                 Fn::Sub:
@@ -75,7 +81,7 @@ Resources:
                         - Fn::Split:
                             - '/64'
                             - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-Ipv6CidrBlock' ] ]
-                    HostPart: 15
+                    HostPart: !Ref Ipv6HostNumber
 #          NetworkInterfaceId: String
           PrivateIpAddress:
             Fn::Sub:
@@ -86,10 +92,7 @@ Resources:
                     - Fn::Split:
                         - '0/24'
                         - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-CidrBlock' ] ]
-                HostPart: 110
-#          PrivateIpAddresses:
-#            - PrivateIpAddressSpecification
-#          SecondaryPrivateIpAddressCount: Integer
+                HostPart: !Ref Ipv4HostNumber
           SubnetId:
             Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-SubnetId'
       PrivateDnsNameOptions:
@@ -167,6 +170,14 @@ Resources:
 #      InstanceId: !Ref PiHoleEC2Instance
 #      NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
 
+  # EC2 EIP Association
+  PiHoleEC2EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ]]
+      InstanceId: !Ref PiHoleEC2Instance
+
   # IAM Instance Profile
   PiHoleIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -223,4 +234,12 @@ Outputs:
 #    Value: !GetAtt Ipv6Resource.Ipv6Address
 #    Export:
 #      Name: !Sub '${AWS::StackName}-${AWS::Region}-CloudFormation-CustomResource-Ipv6Resource-Ipv6Address'
+  PiHoleEC2EIPAssociationRef:
+    Value: !Ref PiHoleEC2EIPAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Ref'
+  PiHoleEC2EIPAssociationId:
+    Value: !GetAtt PiHoleEC2EIPAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'
 
