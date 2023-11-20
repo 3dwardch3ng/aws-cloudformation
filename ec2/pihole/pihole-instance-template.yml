@@ -46,7 +46,7 @@ Resources:
     Properties:
       InstanceProfileName: PiHoleIAMInstanceProfile
       Roles:
-        - !Sub 'pihole-security-stack-${AWS::Region}-IAM-Role-PiHoleIAMRole-Ref'
+        - Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-Role-PiHoleIAMRole-Ref'
 
   # Fetch EC2 Ipv6 CloudFormation Custom Resource
   Ipv6Resource:
