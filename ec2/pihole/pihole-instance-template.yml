@@ -119,15 +119,15 @@ Resources:
 #      Tags:
 #        - Key: Name
 #          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
-
-  # EC2 NetworkInterfaceAttachment
-  PiHoleEC2NetworkInterfaceAttachment:
-    Type: AWS::EC2::NetworkInterfaceAttachment
-    Properties:
-      DeleteOnTermination: false
-      DeviceIndex: 0
-      InstanceId: !Ref PiHoleEC2Instance
-      NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
+#
+#  # EC2 NetworkInterfaceAttachment
+#  PiHoleEC2NetworkInterfaceAttachment:
+#    Type: AWS::EC2::NetworkInterfaceAttachment
+#    Properties:
+#      DeleteOnTermination: false
+#      DeviceIndex: 0
+#      InstanceId: !Ref PiHoleEC2Instance
+#      NetworkInterfaceId: !Sub 'pihole-network-stack-${AWS::Region}-EC2-NetworkInterface-PiHoleNetworkInterface0-Id'
 
   # IAM Instance Profile
   PiHoleIAMInstanceProfile:
@@ -139,51 +139,51 @@ Resources:
         - Fn::ImportValue: !Sub 'iam-role-stack-${AWS::Region}-IAM-Role-LogRole-Ref'
 
   # Fetch EC2 Ipv6 CloudFormation Custom Resource
-  Ipv6Resource:
-    DependsOn:
-      - PiHoleEC2Instance
-      - PiHoleEC2NetworkInterfaceAttachment
-    Type: AWS::CloudFormation::CustomResource
-    Properties:
-      ServiceToken:
-        Fn::ImportValue: !Join [ '-', [ 'fetch-ec2-ipv6-lambda-stack', Ref: AWS::Region, 'FetchEC2Ipv6FunctionArn' ]]
-      ResourceRef: !Ref PiHoleEC2Instance
+#  Ipv6Resource:
+#    DependsOn:
+#      - PiHoleEC2Instance
+#      - PiHoleEC2NetworkInterfaceAttachment
+#    Type: AWS::CloudFormation::CustomResource
+#    Properties:
+#      ServiceToken:
+#        Fn::ImportValue: !Join [ '-', [ 'fetch-ec2-ipv6-lambda-stack', Ref: AWS::Region, 'FetchEC2Ipv6FunctionArn' ]]
+#      ResourceRef: !Ref PiHoleEC2Instance
 
 Outputs:
-  PiHoleEC2InstanceRef:
-    Value: !Ref PiHoleEC2Instance
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-Ref'
-  PiHoleEC2InstanceAvailabilityZone:
-    Value: !GetAtt PiHoleEC2Instance.AvailabilityZone
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-AvailabilityZone'
-  PiHoleEC2InstancePrivateDnsName:
-    Value: !GetAtt PiHoleEC2Instance.PrivateDnsName
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateDnsName'
-  PiHoleEC2InstancePrivateIp:
-    Value: !GetAtt PiHoleEC2Instance.PrivateIp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
-  PiHoleEC2InstancePublicDnsName:
-    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
-  PiHoleEC2InstancePublicIp:
-    Value: !GetAtt PiHoleEC2Instance.PublicIp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
-  PiHoleEC2NetworkInterfaceAttachmentRef:
-    Value: !Ref PiHoleEC2NetworkInterfaceAttachment
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-Ref'
-  PiHoleEC2NetworkInterfaceAttachmentId:
-    Value: !GetAtt PiHoleEC2NetworkInterfaceAttachment.AttachmentId
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-AttachmentId'
-  Ipv6ResourceIpv6Address:
-    Value: !GetAtt Ipv6Resource.Ipv6Address
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-CloudFormation-CustomResource-Ipv6Resource-Ipv6Address'
+#  PiHoleEC2InstanceRef:
+#    Value: !Ref PiHoleEC2Instance
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-Ref'
+#  PiHoleEC2InstanceAvailabilityZone:
+#    Value: !GetAtt PiHoleEC2Instance.AvailabilityZone
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-AvailabilityZone'
+#  PiHoleEC2InstancePrivateDnsName:
+#    Value: !GetAtt PiHoleEC2Instance.PrivateDnsName
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateDnsName'
+#  PiHoleEC2InstancePrivateIp:
+#    Value: !GetAtt PiHoleEC2Instance.PrivateIp
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
+#  PiHoleEC2InstancePublicDnsName:
+#    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
+#  PiHoleEC2InstancePublicIp:
+#    Value: !GetAtt PiHoleEC2Instance.PublicIp
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
+#  PiHoleEC2NetworkInterfaceAttachmentRef:
+#    Value: !Ref PiHoleEC2NetworkInterfaceAttachment
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-Ref'
+#  PiHoleEC2NetworkInterfaceAttachmentId:
+#    Value: !GetAtt PiHoleEC2NetworkInterfaceAttachment.AttachmentId
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-NetworkInterfaceAttachment-PiHoleEC2NetworkInterfaceAttachment-AttachmentId'
+#  Ipv6ResourceIpv6Address:
+#    Value: !GetAtt Ipv6Resource.Ipv6Address
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-CloudFormation-CustomResource-Ipv6Resource-Ipv6Address'
 
