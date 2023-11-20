@@ -57,6 +57,11 @@ Resources:
           FromPort: -1
           ToPort: -1
         - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for SSH TCP on port 22
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        - CidrIp: 0.0.0.0/0
           Description: Allow inbound ipv4 traffic for pihole-FTL DNS TCP on port 53
           IpProtocol: tcp
           FromPort: 53

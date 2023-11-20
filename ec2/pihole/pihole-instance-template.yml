@@ -156,6 +156,10 @@ Resources:
             - '         --resource PiHoleEC2Instance '
             - '         --region '
             - !Ref 'AWS::Region'
+            - |
+              # Install the EC2 Instance Connect
+            - |
+              sudo apt-get install ec2-instance-connect
             - |+
       Tags:
         - Key: Name
