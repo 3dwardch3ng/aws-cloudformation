@@ -533,10 +533,6 @@ Outputs:
     Value: !Ref GeneralVpcPrivateSubnet1AclAssociation
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1AclAssociation-Ref'
-  GeneralVpcPrivateSubnet1AclAssociationAssociationId:
-    Value: !GetAtt GeneralVpcPrivateSubnet1AclAssociation.AssociationId
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1AclAssociation-AssociationId'
   GeneralVpcPrivateSubnet1RouteTableAssociationRef:
     Value: !Ref GeneralVpcPrivateSubnet1RouteTableAssociation
     Export:
@@ -545,7 +541,6 @@ Outputs:
     Value: !GetAtt GeneralVpcPrivateSubnet1RouteTableAssociation.Id
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1RouteTableAssociation-Id'
-  
   GeneralVpcPrivateSubnet2Ref:
     Value: !Ref GeneralVpcPrivateSubnet2
     Export:
@@ -586,10 +581,6 @@ Outputs:
     Value: !Ref GeneralVpcPrivateSubnet2AclAssociation
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2AclAssociation-Ref'
-  GeneralVpcPrivateSubnet2AclAssociationAssociationId:
-    Value: !GetAtt GeneralVpcPrivateSubnet2AclAssociation.AssociationId
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2AclAssociation-AssociationId'
   GeneralVpcPrivateSubnet2RouteTableAssociationRef:
     Value: !Ref GeneralVpcPrivateSubnet2RouteTableAssociation
     Export:
