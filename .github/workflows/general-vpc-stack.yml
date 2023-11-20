@@ -1,14 +1,8 @@
-name: VPC Stack
+name: General VPC Stack
 
 on:
   workflow_dispatch:
     inputs:
-      category:
-        description: 'Category'
-        type: choice
-        default: 'GENERAL'
-        options:
-          - 'GENERAL'
       region:
         description: 'AWS Region'
         type: choice
@@ -37,7 +31,7 @@ permissions:
 
 jobs:
   create-vpc:
-    name: Create / Update VPC Resources
+    name: Create / Update General VPC Resources
     runs-on: ubuntu-latest
     environment: AWS
     steps:
@@ -54,6 +48,6 @@ jobs:
         id: vpc-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: vpc-stack
+          name: general-vpc-stack
           template: vpc/general-vpc-template.yml
           no-fail-on-empty-changeset: "1"
