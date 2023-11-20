@@ -27,12 +27,20 @@ Resources:
           ToPort: 22
       Tags:
         - Key: EdwardHomeSecurityGroup
-          Value: !Sub 'EdwardHome-${AWS::Region}-SecurityGroup'
+          Value: !Join [ '-', [ Ref: AWS::StackName, 'SecurityGroup', 'EdwardHome' ]]
       VpcId:
-        Fn::ImportValue: !Sub 'vpc-stack-${AWS::Region}-VpcId'
+        Fn::ImportValue: !Sub 'vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpc-VpcId'
 
 Outputs:
-  EdwardHomeSecurityGroupId:
+  EdwardHomeSecurityGroupRef:
     Value: !Ref EdwardHomeSecurityGroup
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EdwardHome-EC2-SecurityGroup-Id'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-EdwardHomeSecurityGroup-Ref'
+  EdwardHomeSecurityGroupGroupId:
+    Value: !GetAtt EdwardHomeSecurityGroup.GroupId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-EdwardHomeSecurityGroup-GroupId'
+  EdwardHomeSecurityGroupVpcId:
+    Value: !GetAtt EdwardHomeSecurityGroup.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-EdwardHomeSecurityGroup-VpcId'
