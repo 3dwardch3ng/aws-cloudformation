@@ -283,6 +283,43 @@ Resources:
       Roles:
         - Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-Role-PiHoleIAMRole-Ref'
 
+  # Logs LogGroup
+  PiHoleSyslogLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '${EC2ServiceName}-syslog-log-group'
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: PiHoleSyslogLogGroup
+
+  PiHoleCfnInitLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '${EC2ServiceName}-cfn-init-log-group'
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: PiHoleCfnInitLogGroup
+
+  PiHoleCfnInitCmdLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '${EC2ServiceName}-cfn-init-cmd-log-group'
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: PiHoleCfnInitLogGroup
+
+  PiHoleCfnWireLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '${EC2ServiceName}-cfn-wire-log-group'
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: PiHoleCfnWireLogGroup
+
 Outputs:
   PiHoleEC2InstanceRef:
     Value: !Ref PiHoleEC2Instance
