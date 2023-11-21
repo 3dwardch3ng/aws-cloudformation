@@ -18,22 +18,29 @@ Resources:
       Description: 'The IAM Role for the PiHole EC2 Instance'
       MaxSessionDuration: 43200
       ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/IAMReadOnlyAccess
       Policies:
-        - PolicyName: LogRolePolicy
+        - PolicyName: PiHoleIAMRoleS3Policy
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - 'logs:Create*'
-                  - 'logs:PutLogEvents'
                   - 's3:GetObject'
                 Resource:
-                  - 'arn:aws:logs:*:*:*'
                   - 'arn:aws:s3:::*'
+        - PolicyName: PiHoleIAMRoleLogPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:PutRetentionPolicy'
+                Resource:
+                  - '*'
       RoleName: 'PiHoleIAMRole'
       Tags:
         - Key: Name
