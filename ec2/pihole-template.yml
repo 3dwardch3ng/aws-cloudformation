@@ -1,88 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Creates a PiHole EC2 instance in AWS
-
-Parameters:
-  VpcCategory:
-    Description: The VPC Category to deploy the EC2 instance into
-    Type: String
-    Default: GENERAL
-    AllowedValues:
-      - GENERAL
-  Subnet:
-    Description: The Subnet to deploy the EC2 instance into
-    Type: String
-    Default: PublicSubnet1
-    AllowedValues:
-      - PublicSubnet1
-      - PublicSubnet2
-
-Mappings:
-  Properties:
-    CouldFormationInit:
-      EC2ResourceName: PiHoleEC2Instance
-      ResourcePath: Resources.PiHoleEC2Instance.Metadata.AWS::CloudFormation::Init
+Description: Creates a PiHole EC2 Resources in AWS
 
 Resources:
-  # EC2 Instance
-#  PiHoleEC2Instance:
-#    Type: AWS::EC2::Instance
-#    Properties:
-#      AvailabilityZone:
-#        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ]]
-#      BlockDeviceMappings:
-#        - DeviceName: /dev/xvda
-#          Ebs:
-#            DeleteOnTermination: true
-#            VolumeSize: 16
-#            VolumeType: gp3
-#      LaunchTemplate:
-#        LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
-#        Version: !GetAtt PiHoleEC2LaunchTemplate.LatestVersionNumber
-#      PropagateTagsToVolumeOnCreation: true
-#      Volumes:
-#        - Device: /dev/xvda
-#          VolumeId: !Ref PiHoleEBSStorage
-#      Tags:
-#        - Key: Name
-#          Value: !Sub 'PiHole-${AWS::Region}-${!Ref Subnet}-EC2'
-  PiHoleEC2Instance:
-    Type: AWS::EC2::Instance
+  # EC2 EIP Association
+  PiHoleEC2EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
     Properties:
-      AvailabilityZone:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ]]
-      BlockDeviceMappings:
-        - DeviceName: /dev/xvda
-          Ebs:
-            DeleteOnTermination: true
-            VolumeSize: 16
-            VolumeType: gp3
-      IamInstanceProfile: !Ref PiHoleIAMInstanceProfile
-      ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
-      InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
-      KeyName: pihole-key
-#      LaunchTemplate:
-#        LaunchTemplateId: !Ref PiHoleEC2LaunchTemplate
-#        Version: !GetAtt PiHoleEC2LaunchTemplate.LatestVersionNumber
-      Monitoring: true
-      NetworkInterfaces:
-        - AssociatePublicIpAddress: false
-          DeleteOnTermination: false
-          Description: 'PiHole EC2 Network Interface 0'
-          DeviceIndex: 0
-          NetworkInterfaceId: !Ref PiHoleNetworkInterfaces
-      PrivateDnsNameOptions:
-        EnableResourceNameDnsAAAARecord: true
-        EnableResourceNameDnsARecord: true
-        HostnameType: 'resource-name'
-      PropagateTagsToVolumeOnCreation: true
-      SubnetId:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
-      Volumes:
-        - Device: /dev/xvda
-          VolumeId: !Ref PiHoleEBSStorage
-      Tags:
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'EC2Instance' ]]
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ] ]
+      InstanceId: !Ref PiHoleEC2Instance
 
   # IAM Instance Profile
   PiHoleIAMInstanceProfile:
@@ -90,7 +16,9 @@ Resources:
     Properties:
       InstanceProfileName: PiHoleIAMInstanceProfile
       Roles:
-        - Ref: PiHoleIAMRole
+        - Fn::ImportValue: !Ref PiHoleIAMRole
+
+  # IAM Role
   PiHoleIAMRole:
     Type: AWS::IAM::Role
     Properties:
@@ -106,115 +34,33 @@ Resources:
       Description: 'The IAM Role for the PiHole EC2 Instance'
       MaxSessionDuration: 43200
       ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/IAMReadOnlyAccess
+      Policies:
+        - PolicyName: PiHoleIAMRoleS3Policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                Resource:
+                  - 'arn:aws:s3:::*'
+        - PolicyName: PiHoleIAMRoleLogPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:PutRetentionPolicy'
+                Resource:
+                  - '*'
       RoleName: 'PiHoleIAMRole'
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'IAMRole' ]]
-
-  PiHoleNetworkInterfaces:
-    Type: AWS::EC2::NetworkInterface
-    Properties:
-      Description: 'PiHole EC2 Network Interface 0'
-      GroupSet:
-        - Ref: PiHoleEC2SecurityGroup
-        - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
-      Ipv6Addresses:
-        - Ipv6Address:
-            Fn::Sub:
-              - '${NetworkPart}${HostPart}'
-              - NetworkPart:
-                  Fn::Select:
-                    - '0'
-                    - Fn::Split:
-                        - '/64'
-                        - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Ipv6CidrBlock' ] ]
-                HostPart: 10
-      PrivateIpAddress:
-        Fn::Sub:
-          - '${NetworkPart}${HostPart}'
-          - NetworkPart:
-              Fn::Select:
-                - '0'
-                - Fn::Split:
-                    - '0/24'
-                    - Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'CidrBlock' ] ]
-            HostPart: 100
-      SourceDestCheck: true
-      SubnetId:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
-      Tags:
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'NetworkInterfaces' ]]
-
-  # EC2 Launch Template
-#  PiHoleEC2LaunchTemplate:
-#    Type: AWS::EC2::LaunchTemplate
-#    Properties:
-#      LaunchTemplateData:
-#        BlockDeviceMappings:
-#          - DeviceName: /dev/xvda
-#            Ebs:
-#              DeleteOnTermination: true
-#              VolumeSize: 16
-#              VolumeType: gp3
-#        IamInstanceProfile:
-#          Arn: !GetAtt PiHoleIAMInstanceProfile.Arn
-#        ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
-#        InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
-#        KeyName: pihole-key
-#        Monitoring:
-#          Enabled: true
-#        NetworkInterfaces:
-#          - AssociatePublicIpAddress: false
-#            DeleteOnTermination: false
-#            Description: 'PiHole EC2 Network Interface 0'
-#            DeviceIndex: 0
-#            Ipv4PrefixCount: 1
-#            Ipv6PrefixCount: 1
-#            NetworkCardIndex: 0
-#            SubnetId:
-#              Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'Id' ] ]
-#        PrivateDnsNameOptions:
-#          EnableResourceNameDnsAAAARecord: true
-#          EnableResourceNameDnsARecord: true
-#          HostnameType: 'resource-name'
-#        SecurityGroupIds:
-#          - Ref: PiHoleEC2SecurityGroup
-#          - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EdwardHomeSecurityGroupId' ] ]
-#      LaunchTemplateName: piHoleEC2LaunchTemplate
-#      TagSpecifications:
-#        - ResourceType: 'launch-template'
-#          Tags:
-#            - Key: Name
-#              Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2LaunchTemplate', 'piHoleEC2LaunchTemplate' ]]
-
-  # EC2 EIP Association
-#  PiHoleEC2EIPAssociation:
-#    Type: AWS::EC2::EIPAssociation
-#    Properties:
-#      AllocationId:
-#        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EIP1', 'AllocationId' ]]
-#      InstanceId: !Ref PiHoleEC2Instance
-
-  # EBS Storage
-  PiHoleEBSStorage:
-    Type: AWS::EC2::Volume
-    Properties:
-      AutoEnableIO: true
-      AvailabilityZone:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, Ref: Subnet, 'AvailabilityZone' ]]
-      Encrypted: true
-      Iops: 3000
-      MultiAttachEnabled: false
-      Size: 16
-      Throughput: 500
-      VolumeType: gp3
-      Tags:
-        - Key: Name
-          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'EBSStorage' ]]
 
   # Security Group
   PiHoleEC2SecurityGroup:
@@ -294,46 +140,31 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole', 'SecurityGroup' ]]
       VpcId:
-        Fn::ImportValue: !Join [ '-', [ 'vpc-stack', Ref: AWS::Region, 'VpcId' ] ]
-
-  # Fetch EC2 Ipv6 CloudFormation Custom Resource
-#  Ipv6Resource:
-#    Type: AWS::CloudFormation::CustomResource
-#    Properties:
-#      ServiceToken:
-#        Fn::ImportValue: !Join [ '-', [ 'fetch-ec2-ipv6-lambda-stack', Ref: AWS::Region, 'FetchEC2Ipv6FunctionArn' ]]
-#      ResourceRef: !Ref PiHoleEC2Instance
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpc-VpcId' ]]
 
 Outputs:
-#    PiHoleEC2InstanceId:
-#      Value: !Ref PiHoleEC2Instance
-#      Export:
-#        Name: !Sub 'PiHole-${AWS::Region}-EC2-InstanceId'
-#    PiHoleEC2InstancePublicIpv4:
-#      Value: !GetAtt PiHoleEC2Instance.PublicIp
-#      Export:
-#        Name: !Sub 'PiHole-${AWS::Region}-EC2-Public-Ipv4'
-#    PiHoleEC2InstancePublicIpv6:
-#      Value: !GetAtt Ipv6Resource.Ipv6Address
-#      Export:
-#        Name: !Sub 'PiHole-${AWS::Region}-EC2-Public-Ipv6'
-#    PiHoleEC2SecurityGroupId:
-#      Value: !Ref PiHoleEC2SecurityGroup
-#      Export:
-#        Name: !Sub 'PiHole-${AWS::Region}-EC2-SecurityGroupId'
-#    PiHoleEC2LaunchTemplateId:
-#      Value: !Ref PiHoleEC2LaunchTemplate
-#      Export:
-#        Name: !Sub 'PiHole-${AWS::Region}-EC2-LaunchTemplateId'
-#    PiHoleEBSStorageId:
-#      Value: !GetAtt PiHoleEBSStorage.VolumeId
-#      Export:
-#        Name: !Sub 'PiHole-${AWS::Region}-EBS-StorageId'
-    PiHoleIAMInstanceProfileArn:
-      Value: !GetAtt PiHoleIAMInstanceProfile.Arn
-      Export:
-        Name: !Sub 'PiHole-${AWS::Region}-IAM-InstanceProfileArn'
-    PiHoleIAMRoleId:
-      Value: !Ref PiHoleIAMRole
-      Export:
-        Name: !Sub 'PiHole-${AWS::Region}-EC2IAMRoleId'
+  PiHoleIAMRoleRef:
+    Value: !Ref PiHoleIAMRole
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-PiHoleIAMRole-Ref'
+  PiHoleIAMRoleArn:
+    Value: !GetAtt PiHoleIAMRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-PiHoleIAMRole-Arn'
+  PiHoleIAMRoleId:
+    Value: !GetAtt PiHoleIAMRole.RoleId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-PiHoleIAMRole-Id'
+  PiHoleEC2SecurityGroupRef:
+    Value: !Ref PiHoleEC2SecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-PiHoleEC2SecurityGroup-Ref'
+  PiHoleEC2SecurityGroupId:
+    Value: !GetAtt PiHoleEC2SecurityGroup.GroupId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-PiHoleEC2SecurityGroup-Id'
+  PiHoleEC2SecurityGroupVpcId:
+    Value: !GetAtt PiHoleEC2SecurityGroup.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-PiHoleEC2SecurityGroup-VpcId'
+
