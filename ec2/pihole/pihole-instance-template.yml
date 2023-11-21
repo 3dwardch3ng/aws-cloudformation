@@ -251,7 +251,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           # Install environment toolings
-          sudo apt-get update
+          sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install unzip
           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
           python3 get-pip.py
@@ -270,6 +270,9 @@ Resources:
           sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}
+          # Install PiHole
+          sudo curl -sSL https://install.pi-hole.net | bash
+          echo "VKiMFEop6PUkJX7QLkhoqYM97" | pihole -a -p
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
