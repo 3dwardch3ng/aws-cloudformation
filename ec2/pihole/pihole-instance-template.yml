@@ -157,12 +157,7 @@ Resources:
           # Install environment toolings
           sudo apt-get update
           sudo apt-get install unzip
-          apt install -y python3-pip
-                      
-                      
-                      
-                      
-                      curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
           python3 get-pip.py
           export PATH="/home/ubuntu/.local/bin:$PATH"
           echo 'export PATH=/home/ubuntu/.local/bin:$PATH' >>~/.profile
