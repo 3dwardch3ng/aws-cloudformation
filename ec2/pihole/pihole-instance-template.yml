@@ -63,7 +63,7 @@ Resources:
                         ],
                         "totalcpu": false,
                         "drop_original_metrics": [ "cpu_usage_guest" ],
-                        "metrics_collection_interval": 5,
+                        "metrics_collection_interval": 5
                       },
                       "disk": {
                         "measurement": [
