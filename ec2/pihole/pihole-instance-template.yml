@@ -33,7 +33,7 @@ Resources:
         02_config-amazon-cloudwatch-agent:
           files:
             '/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json':
-              source: https://s3.amazonaws.com/cloudformation-templates-shared-files/metadata/pihole/amazon-cloudwatch-agent.json
+              source: cloudformation-templates-shared-files.s3.amazonaws.com/metadata/pihole/amazon-cloudwatch-agent.json
         # Invoke amazon-cloudwatch-agent-ctl to restart the AmazonCloudWatchAgent.
         03_restart_amazon-cloudwatch-agent:
           commands:
