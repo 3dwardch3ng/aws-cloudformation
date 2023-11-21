@@ -86,8 +86,6 @@ Resources:
           type: S3
           buckets: [ 'example-bucket' ]
           roleName: PiHoleIAMRole
-        }
-      }
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
