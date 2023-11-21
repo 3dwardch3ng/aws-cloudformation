@@ -154,19 +154,24 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
+          # Install environment toolings
           sudo apt-get update
           sudo apt-get install unzip
-          # Install AWS Cli
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
-          # Install EC2 Instance Connect
-          sudo apt-get install ec2-instance-connect
-          # Install AmazonCloudWatchAgent and restart it
-          wget https://amazoncloudwatch-agent-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
-          sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
-          /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region} --configsets default
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region}
+#          # Install AWS Cli
+#          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#          unzip awscliv2.zip
+#          sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+#          # Install EC2 Instance Connect
+#          sudo apt-get install ec2-instance-connect
+#          # Install CloudFormation helper
+#          curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz -o "aws-cfn-bootstrap-latest.tar.gz" | tar xz -C /opt
+#          tar -xf aws-cfn-bootstrap-latest.tar.gz -C aws-cfn-bootstrap
+#
+#          # Install AmazonCloudWatchAgent and restart it
+#          wget https://amazoncloudwatch-agent-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+#          sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+#          /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region} --configsets default
+#          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region}
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
