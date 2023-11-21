@@ -157,14 +157,26 @@ Resources:
           # Install environment toolings
           sudo apt-get update
           sudo apt-get install unzip
-#          # Install AWS Cli
-#          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-#          unzip awscliv2.zip
-#          sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
-#          # Install EC2 Instance Connect
-#          sudo apt-get install ec2-instance-connect
-#          # Install CloudFormation helper
-#          curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz -o "aws-cfn-bootstrap-latest.tar.gz" | tar xz -C /opt
+          apt install -y python3-pip
+                      
+                      
+                      
+                      
+                      curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3 get-pip.py
+          export PATH="/home/ubuntu/.local/bin:$PATH"
+          echo 'export PATH=/home/ubuntu/.local/bin:$PATH' >>~/.profile
+          wget https://bootstrap.pypa.io/ez_setup.py -O – | sudo python3
+          pip3 install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
+          # Install AWS Cli
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+          unzip awscliv2.zip
+          sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+          # Install EC2 Instance Connect
+          sudo apt-get install ec2-instance-connect
+          # Install CloudFormation helper
+#          mkdir aws-cfn-bootstrap
+#          curl https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz | tar xz -C .
 #          tar -xf aws-cfn-bootstrap-latest.tar.gz -C aws-cfn-bootstrap
 #
 #          # Install AmazonCloudWatchAgent and restart it
