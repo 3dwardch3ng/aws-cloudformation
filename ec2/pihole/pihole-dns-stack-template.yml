@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a PiHole EC2 DNS Resources in AWS
+
+Resources:
+  # EC2 EIP Association
+  PiHoleEC2EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ] ]
+      InstanceId: !Ref PiHoleEC2Instance
+
+
+Outputs:
+  PiHoleEC2EIPAssociationRef:
+    Value: !Ref PiHoleEC2EIPAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Ref'
+  PiHoleEC2EIPAssociationId:
+    Value: !GetAtt PiHoleEC2EIPAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'
+
