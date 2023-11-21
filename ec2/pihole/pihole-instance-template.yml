@@ -228,13 +228,3 @@ Outputs:
     Value: !GetAtt PiHoleEC2Instance.PrivateIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
-  PiHoleEC2InstancePublicDnsName:
-    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
-  PiHoleEC2InstancePublicIp:
-    Value: !GetAtt PiHoleEC2Instance.PublicIp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
-
-
