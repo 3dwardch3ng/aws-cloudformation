@@ -83,8 +83,8 @@ Resources:
                 systemctl start cfn-hup.service
       AWS::CloudFormation::Authentication:
         S3AccessCreds:
-          type: S3,
-          buckets: [ 'example-bucket' ],
+          type: S3
+          buckets: [ 'example-bucket' ]
           roleName: PiHoleIAMRole
         }
       }
