@@ -166,6 +166,14 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
 
+  # EC2 EIP Association
+  PiHoleEC2EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ]]
+      InstanceId: !Ref PiHoleEC2Instance
+
   # IAM Instance Profile
   PiHoleIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -228,3 +236,20 @@ Outputs:
     Value: !GetAtt PiHoleEC2Instance.PrivateIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
+  PiHoleEC2InstancePublicDnsName:
+    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
+  PiHoleEC2InstancePublicIp:
+    Value: !GetAtt PiHoleEC2Instance.PublicIp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
+  PiHoleEC2EIPAssociationRef:
+    Value: !Ref PiHoleEC2EIPAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Ref'
+  PiHoleEC2EIPAssociationId:
+    Value: !GetAtt PiHoleEC2EIPAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'
+
