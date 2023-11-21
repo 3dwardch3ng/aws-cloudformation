@@ -15,11 +15,6 @@ Parameters:
     Type: String
     Default: 10
 
-Mappings:
-  LogRoleArn:
-    PiHole:
-        Arn: !Sub '${EC2ServiceName}-security-stack-${AWS::Region}-IAM-Role-PiHoleIAMRole-Arn'
-
 Resources:
   # EC2 Instance
   PiHoleEC2Instance:
@@ -44,7 +39,7 @@ Resources:
                     "metrics_collection_interval": 5,
                     "region": "${AWS::Region}",
                     "credentials": {
-                      "role_arn": !FindInMap [ LogRoleArn, PiHole, Arn ]
+                      "role_arn": "arn:aws:iam::359331717478:role/PiHoleIAMRole"
                     }
                     "debug": true,
                     "aws_sdk_log_level": LogDebug,
@@ -101,7 +96,7 @@ Resources:
                     },
                     "force_flush_interval": 5,
                     "credentials": {
-                      "role_arn": !FindInMap [ LogRoleArn, PiHole, Arn ]
+                      "role_arn": "arn:aws:iam::359331717478:role/PiHoleIAMRole"
                     }
                   },
                   "logs": {
@@ -142,7 +137,7 @@ Resources:
                     "log_stream_name": !Sub "${EC2ServiceName}-log-stream",
                     "force_flush_interval": 5,
                     "credentials": {
-                      "role_arn": !FindInMap [ LogRoleArn, PiHole, Arn ]
+                      "role_arn": "arn:aws:iam::359331717478:role/PiHoleIAMRole"
                     }
                   }
                 }
