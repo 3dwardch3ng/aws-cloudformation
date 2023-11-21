@@ -14,6 +14,9 @@ Parameters:
     Description: The host value of the public IPv6 address for the new instance
     Type: String
     Default: 10
+  PiHoleAdminPwd:
+    Description: The password to access the PiHole Admin Console
+    Type: String
 
 Resources:
   # EC2 Instance
@@ -272,7 +275,7 @@ Resources:
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}
           # Install PiHole
           sudo curl -sSL https://install.pi-hole.net | bash
-          echo "VKiMFEop6PUkJX7QLkhoqYM97" | pihole -a -p
+          echo ${PiHoleAdminPwd} | pihole -a -p
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]

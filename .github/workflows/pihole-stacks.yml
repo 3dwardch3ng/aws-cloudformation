@@ -70,5 +70,6 @@ jobs:
           parameter-overrides: >-
             EC2ServiceName=pihole,
             Ipv4HostNumber=${{ github.event.inputs.ipv4-host-value }},
-            Ipv6HostNumber=${{ github.event.inputs.ipv6-host-value }}
+            Ipv6HostNumber=${{ github.event.inputs.ipv6-host-value }},
+            PiHoleAdminPwd=${{ secrets.PI_HOLE_ADMIN_PASSWORD }},
           no-fail-on-empty-changeset: "1"
