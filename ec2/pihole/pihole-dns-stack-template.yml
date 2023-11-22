@@ -24,11 +24,11 @@ Outputs:
     Value: !GetAtt PiHoleEC2EIPAssociation.Id
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'
-  PiHoleEC2InstancePublicDnsName:
-    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
-  PiHoleEC2InstancePublicIp:
-    Value: !GetAtt PiHoleEC2Instance.PublicIp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
+#  PiHoleEC2InstancePublicDnsName:
+#    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
+#  PiHoleEC2InstancePublicIp:
+#    Value: !GetAtt PiHoleEC2Instance.PublicIp
+#    Export:
+#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
