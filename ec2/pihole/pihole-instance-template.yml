@@ -14,8 +14,8 @@ Parameters:
     Description: The host value of the public IPv6 address for the new instance
     Type: String
     Default: 10
-  PiHoleAdminPwd:
-    Description: The password to access the PiHole Admin Console
+  PiHoleAdminPwdHash:
+    Description: The password double hash to access the PiHole Admin Console
     Type: String
 
 Resources:
@@ -29,6 +29,7 @@ Resources:
             - 01_setupCfnHup
             - 02_config-amazon-cloudwatch-agent
             - 03_restart_amazon-cloudwatch-agent
+            - 04_setupPiHoleInstallationConfig
           UpdateEnvironment:
             - 02_config-amazon-cloudwatch-agent
             - 03_restart_amazon-cloudwatch-agent
@@ -36,116 +37,10 @@ Resources:
         02_config-amazon-cloudwatch-agent:
           files:
             '/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json':
-              content: !Sub |
-                {
-                  "agent": {
-                    "metrics_collection_interval": 5,
-                    "region": "${AWS::Region}",
-                    "credentials": {
-                      "role_arn": "arn:aws:iam::359331717478:role/PiHoleIAMRole"
-                    },
-                    "debug": true,
-                    "aws_sdk_log_level": "LogDebug",
-                    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
-                  },
-                  "metrics": {
-                    "append_dimensions": {
-                      "ImageId": "${!aws:ImageId}",
-                      "InstanceId": "${!aws:InstanceId}",
-                      "InstanceType": "${!aws:InstanceType}"
-                    },
-                    "metrics_collected": {
-                      "cpu": {
-                        "resources": [
-                          "*"
-                        ],
-                        "measurement": [
-                          {"name": "cpu_usage_idle", "rename": "CPU_USAGE_IDLE", "unit": "Percent"},
-                          {"name": "cpu_usage_nice", "unit": "Percent"},
-                          "cpu_usage_guest"
-                        ],
-                        "totalcpu": false,
-                        "drop_original_metrics": [ "cpu_usage_guest" ],
-                        "metrics_collection_interval": 5
-                      },
-                      "disk": {
-                        "measurement": [
-                          "used_percent"
-                        ],
-                        "resources": [
-                          "*"
-                        ],
-                        "drop_device": true,
-                        "metrics_collection_interval": 5
-                      },
-                      "diskio": {
-                        "measurement": [
-                          "reads", "writes", "read_bytes", "write_bytes", "read_time", "write_time", "io_time", "iops_in_progress"
-                        ],
-                        "metrics_collection_interval": 5
-                      },
-                      "mem": {
-                        "measurement": [
-                          "active", "available", "available_percent", "buffered", "cached", "free", "inactive", "total", "used", "used_percent"
-                        ],
-                        "metrics_collection_interval": 5
-                      },
-                      "swap": {
-                        "measurement": [
-                          "free", "used", "used_percent"
-                        ],
-                        "metrics_collection_interval": 5
-                      }
-                    },
-                    "force_flush_interval": 5,
-                    "credentials": {
-                      "role_arn": "arn:aws:iam::359331717478:role/PiHoleIAMRole"
-                    }
-                  },
-                  "logs": {
-                    "logs_collected": {
-                      "files": {
-                        "collect_list": [
-                          {
-                            "file_path": "/var/log/syslog",
-                            "log_group_name": "${EC2ServiceName}-syslog-log-group",
-                            "log_stream_name": "${EC2ServiceName}-syslog-log-stream",
-                            "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
-                            "timezone": "Local"
-                          },
-                          {
-                            "file_path": "/var/log/cfn-init.log",
-                            "log_group_name": "${EC2ServiceName}-cfn-init-log-group",
-                            "log_stream_name": "${EC2ServiceName}-cfn-init-log-stream",
-                            "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
-                            "timezone": "Local"
-                          },
-                          {
-                            "file_path": "/var/log/cfn-init-cmd.log",
-                            "log_group_name": "${EC2ServiceName}-cfn-init-cmd-log-group",
-                            "log_stream_name": "${EC2ServiceName}-cfn-init-cmd-log-stream",
-                            "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
-                            "timezone": "Local"
-                          },
-                          {
-                            "file_path": "/var/log/cfn-wire.log",
-                            "log_group_name": "${EC2ServiceName}-cfn-wire-log-group",
-                            "log_stream_name": "${EC2ServiceName}-cfn-wire-log-stream",
-                            "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
-                            "timezone": "Local"
-                          }
-                        ]
-                      }
-                    },
-                    "log_stream_name": "${EC2ServiceName}-log-stream",
-                    "force_flush_interval": 5,
-                    "credentials": {
-                      "role_arn": "arn:aws:iam::359331717478:role/PiHoleIAMRole"
-                    }
-                  }
-                }
-#              source: https://cloudformation-templates-shared-files.s3.amazonaws.com/metadata/pihole/amazon-cloudwatch-agent.json
-#              "authentication" : "S3AccessCreds"
+              Fn::Transform:
+                Name: AWS::Include
+                Parameters:
+                  Location: s3://cloudformation-templates-shared-files/metadata/pihole/file-content-amazon-cloudwatch-agent.yml
         # Invoke amazon-cloudwatch-agent-ctl to restart the AmazonCloudWatchAgent.
         03_restart_amazon-cloudwatch-agent:
           commands:
@@ -193,29 +88,24 @@ Resources:
             02start_cfn_hup:
               command: !Sub |
                 systemctl start cfn-hup.service
-#      AWS::CloudFormation::Authentication:
-#        S3AccessCreds:
-#          type: S3
-#          buckets: [ 'cloudformation-templates-shared-files' ]
-#          roleName: PiHoleIAMRole
+        # PiHole Configuration for the unattended installation
+        04_setupPiHoleInstallationConfig:
+          files:
+            '/etc/pihole/setupVars.conf':
+              Fn::Transform:
+                Name: AWS::Include
+                Parameters:
+                  Location: s3://cloudformation-templates-shared-files/metadata/pihole/file-content-setupVars.yml
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
-      BlockDeviceMappings:
-        - DeviceName: /dev/xvda
-          Ebs:
-            DeleteOnTermination: true
-            Encrypted: true
-            Iops: 3000
-            VolumeSize: 16
-            VolumeType: gp3
       IamInstanceProfile: !Ref PiHoleIAMInstanceProfile
       ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key
       Monitoring: true
       NetworkInterfaces:
-        - AssociatePublicIpAddress: false
+        - AssociatePublicIpAddress: true
           DeleteOnTermination: true
           Description: 'PiHole EC2 Network Interface 0'
           DeviceIndex: 0
@@ -274,19 +164,19 @@ Resources:
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}
           # Install PiHole
-          sudo curl -sSL https://install.pi-hole.net | bash
-          echo ${PiHoleAdminPwd} | pihole -a -p
+          sudo apt install lighttpd
+          sudo curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
 
   # EC2 EIP Association
-  PiHoleEC2EIPAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId:
-        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ]]
-      InstanceId: !Ref PiHoleEC2Instance
+#  PiHoleEC2EIPAssociation:
+#    Type: AWS::EC2::EIPAssociation
+#    Properties:
+#      AllocationId:
+#        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ]]
+#      InstanceId: !Ref PiHoleEC2Instance
 
   # IAM Instance Profile
   PiHoleIAMInstanceProfile:
