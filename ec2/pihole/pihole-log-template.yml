@@ -1,11 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a PiHole EC2 Log Resources in AWS
 
-Parameters:
-  EC2InstanceId:
-    Description: The Id of the EC2 Instance
-    Type: String
-
 Resources:
   # Logs LogGroup
   PiHoleSyslogLogGroup:
