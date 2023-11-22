@@ -71,5 +71,5 @@ jobs:
             EC2ServiceName=pihole,
             Ipv4HostNumber=${{ github.event.inputs.ipv4-host-value }},
             Ipv6HostNumber=${{ github.event.inputs.ipv6-host-value }},
-            PiHoleAdminPwd=${{ secrets.PI_HOLE_ADMIN_PASSWORD }}
+            PiHoleAdminPwdHash=${{ secrets.PI_HOLE_ADMIN_PASSWORD_HASH }}
           no-fail-on-empty-changeset: "1"
