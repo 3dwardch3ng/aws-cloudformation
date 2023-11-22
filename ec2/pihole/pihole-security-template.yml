@@ -131,8 +131,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: PiHoleIAMInstanceProfile
-      Roles:
-        - Fn::ImportValue: !Ref PiHoleIAMRole
+      Roles: !Ref PiHoleIAMRole
 
 Outputs:
   PiHoleIAMRoleRef:
