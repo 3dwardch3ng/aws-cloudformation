@@ -285,8 +285,8 @@ Resources:
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}
           # Install PiHole
-          sudo apt install lighttpd
-          sudo curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
+#          sudo apt install lighttpd
+#          sudo curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]

@@ -43,5 +43,5 @@ Outputs:
 # Notes:
 # 1. Following CLI command can be used to get the ID of the key pair after it is created:
 # aws ec2 describe-key-pairs --filters Name=key-name,Values=YOUR_KEY_NAME --query KeyPairs[*].KeyPairId --output text
-# 2. Following CLI command can be used to et the parameter for your key and save the key material in a .pem file:
+# 2. Following CLI command can be used to get the parameter for your key and save the key material in a .pem file:
 # aws ssm get-parameter --name /ec2/keypair/YOUR_KEY_PAIR_ID --with-decryption --query Parameter.Value --output text > YOUR_KEY_FILE.pem
