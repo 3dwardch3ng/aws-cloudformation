@@ -265,6 +265,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           # Install environment toolings
+          sudo apt upgrade -y
           sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install unzip
           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
