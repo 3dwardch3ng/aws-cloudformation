@@ -199,8 +199,8 @@ Resources:
               content: !Sub |
                 WEBPASSWORD=${PiHoleAdminPwdHash}
                 PIHOLE_INTERFACE=eth0
-                IPV4_ADDRESS= 10.1.1.${Ipv4HostNumber}
-                IPV6_ADDRESS= 2406:da1c:1c:2f01::${Ipv6HostNumber}
+                IPV4_ADDRESS=10.1.1.${Ipv4HostNumber}
+                IPV6_ADDRESS=2406:da1c:1c:2f01::${Ipv6HostNumber}
                 QUERY_LOGGING=true
                 INSTALL_WEB=true
                 DNSMASQ_LISTENING=single
@@ -286,7 +286,8 @@ Resources:
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}
           # Install PiHole
           sudo apt install lighttpd
-#          sudo curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
+          sudo su
+          curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
