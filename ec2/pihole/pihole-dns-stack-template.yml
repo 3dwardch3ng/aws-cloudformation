@@ -12,8 +12,7 @@ Resources:
     Type: AWS::EC2::EIPAssociation
     Properties:
       AllocationId:
-        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ] ]
-#      InstanceId: !ImportValue pihole-instance-stack-ap-southeast-2-EC2-Instance-PiHoleEC2Instance-Ref
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ]]
       InstanceId: !Sub ${EC2InstanceId}
 
 Outputs:
