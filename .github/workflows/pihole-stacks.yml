@@ -100,3 +100,10 @@ jobs:
           template: ec2/pihole/pihole-dns-stack-template.yml
           capabilities: CAPABILITY_NAMED_IAM
           parameter-overrides: EC2InstanceId=${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
+      - name: Delete Previous PiHole Instance Stack via CloudFormation
+        id: pihole-instance-stack-delete
+        run: |
+          aws cloudformation delete-stack \
+              --stack-name pihole-instance-stack-${{ github.run_number - 1 }} \
+              --region ap-southeast-2
+        shell: bash

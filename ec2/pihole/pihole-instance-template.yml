@@ -226,7 +226,6 @@ Resources:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
       IamInstanceProfile:
         Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
-#      IamInstanceProfile: !Ref PiHoleIAMInstanceProfile
       ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key
@@ -297,8 +296,7 @@ Resources:
           curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
       Tags:
         - Key: Name
-#          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance-' ]]
-          Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance-${StackNumber}'
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance'
 
 Outputs:
   PiHoleEC2InstanceRef:
@@ -317,20 +315,4 @@ Outputs:
     Value: !GetAtt PiHoleEC2Instance.PrivateIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
-#  PiHoleEC2InstancePublicDnsName:
-#    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
-#  PiHoleEC2InstancePublicIp:
-#    Value: !GetAtt PiHoleEC2Instance.PublicIp
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
-#  PiHoleEC2EIPAssociationRef:
-#    Value: !Ref PiHoleEC2EIPAssociation
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Ref'
-#  PiHoleEC2EIPAssociationId:
-#    Value: !GetAtt PiHoleEC2EIPAssociation.Id
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'
 
