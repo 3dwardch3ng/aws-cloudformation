@@ -199,20 +199,8 @@ Resources:
               content: !Sub |
                 WEBPASSWORD=${PiHoleAdminPwdHash}
                 PIHOLE_INTERFACE=eth0
-                IPV4_ADDRESS= |
-                  Fn::Select:
-                    - '0'
-                    - Fn::Split:
-                        - '0/24'
-                        - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-CidrBlock' ] ]
-                  ${Ipv4HostNumber}
-                IPV6_ADDRESS= |
-                  Fn::Select:
-                    - '0'
-                    - Fn::Split:
-                        - '/64'
-                        - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-Ipv6CidrBlock' ]]
-                  ${Ipv6HostNumber}
+                IPV4_ADDRESS= 10.1.1.${Ipv4HostNumber}
+                IPV6_ADDRESS= 2406:da1c:1c:2f01::${Ipv6HostNumber}
                 QUERY_LOGGING=true
                 INSTALL_WEB=true
                 DNSMASQ_LISTENING=single
@@ -381,12 +369,12 @@ Outputs:
     Value: !GetAtt PiHoleEC2Instance.PublicIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
-#  PiHoleEC2EIPAssociationRef:
-#    Value: !Ref PiHoleEC2EIPAssociation
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Ref'
-#  PiHoleEC2EIPAssociationId:
-#    Value: !GetAtt PiHoleEC2EIPAssociation.Id
-#    Export:
-#      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'
+  PiHoleEC2EIPAssociationRef:
+    Value: !Ref PiHoleEC2EIPAssociation
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Ref'
+  PiHoleEC2EIPAssociationId:
+    Value: !GetAtt PiHoleEC2EIPAssociation.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIPAssociation-PiHoleEC2EIPAssociation-Id'
 
