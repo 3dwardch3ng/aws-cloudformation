@@ -238,7 +238,7 @@ Resources:
       KeyName: pihole-key
       Monitoring: true
       NetworkInterfaces:
-        - AssociatePublicIpAddress: true
+        - AssociatePublicIpAddress: false
           DeleteOnTermination: true
           Description: 'PiHole EC2 Network Interface 0'
           DeviceIndex: 0
