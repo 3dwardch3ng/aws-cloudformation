@@ -75,10 +75,11 @@ jobs:
         id: pihole-instance-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: pihole-instance-stack
+          name: pihole-instance-stack-${{ github.run_number }}
           template: ec2/pihole/pihole-instance-template.yml
           capabilities: CAPABILITY_NAMED_IAM
           parameter-overrides: >-
+            StackNumber=${{ github.run_number }},
             EC2ServiceName=pihole,
             Ipv4HostNumber=${{ github.event.inputs.ipv4-host-value }},
             Ipv6HostNumber=${{ github.event.inputs.ipv6-host-value }},

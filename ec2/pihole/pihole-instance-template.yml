@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a PiHole EC2 Security Resources in AWS
 
 Parameters:
+  StackNumber:
+    Description: The sequencial number of the stack
+    Type: String
+    Default: 1
   EC2ServiceName:
     Description: The name of the EC2 service
     Type: String
@@ -20,7 +24,7 @@ Parameters:
 
 Resources:
   # EC2 Instance
-  PiHoleEC2Instance:
+  !Sub 'PiHoleEC2Instance${StackNumber}':
     Type: AWS::EC2::Instance
     Metadata:
       AWS::CloudFormation::Init:
@@ -169,8 +173,8 @@ Resources:
               content: !Sub |
                 [cfn-auto-reloader-hook]
                 triggers=post.update
-                path=Resources.PiHoleEC2Instance.Metadata.AWS::CloudFormation::Init.02_config-amazon-cloudwatch-agent
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region} --configsets UpdateEnvironment
+                path=Resources.PiHoleEC2Instance${StackNumber}.Metadata.AWS::CloudFormation::Init.02_config-amazon-cloudwatch-agent
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance${StackNumber} --region ${AWS::Region} --configsets UpdateEnvironment
                 runas=root
               mode: '000400'
               owner: root
@@ -285,8 +289,8 @@ Resources:
           # Install AmazonCloudWatchAgent and restart it
           wget https://amazoncloudwatch-agent-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
           sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
-          sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
-          sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}
+          sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance${StackNumber} --region ${AWS::Region} --configsets default
+          sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance${StackNumber} --region ${AWS::Region}
           # Install PiHole
           sudo apt install lighttpd
           sudo su
@@ -295,31 +299,27 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'PiHole-EC2-Instance' ]]
 
-  # EC2 EIP Association
-#  PiHoleEC2EIPAssociation:
-#    Type: AWS::EC2::EIPAssociation
-#    Properties:
-#      AllocationId:
-#        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ]]
-#      InstanceId: !Ref PiHoleEC2Instance
-
 Outputs:
   PiHoleEC2InstanceRef:
-    Value: !Ref PiHoleEC2Instance
+    Value:
+      Fn::Ref: !Sub 'PiHoleEC2Instance${StackNumber}'
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-Ref'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-${StackNumber}-Ref'
   PiHoleEC2InstanceAvailabilityZone:
-    Value: !GetAtt PiHoleEC2Instance.AvailabilityZone
+    Value:
+      Fn::GetAtt: !Sub 'PiHoleEC2Instance${StackNumber}.AvailabilityZone'
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-AvailabilityZone'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-${StackNumber}-AvailabilityZone'
   PiHoleEC2InstancePrivateDnsName:
-    Value: !GetAtt PiHoleEC2Instance.PrivateDnsName
+    Value:
+      Fn::GetAtt: !Sub 'PiHoleEC2Instance${StackNumber}.PrivateDnsName'
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateDnsName'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-${StackNumber}-PrivateDnsName'
   PiHoleEC2InstancePrivateIp:
-    Value: !GetAtt PiHoleEC2Instance.PrivateIp
+    Value:
+      Fn::GetAtt: !Sub 'PiHoleEC2Instance${StackNumber}.PrivateIp'
     Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-${StackNumber}-PrivateIp'
 #  PiHoleEC2InstancePublicDnsName:
 #    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
 #    Export:
