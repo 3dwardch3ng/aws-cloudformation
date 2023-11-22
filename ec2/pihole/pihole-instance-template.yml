@@ -109,36 +109,36 @@ Resources:
                         "collect_list": [
                           {
                             "file_path": "/var/log/syslog",
-                            "log_group_name": "${EC2ServiceName}-syslog-log-group",
+                            "log_group_name": "pihole-syslog-log-group",
                             "log_stream_name": "${EC2ServiceName}-syslog-log-stream",
                             "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
                             "timezone": "Local"
                           },
                           {
                             "file_path": "/var/log/cfn-init.log",
-                            "log_group_name": "${EC2ServiceName}-cfn-init-log-group",
-                            "log_stream_name": "${EC2ServiceName}-cfn-init-log-stream",
+                            "log_group_name": "pihole-cfn-init-log-group",
+                            "log_stream_name": "pihole-cfn-init-log-stream",
                             "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
                             "timezone": "Local"
                           },
                           {
                             "file_path": "/var/log/cfn-init-cmd.log",
-                            "log_group_name": "${EC2ServiceName}-cfn-init-cmd-log-group",
-                            "log_stream_name": "${EC2ServiceName}-cfn-init-cmd-log-stream",
+                            "log_group_name": "pihole-cfn-init-cmd-log-group",
+                            "log_stream_name": "pihole-cfn-init-cmd-log-stream",
                             "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
                             "timezone": "Local"
                           },
                           {
                             "file_path": "/var/log/cfn-wire.log",
-                            "log_group_name": "${EC2ServiceName}-cfn-wire-log-group",
-                            "log_stream_name": "${EC2ServiceName}-cfn-wire-log-stream",
+                            "log_group_name": "pihole-cfn-wire-log-group",
+                            "log_stream_name": "pihole-cfn-wire-log-stream",
                             "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
                             "timezone": "Local"
                           }
                         ]
                       }
                     },
-                    "log_stream_name": "${EC2ServiceName}-log-stream",
+                    "log_stream_name": "pihole-log-stream",
                     "force_flush_interval": 5,
                     "credentials": {
                       "role_arn": "arn:aws:iam::359331717478:role/PiHoleIAMRole"
@@ -169,7 +169,7 @@ Resources:
               content: !Sub |
                 [cfn-auto-reloader-hook]
                 triggers=post.update
-                path=Resources.EC2Instance.Metadata.AWS::CloudFormation::Init.02_config-amazon-cloudwatch-agent
+                path=Resources.PiHoleEC2Instance.Metadata.AWS::CloudFormation::Init.02_config-amazon-cloudwatch-agent
                 action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region} --configsets UpdateEnvironment
                 runas=root
               mode: '000400'
@@ -220,7 +220,9 @@ Resources:
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
-      IamInstanceProfile: !Ref PiHoleIAMInstanceProfile
+      IamInstanceProfile:
+        Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
+#      IamInstanceProfile: !Ref PiHoleIAMInstanceProfile
       ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key
@@ -300,51 +302,6 @@ Resources:
       AllocationId:
         Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ]]
       InstanceId: !Ref PiHoleEC2Instance
-
-  # IAM Instance Profile
-  PiHoleIAMInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      InstanceProfileName: PiHoleIAMInstanceProfile
-      Roles:
-        - Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-Role-PiHoleIAMRole-Ref'
-
-  # Logs LogGroup
-  PiHoleSyslogLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub '${EC2ServiceName}-syslog-log-group'
-      RetentionInDays: 7
-      Tags:
-        - Key: Name
-          Value: PiHoleSyslogLogGroup
-
-  PiHoleCfnInitLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub '${EC2ServiceName}-cfn-init-log-group'
-      RetentionInDays: 7
-      Tags:
-        - Key: Name
-          Value: PiHoleCfnInitLogGroup
-
-  PiHoleCfnInitCmdLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub '${EC2ServiceName}-cfn-init-cmd-log-group'
-      RetentionInDays: 7
-      Tags:
-        - Key: Name
-          Value: PiHoleCfnInitLogGroup
-
-  PiHoleCfnWireLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub '${EC2ServiceName}-cfn-wire-log-group'
-      RetentionInDays: 7
-      Tags:
-        - Key: Name
-          Value: PiHoleCfnWireLogGroup
 
 Outputs:
   PiHoleEC2InstanceRef:

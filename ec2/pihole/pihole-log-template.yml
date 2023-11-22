@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a PiHole EC2 Log Resources in AWS
+
+Parameters:
+  EC2InstanceId:
+    Description: The Id of the EC2 Instance
+    Type: String
+
+Resources:
+  # Logs LogGroup
+  PiHoleSyslogLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: pihole-syslog-log-group
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: PiHoleSyslogLogGroup
+
+  PiHoleCfnInitLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: pihole-cfn-init-log-group
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: PiHoleCfnInitLogGroup
+
+  PiHoleCfnInitCmdLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: pihole-cfn-init-cmd-log-group
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: PiHoleCfnInitLogGroup
+
+  PiHoleCfnWireLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: pihole-cfn-wire-log-group
+      RetentionInDays: 7
+      Tags:
+        - Key: Name
+          Value: PiHoleCfnWireLogGroup
+
+Outputs:
+  PiHoleSyslogLogGroupRef:
+    Value: !Ref PiHoleSyslogLogGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-LogGroup-PiHoleSyslogLogGroup-Ref'
+  PiHoleSyslogLogGroupArn:
+    Value: !GetAtt PiHoleSyslogLogGroup.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-LogGroup-PiHoleSyslogLogGroup-Arn'
+  PiHoleCfnInitLogGroupRef:
+    Value: !Ref PiHoleCfnInitLogGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-LogGroup-PiHoleCfnInitLogGroup-Ref'
+  PiHoleCfnInitLogGroupArn:
+    Value: !GetAtt PiHoleCfnInitLogGroup.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-LogGroup-PiHoleCfnInitLogGroup-Arn'
+  PiHoleCfnInitCmdLogGroupRef:
+    Value: !Ref PiHoleCfnInitCmdLogGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-LogGroup-PiHoleCfnInitCmdLogGroup-Ref'
+  PiHoleCfnInitCmdLogGroupArn:
+    Value: !GetAtt PiHoleCfnInitCmdLogGroup.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-LogGroup-PiHoleCfnInitCmdLogGroup-Arn'
+
