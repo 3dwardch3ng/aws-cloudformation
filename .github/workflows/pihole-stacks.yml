@@ -103,8 +103,8 @@ jobs:
       - name: Delete Previous PiHole Instance Stack via CloudFormation
         id: pihole-instance-stack-delete
         run: |
-          set last_run_number=$(( ${{ github.run_number }} - 1 ))
+          echo "last_stack_name=pihole-instance-stack-$(( ${{ github.run_number }} -1 ))" >> $GITHUB_ENV
           aws cloudformation delete-stack \
-              --stack-name pihole-instance-stack-${{ last_run_number }} \
+              --stack-name ${{ last_stack_name }} \
               --region ap-southeast-2
         shell: bash
