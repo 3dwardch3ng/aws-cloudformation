@@ -36,11 +36,10 @@ Resources:
         # Definition of json configuration of AmazonCloudWatchAgent, you can change the configuration below.
         02_config-amazon-cloudwatch-agent:
           files:
-            '/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json':
-              Fn::Transform:
-                Name: AWS::Include
-                Parameters:
-                  Location: s3://cloudformation-templates-shared-files/metadata/pihole/file-content-amazon-cloudwatch-agent.yml
+            Fn::Transform:
+              Name: AWS::Include
+              Parameters:
+                Location: s3://cloudformation-templates-shared-files/metadata/pihole/file-amazon-cloudwatch-agent.yml
         # Invoke amazon-cloudwatch-agent-ctl to restart the AmazonCloudWatchAgent.
         03_restart_amazon-cloudwatch-agent:
           commands:
@@ -91,11 +90,10 @@ Resources:
         # PiHole Configuration for the unattended installation
         04_setupPiHoleInstallationConfig:
           files:
-            '/etc/pihole/setupVars.conf':
-              Fn::Transform:
-                Name: AWS::Include
-                Parameters:
-                  Location: s3://cloudformation-templates-shared-files/metadata/pihole/file-content-setupVars.yml
+            Fn::Transform:
+              Name: AWS::Include
+              Parameters:
+                Location: s3://cloudformation-templates-shared-files/metadata/pihole/file-setupVars.yml
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'

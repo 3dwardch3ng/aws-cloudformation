@@ -1,0 +1,34 @@
+'/etc/pihole/setupVars.conf':
+  content: !Sub |
+    WEBPASSWORD=${PiHoleAdminPwdHash}
+    PIHOLE_INTERFACE=eth0
+    IPV4_ADDRESS= |
+      Fn::Select:
+        - '0'
+        - Fn::Split:
+            - '0/24'
+            - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-CidrBlock' ] ]
+      ${Ipv4HostNumber}
+    IPV6_ADDRESS= |
+      Fn::Select:
+        - '0'
+        - Fn::Split:
+            - '/64'
+            - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-Ipv6CidrBlock' ]]
+      ${Ipv6HostNumber}
+    QUERY_LOGGING=true
+    INSTALL_WEB=true
+    DNSMASQ_LISTENING=single
+    PIHOLE_DNS_1=8.8.8.8
+    PIHOLE_DNS_2=8.8.4.4
+    PIHOLE_DNS_3=2001:4860:4860:0:0:0:0:8888
+    PIHOLE_DNS_4=2001:4860:4860:0:0:0:0:8844
+    DNS_FQDN_REQUIRED=true
+    DNS_BOGUS_PRIV=true
+    DNSSEC=true
+    TEMPERATUREUNIT=C
+    WEBUIBOXEDLAYOUT=traditional
+    API_EXCLUDE_DOMAINS=
+    API_EXCLUDE_CLIENTS=
+    API_QUERY_LOG_SHOW=all
+    API_PRIVACY_MODE=false
