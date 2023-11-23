@@ -226,7 +226,7 @@ Resources:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
       IamInstanceProfile:
         Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
-      ImageId: ami-0f2967bce46537146 # Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
+      ImageId: 	ami-0a02bc4adcb6b5fbe # Ubuntu Server 22.04, AMD64, HVM-SSD, Release 20231121
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key
       Monitoring: true
@@ -270,7 +270,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           # Install environment toolings
-          sudo apt upgrade -y
+          # sudo apt upgrade -y
           sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install unzip
           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
@@ -293,7 +293,7 @@ Resources:
           # Install PiHole
           sudo apt install lighttpd
           sudo su
-#          curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
+          curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance'
