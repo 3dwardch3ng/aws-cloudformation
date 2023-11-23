@@ -2,8 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a PiHole EC2 Security Resources in AWS
 
 Parameters:
-  InstanceNumber:
-    Description: The sequencial number of the instance
+  StackNumber:
+    Description: The integer number of the stack
     Type: String
     Default: 1
   EC2ServiceName:
@@ -296,7 +296,7 @@ Resources:
           curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance-${InstanceNumber}'
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance'
 
 Outputs:
   PiHoleEC2InstanceRef:

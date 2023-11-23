@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a PiHole EC2 DNS Resources in AWS
+
+Parameters:
+  StackNumber:
+    Description: The integer number of the stack
+    Type: String
+    Default: 1
+  EC2InstanceId:
+    Description: The Id of the EC2 Instance
+    Type: String
+
+Resources:
+  # Route 53 Record Set
+  PiHoleAR53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: 'PiHoleEC2Instance Ipv4 DNS Record'
+      HostedZoneId:
+        Fn::ImportValue: !Sub 'route-53-stack-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-Id'
+      Name: pi-hole.edward-cheng.name
+      Region: String
+      ResourceRecords:
+        - Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
+      SetIdentifier: String
+      TTL: 60
+      Type: A
+  PiHoleAAAAR53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: 'PiHoleEC2Instance Ipv6 DNS Record'
+      HostedZoneId:
+        Fn::ImportValue: !Sub 'route-53-stack-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-Id'
+      Name: pi-hole.edward-cheng.name
+      Region: String
+      ResourceRecords:
+        - Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIpv6'
+      SetIdentifier: String
+      TTL: 60
+      Type: AAAA
