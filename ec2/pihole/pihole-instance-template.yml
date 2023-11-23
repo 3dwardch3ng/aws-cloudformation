@@ -310,7 +310,7 @@ Resources:
           #!/bin/bash
           # Update needrestart config
           needrestart -r a
-          sed -i 's/#$nrconf{restart} = 'i';/$nrconf{restart} = 'a';/g' /etc/default/needrestart
+          sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
           # Install environment toolings
           sudo apt upgrade -y
           sudo apt-get update && sudo apt-get upgrade -y
@@ -333,7 +333,7 @@ Resources:
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
           # Install PiHole
-          sudo apt install lighttpd
+          sudo apt install lighttpd -y
           sudo su
           curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
           # Install Lighttpd SSL support
