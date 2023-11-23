@@ -226,7 +226,7 @@ Resources:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
       IamInstanceProfile:
         Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-InstanceProfile-PiHoleIAMInstanceProfile-Ref'
-      ImageId: 	ami-0a02bc4adcb6b5fbe # Ubuntu Server 22.04, AMD64, HVM-SSD, Release 20231121
+      ImageId: ami-0a02bc4adcb6b5fbe # Ubuntu Server 22.04, AMD64, HVM-SSD, Release 20231121
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key
       Monitoring: true
