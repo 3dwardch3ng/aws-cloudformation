@@ -75,7 +75,7 @@ jobs:
         id: pihole-instance-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: pihole-instance-stack-${{ github.run_number }}
+          name: pihole-instance-stack
           template: ec2/pihole/pihole-instance-template.yml
           capabilities: CAPABILITY_NAMED_IAM
           parameter-overrides: >-
@@ -85,21 +85,21 @@ jobs:
             Ipv6HostNumber=${{ github.event.inputs.ipv6-host-value }},
             PiHoleAdminPwdHash=${{ secrets.PI_HOLE_ADMIN_PASSWORD_HASH }}
           no-fail-on-empty-changeset: "1"
-      - name: Wait for instances
-        id: ec2-wait
-        uses: truemark/aws-ec2-instance-wait-action@v3
-        with:
-          instance-ids: ${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
-          region: "ap-southeast-2"
-          timeout-ms: "600000"
-      - name: Deploy PiHole DNS Stack via CloudFormation
-        id: pihole-dns-stack
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        with:
-          name: pihole-dns-stack
-          template: ec2/pihole/pihole-dns-stack-template.yml
-          capabilities: CAPABILITY_NAMED_IAM
-          parameter-overrides: EC2InstanceId=${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
+#      - name: Wait for instances
+#        id: ec2-wait
+#        uses: truemark/aws-ec2-instance-wait-action@v3
+#        with:
+#          instance-ids: ${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
+#          region: "ap-southeast-2"
+#          timeout-ms: "600000"
+#      - name: Deploy PiHole DNS Stack via CloudFormation
+#        id: pihole-dns-stack
+#        uses: aws-actions/aws-cloudformation-github-deploy@v1
+#        with:
+#          name: pihole-dns-stack
+#          template: ec2/pihole/pihole-dns-stack-template.yml
+#          capabilities: CAPABILITY_NAMED_IAM
+#          parameter-overrides: EC2InstanceId=${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
 #      - name: Delete Previous PiHole Instance Stack via CloudFormation
 #        id: pihole-instance-stack-delete
 #        run: |

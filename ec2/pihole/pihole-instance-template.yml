@@ -231,7 +231,7 @@ Resources:
       KeyName: pihole-key
       Monitoring: true
       NetworkInterfaces:
-        - AssociatePublicIpAddress: false
+        - AssociatePublicIpAddress: true
           DeleteOnTermination: true
           Description: 'PiHole EC2 Network Interface 0'
           DeviceIndex: 0
@@ -315,4 +315,12 @@ Outputs:
     Value: !GetAtt PiHoleEC2Instance.PrivateIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PrivateIp'
+  PiHoleEC2InstancePublicDnsName:
+    Value: !GetAtt PiHoleEC2Instance.PublicDnsName
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicDnsName'
+  PiHoleEC2InstancePublicIp:
+    Value: !GetAtt PiHoleEC2Instance.PublicIp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
 
