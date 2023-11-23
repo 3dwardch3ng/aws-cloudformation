@@ -221,6 +221,44 @@ Resources:
                 API_EXCLUDE_CLIENTS=
                 API_QUERY_LOG_SHOW=all
                 API_PRIVACY_MODE=false
+        05_setupLighttpdConfig:
+          files:
+            '/etc/lighttpd/lighttpd.conf.bak':
+              content: |
+                # generated 2023-11-23, Mozilla Guideline v5.7, lighttpd 1.4.63, OpenSSL 3.0.2, intermediate configuration
+                # https://ssl-config.mozilla.org/#server=lighttpd&version=1.4.63&config=intermediate&openssl=3.0.2&guideline=5.7
+                #server.modules += ("mod_redirect")
+                #server.modules += ("mod_setenv")
+                #server.modules += ("mod_openssl")
+                #server.port = 80
+                $SERVER["socket"] == "[::]:80" { }
+
+                $HTTP["scheme"] == "http" {
+                    url.redirect = ("" => "https://${url.authority}${url.path}${qsa}")
+                }
+
+                $HTTP["scheme"] == "https" {
+                    # HTTP Strict Transport Security (63072000 seconds)
+                    setenv.add-response-header = (
+                        "Strict-Transport-Security" => "max-age=63072000"
+                    )
+                }
+
+                # select one TLS module: "mod_openssl" "mod_mbedtls" "mod_gnutls" "mod_wolfssl" "mod_nss"
+                server.modules += ("mod_openssl")
+
+                # lighttpd 1.4.56 and later will inherit ssl.* from the global scope if
+                # $SERVER["socket"] contains ssl.engine = "enable" and no other ssl.* options
+                # (to avoid having to repeat ssl.* directives in both ":443" and "[::]:443")
+                $SERVER["socket"] ==     ":443" { ssl.engine = "enable" }
+                $SERVER["socket"] == "[::]:443" { ssl.engine = "enable" }
+                ssl.privkey = "/etc/letsencrypt/live/pi-hole.edward-cheng.name/privkey.pem"
+                ssl.pemfile = "/etc/letsencrypt/live/pi-hole.edward-cheng.name/fullchain.pem"
+                ssl.openssl.ssl-conf-cmd = ("MinProtocol" => "TLSv1.2")
+                ssl.openssl.ssl-conf-cmd += ("Options" => "-ServerPreference")
+                # TLS modules besides mod_openssl might name ciphers differently
+                # See https://redmine.lighttpd.net/projects/lighttpd/wiki/Docs_SSL
+                ssl.openssl.ssl-conf-cmd += ("CipherString" => "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305")
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
@@ -289,9 +327,22 @@ Resources:
           wget https://amazoncloudwatch-agent-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
           sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
-          sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}
-          # Install PiHole
+          sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
+          # Install Lighttpd with SSL support
           sudo apt install lighttpd
+          sudo apt install lighttpd-mod-openssl
+          sudo apt install snapd
+          sudo snap install core; sudo snap refresh core
+          sudo snap install --classic certbot
+          sudo ln -s /snap/bin/certbot /usr/bin/certbot
+          sudo systemctl stop lighttpd
+          sudo certbot certonly --standalone -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
+          sudo systemctl start lighttpd
+          sudo su
+          mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
+          cp /etc/lighttpd/lighttpd.conf.bak /etc/lighttpd/lighttpd.conf
+          sudo systemctl restart lighttpd
+          # Install PiHole
           sudo su
           curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
       Tags:
