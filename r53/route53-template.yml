@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create Route53 Resources
+
+Resources:
+  EdwardChengNameHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: 'HostedZone created by Route53 Registrar'
+      Name: edward-cheng.name
+
+Outputs:
+  EdwardChengNameHostedZoneRef:
+    Value: !Ref EdwardChengNameHostedZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-Ref'
+  EdwardChengNameHostedZoneId:
+    Value: !Ref EdwardChengNameHostedZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-Id'
+  EdwardChengNameHostedZoneNameServers:
+    Value: !GetAtt EdwardChengNameHostedZone.NameServers
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-NameServers'
