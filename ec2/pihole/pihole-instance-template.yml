@@ -296,7 +296,7 @@ Resources:
           curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance-'
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance-${InstanceNumber}'
 
 Outputs:
   PiHoleEC2InstanceRef:
