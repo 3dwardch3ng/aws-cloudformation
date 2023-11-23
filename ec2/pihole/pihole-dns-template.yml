@@ -19,7 +19,6 @@ Resources:
       HostedZoneId:
         Fn::ImportValue: !Sub 'route-53-stack-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-Id'
       Name: pi-hole.edward-cheng.name
-      Region: String
       ResourceRecords:
         - Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
       SetIdentifier: String
@@ -32,7 +31,6 @@ Resources:
       HostedZoneId:
         Fn::ImportValue: !Sub 'route-53-stack-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-Id'
       Name: pi-hole.edward-cheng.name
-      Region: String
       ResourceRecords:
         - Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIpv6'
       SetIdentifier: String
