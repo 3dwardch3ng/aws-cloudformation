@@ -34,6 +34,7 @@ Resources:
             - 02_config-amazon-cloudwatch-agent
             - 03_restart_amazon-cloudwatch-agent
             - 04_setupPiHoleInstallationConfig
+            - 05_setupLighttpdConfig
           UpdateEnvironment:
             - 02_config-amazon-cloudwatch-agent
             - 03_restart_amazon-cloudwatch-agent
@@ -329,7 +330,7 @@ Resources:
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
           # Install Lighttpd with SSL support
-          sudo apt install lighttpd
+          sudo apt install lighttpd -y
           sudo apt install lighttpd-mod-openssl
           sudo apt install snapd
           sudo snap install core; sudo snap refresh core
