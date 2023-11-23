@@ -289,9 +289,6 @@ Resources:
           sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}
-          # Install PiHole
-          sudo apt install lighttpd
-          sudo su
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance'
