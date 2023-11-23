@@ -293,7 +293,7 @@ Resources:
           # Install PiHole
           sudo apt install lighttpd
           sudo su
-          curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
+          # curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance'
