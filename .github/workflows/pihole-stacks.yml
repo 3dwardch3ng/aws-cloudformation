@@ -75,7 +75,7 @@ jobs:
         id: pihole-instance-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: pihole-instance-stack
+          name: pihole-instance-stack-${{ github.run_number }}
           template: ec2/pihole/pihole-instance-template.yml
           capabilities: CAPABILITY_NAMED_IAM
           parameter-overrides: >-
