@@ -105,7 +105,7 @@ jobs:
           parameter-overrides: >-
             StackNumber=${{ github.run_number }},
             EC2InstanceId=${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
-      - name: Delete Previous PiHole Instance Stack via CloudFormation
+      - name: Delete PiHole Instance Stack ${{ github.event.inputs.previous-stack-number }}
         id: pihole-instance-stack-delete
         run: |
           aws cloudformation delete-stack \
