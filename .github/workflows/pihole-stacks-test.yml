@@ -24,10 +24,10 @@ on:
           - 'eu-west-2'
           - 'eu-west-3'
           - 'eu-north-1'
-      previous-stack-number:
-        description: 'The previous stack number'
-        type: string
-        default: '1'
+#      previous-stack-number:
+#        description: 'The previous stack number'
+#        type: string
+#        default: '1'
 
 permissions:
   id-token: write
@@ -61,10 +61,10 @@ jobs:
           parameter-overrides: >-
             StackNumber=99,
             EC2InstanceId=${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
-      - name: Delete PiHole Instance Stack ${{ github.event.inputs.previous-stack-number }}
-        id: pihole-instance-stack-delete
-        run: |
-          aws cloudformation delete-stack \
-              --stack-name pihole-instance-stack-${{ github.event.inputs.previous-stack-number }} \
-              --region ap-southeast-2
-        shell: bash
+#      - name: Delete PiHole Instance Stack ${{ github.event.inputs.previous-stack-number }}
+#        id: pihole-instance-stack-delete
+#        run: |
+#          aws cloudformation delete-stack \
+#              --stack-name pihole-instance-stack-${{ github.event.inputs.previous-stack-number }} \
+#              --region ap-southeast-2
+#        shell: bash
