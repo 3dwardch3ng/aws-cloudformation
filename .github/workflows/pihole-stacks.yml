@@ -1,4 +1,4 @@
-name: PiHole Stacks
+name: PiHole Stacks ${{ github.run_number }}
 
 on:
   workflow_dispatch:
@@ -30,6 +30,10 @@ on:
         default: '100'
       ipv6-host-value:
         description: 'The host value of the public IPv6 address for the new instance'
+        type: string
+        default: '10'
+      previous-stack-number:
+        description: 'The previous stack number'
         type: string
         default: '10'
 
@@ -71,7 +75,7 @@ jobs:
           name: pihole-log-stack
           template: ec2/pihole/pihole-log-template.yml
           no-fail-on-empty-changeset: "1"
-      - name: Deploy PiHole Instance Stack via CloudFormation
+      - name: Deploy PiHole Instance Stack ${{ github.run_number }} via CloudFormation
         id: pihole-instance-stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
@@ -85,26 +89,26 @@ jobs:
             Ipv6HostNumber=${{ github.event.inputs.ipv6-host-value }},
             PiHoleAdminPwdHash=${{ secrets.PI_HOLE_ADMIN_PASSWORD_HASH }}
           no-fail-on-empty-changeset: "1"
-#      - name: Wait for instances
-#        id: ec2-wait
-#        uses: truemark/aws-ec2-instance-wait-action@v3
-#        with:
-#          instance-ids: ${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
-#          region: "ap-southeast-2"
-#          timeout-ms: "600000"
-#      - name: Deploy PiHole DNS Stack via CloudFormation
-#        id: pihole-dns-stack
-#        uses: aws-actions/aws-cloudformation-github-deploy@v1
-#        with:
-#          name: pihole-dns-stack
-#          template: ec2/pihole/pihole-dns-stack-template.yml
-#          capabilities: CAPABILITY_NAMED_IAM
-#          parameter-overrides: EC2InstanceId=${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
-#      - name: Delete Previous PiHole Instance Stack via CloudFormation
-#        id: pihole-instance-stack-delete
-#        run: |
-#          echo "LAST_STACK_NAME=pihole-instance-stack-$(( ${{ github.run_number }} -1 ))" >> $GITHUB_ENV
-#          aws cloudformation delete-stack \
-#              --stack-name $LAST_STACK_NAME \
-#              --region ap-southeast-2
-#        shell: bash
+      - name: Wait for instances
+        id: ec2-wait
+        uses: truemark/aws-ec2-instance-wait-action@v3
+        with:
+          instance-ids: ${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
+          region: "ap-southeast-2"
+          timeout-ms: "600000"
+      - name: Deploy PiHole DNS Stack via CloudFormation
+        id: pihole-dns-stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: pihole-dns-stack
+          template: ec2/pihole/pihole-dns-template.yml
+          parameter-overrides: >-
+            InstanceNumber=${{ github.run_number }},
+            EC2InstanceId=${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
+      - name: Delete Previous PiHole Instance Stack via CloudFormation
+        id: pihole-instance-stack-delete
+        run: |
+          aws cloudformation delete-stack \
+              --stack-name pihole-instance-stack-${{ github.event.inputs.previous-stack-number }} \
+              --region ap-southeast-2
+        shell: bash
