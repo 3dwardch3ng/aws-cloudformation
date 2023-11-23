@@ -21,7 +21,6 @@ Resources:
       Name: pi-hole.edward-cheng.name
       ResourceRecords:
         - Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
-      SetIdentifier: String
       TTL: 60
       Type: A
   PiHoleAAAAR53RecordSet:
@@ -33,6 +32,5 @@ Resources:
       Name: pi-hole.edward-cheng.name
       ResourceRecords:
         - Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIpv6'
-      SetIdentifier: String
       TTL: 60
       Type: AAAA
