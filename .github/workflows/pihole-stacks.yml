@@ -83,7 +83,7 @@ jobs:
           template: ec2/pihole/pihole-instance-template.yml
           capabilities: CAPABILITY_NAMED_IAM
           parameter-overrides: >-
-            InstanceNumber=${{ github.run_number }},
+            StackNumber=${{ github.run_number }},
             EC2ServiceName=pihole,
             Ipv4HostNumber=${{ github.event.inputs.ipv4-host-value }},
             Ipv6HostNumber=${{ github.event.inputs.ipv6-host-value }},
@@ -103,7 +103,7 @@ jobs:
           name: pihole-dns-stack
           template: ec2/pihole/pihole-dns-template.yml
           parameter-overrides: >-
-            InstanceNumber=${{ github.run_number }},
+            StackNumber=${{ github.run_number }},
             EC2InstanceId=${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
       - name: Delete Previous PiHole Instance Stack via CloudFormation
         id: pihole-instance-stack-delete
