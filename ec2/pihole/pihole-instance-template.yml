@@ -232,6 +232,14 @@ Resources:
                 #server.modules += ("mod_setenv")
                 #server.modules += ("mod_openssl")
                 #server.port = 80
+                
+                server.document-root        = "/var/www/html"
+                server.upload-dirs          = ( "/var/cache/lighttpd/uploads" )
+                server.errorlog             = "/var/log/lighttpd/error.log"
+                server.pid-file             = "/run/lighttpd.pid"
+                server.username             = "www-data"
+                server.groupname            = "www-data"
+  
                 $SERVER["socket"] == "[::]:80" { }
 
                 $HTTP["scheme"] == "http" {
@@ -337,7 +345,6 @@ Resources:
           sudo su
           curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
           # Install Lighttpd SSL support
-          sudo apt install lighttpd-mod-openssl
           sudo apt install snapd
           sudo snap install core; sudo snap refresh core
           sudo snap install --classic certbot
@@ -345,7 +352,6 @@ Resources:
           sudo systemctl stop lighttpd
           sudo certbot certonly --standalone -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
           sudo systemctl start lighttpd
-          sudo su
           mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
           cp /etc/lighttpd/lighttpd.conf.bak /etc/lighttpd/lighttpd.conf
           sudo systemctl restart lighttpd
