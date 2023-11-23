@@ -19,6 +19,8 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-Id'
   EdwardChengNameHostedZoneNameServers:
-    Value: !GetAtt EdwardChengNameHostedZone.NameServers
+    Value: !Join
+      - ','
+      - Fn::GetAtt: EdwardChengNameHostedZone.NameServers
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-NameServers'
