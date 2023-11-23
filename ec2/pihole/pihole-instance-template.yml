@@ -335,14 +335,14 @@ Resources:
           sudo apt install snapd
           sudo snap install core; sudo snap refresh core
           sudo snap install --classic certbot
-          sudo ln -s /snap/bin/certbot /usr/bin/certbot
-          sudo systemctl stop lighttpd
-          sudo certbot certonly --standalone -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
-          sudo systemctl start lighttpd
-          sudo su
-          mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
-          cp /etc/lighttpd/lighttpd.conf.bak /etc/lighttpd/lighttpd.conf
-          sudo systemctl restart lighttpd
+#          sudo ln -s /snap/bin/certbot /usr/bin/certbot
+#          sudo systemctl stop lighttpd
+#          sudo certbot certonly --standalone -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
+#          sudo systemctl start lighttpd
+#          sudo su
+#          mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
+#          cp /etc/lighttpd/lighttpd.conf.bak /etc/lighttpd/lighttpd.conf
+#          sudo systemctl restart lighttpd
           # Install PiHole
           sudo su
           curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
