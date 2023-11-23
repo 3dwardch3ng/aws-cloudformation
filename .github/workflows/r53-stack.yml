@@ -49,5 +49,5 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: route-53-stack
-          template: r53/route53-templated.yml
+          template: r53/route-53-template.yml
           no-fail-on-empty-changeset: "1"
