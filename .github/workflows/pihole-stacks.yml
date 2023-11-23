@@ -1,4 +1,4 @@
-name: PiHole Stacks ${{ github.run_number }}
+name: PiHole Stacks
 
 on:
   workflow_dispatch:
