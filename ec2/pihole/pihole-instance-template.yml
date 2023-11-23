@@ -331,9 +331,9 @@ Outputs:
             Fn::Select:
               - '0'
               - Fn::Split:
-                - '0/24'
-                - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-CidrBlock' ] ]
-          HostPart: !Ref Ipv4HostNumber
+                  - '/64'
+                  - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-Ipv6CidrBlock' ] ]
+          HostPart: !Ref Ipv6HostNumber
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIpv6'
 
