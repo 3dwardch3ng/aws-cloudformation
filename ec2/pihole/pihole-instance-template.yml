@@ -34,7 +34,6 @@ Resources:
             - 02_config-amazon-cloudwatch-agent
             - 03_restart_amazon-cloudwatch-agent
             - 04_setupPiHoleInstallationConfig
-            - 05_setupLighttpdConfig
           UpdateEnvironment:
             - 02_config-amazon-cloudwatch-agent
             - 03_restart_amazon-cloudwatch-agent
@@ -222,52 +221,6 @@ Resources:
                 API_EXCLUDE_CLIENTS=
                 API_QUERY_LOG_SHOW=all
                 API_PRIVACY_MODE=false
-        05_setupLighttpdConfig:
-          files:
-            '/etc/lighttpd/lighttpd.conf.bak':
-              content: |
-                # generated 2023-11-23, Mozilla Guideline v5.7, lighttpd 1.4.63, OpenSSL 3.0.2, intermediate configuration
-                # https://ssl-config.mozilla.org/#server=lighttpd&version=1.4.63&config=intermediate&openssl=3.0.2&guideline=5.7
-                #server.modules += ("mod_redirect")
-                #server.modules += ("mod_setenv")
-                #server.modules += ("mod_openssl")
-                #server.port = 80
-                
-                server.document-root        = "/var/www/html"
-                server.upload-dirs          = ( "/var/cache/lighttpd/uploads" )
-                server.errorlog             = "/var/log/lighttpd/error.log"
-                server.pid-file             = "/run/lighttpd.pid"
-                server.username             = "www-data"
-                server.groupname            = "www-data"
-  
-                $SERVER["socket"] == "[::]:80" { }
-
-                $HTTP["scheme"] == "http" {
-                    url.redirect = ("" => "https://${url.authority}${url.path}${qsa}")
-                }
-
-                $HTTP["scheme"] == "https" {
-                    # HTTP Strict Transport Security (63072000 seconds)
-                    setenv.add-response-header = (
-                        "Strict-Transport-Security" => "max-age=63072000"
-                    )
-                }
-
-                # select one TLS module: "mod_openssl" "mod_mbedtls" "mod_gnutls" "mod_wolfssl" "mod_nss"
-                server.modules += ("mod_openssl")
-
-                # lighttpd 1.4.56 and later will inherit ssl.* from the global scope if
-                # $SERVER["socket"] contains ssl.engine = "enable" and no other ssl.* options
-                # (to avoid having to repeat ssl.* directives in both ":443" and "[::]:443")
-                $SERVER["socket"] ==     ":443" { ssl.engine = "enable" }
-                $SERVER["socket"] == "[::]:443" { ssl.engine = "enable" }
-                ssl.privkey = "/etc/letsencrypt/live/pi-hole.edward-cheng.name/privkey.pem"
-                ssl.pemfile = "/etc/letsencrypt/live/pi-hole.edward-cheng.name/fullchain.pem"
-                ssl.openssl.ssl-conf-cmd = ("MinProtocol" => "TLSv1.2")
-                ssl.openssl.ssl-conf-cmd += ("Options" => "-ServerPreference")
-                # TLS modules besides mod_openssl might name ciphers differently
-                # See https://redmine.lighttpd.net/projects/lighttpd/wiki/Docs_SSL
-                ssl.openssl.ssl-conf-cmd += ("CipherString" => "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305")
     Properties:
       AvailabilityZone:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
@@ -357,7 +310,7 @@ Resources:
           ./dehydrated --register --accept-terms
           ./dehydrated -d pi-hole.edward-cheng.name -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
           mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
-          cp /etc/lighttpd/lighttpd.conf.bak /etc/lighttpd/lighttpd.conf
+          aws s3 cp s3://cloudformation-templates-shared-files/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf
           systemctl restart lighttpd
           # Run cfn-signal
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
