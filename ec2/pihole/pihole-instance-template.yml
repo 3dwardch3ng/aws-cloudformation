@@ -331,6 +331,9 @@ Resources:
           sudo mv /etc/pihole/setupVars.conf /etc/pihole/setupVars.conf.bak
           sudo aws s3 cp s3://cloudformation-templates-shared-files/pihole/setupVars.conf /etc/pihole/setupVars.conf --recursive
           sudo /etc/.pihole/automated\ install/basic-install.sh --reconfigure --unattended
+          sudo echo -e "RATE_LIMIT=0/0\nDELAY_STARTUP=5" >> /etc/pihole/pihole-FTL.conf
+          sudo pihole restartdns
+          sudo service unbound restart
           sudo systemctl restart lighttpd
           # Run cfn-signal
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
