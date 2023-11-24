@@ -65,6 +65,16 @@ Resources:
           FromPort: -1
           ToPort: -1
         - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for OpenVPN UDP on port 1194
+          IpProtocol: udp
+          FromPort: 1194
+          ToPort: 1194
+        - CidrIpv6: ::/0
+          Description: Allow inbound ipv6 traffic for OpenVPN UDP on port 1194
+          IpProtocol: udp
+          FromPort: 1194
+          ToPort: 1194
+        - CidrIp: 0.0.0.0/0
           Description: Allow inbound ipv4 traffic for pihole-FTL DNS TCP on port 53
           IpProtocol: tcp
           FromPort: 53
