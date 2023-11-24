@@ -13,7 +13,7 @@ jobs:
       - name: Sync shared static files to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:
-          args: --follow-symlinks --delete --exclude 'README.md'
+          args: --follow-symlinks --exclude 'README.md'
         env:
           AWS_S3_BUCKET: 'cloudformation-templates-shared-files'
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
