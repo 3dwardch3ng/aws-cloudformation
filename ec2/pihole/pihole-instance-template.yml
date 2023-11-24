@@ -208,10 +208,10 @@ Resources:
                 QUERY_LOGGING=true
                 INSTALL_WEB=true
                 DNSMASQ_LISTENING=single
-                PIHOLE_DNS_1=localhost:5335
-                PIHOLE_DNS_2=
-                PIHOLE_DNS_3=::1#5335
-                PIHOLE_DNS_4=
+                PIHOLE_DNS_1=8.8.8.8
+                PIHOLE_DNS_2=8.8.4.4
+                PIHOLE_DNS_3=2001:4860:4860:0:0:0:0:8888
+                PIHOLE_DNS_4=2001:4860:4860:0:0:0:0:8844
                 DNS_FQDN_REQUIRED=true
                 DNS_BOGUS_PRIV=true
                 DNSSEC=true
@@ -293,17 +293,6 @@ Resources:
           sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
           # Run cfn-init
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
-          # Install unbound
-          sudo apt install unbound -y
-          sudo wget https://www.internic.net/domain/named.root -qO- | sudo tee /var/lib/unbound/root.hints
-          sudo mv /etc/unbound/unbound.conf.d/pi-hole.conf /etc/unbound/unbound.conf.d/pi-hole.conf.old
-          sudo aws s3 cp s3://cloudformation-templates-shared-files/unbound/pi-hole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
-          sudo mkdir -p /var/log/unbound
-          sudo touch /var/log/unbound/unbound.log
-          sudo chown unbound /var/log/unbound/unbound.log
-          sudo echo -e "/var/log/unbound/unbound.log rw," >> /etc/apparmor.d/local/usr.sbin.unbound
-          sudo apparmor_parser -r /etc/apparmor.d/usr.sbin.unbound
-          sudo service unbound restart
           # Install PiHole
           sudo apt install lighttpd -y
           sudo su
@@ -317,7 +306,7 @@ Resources:
           # certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
           sudo certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward.sydney --non-interactive --agree-tos -m edward@cheng.sydney
           sudo aws s3 cp /etc/letsencrypt s3://cloudformation-templates-shared-files/letsencrypt --recursive
-          $ aws s3 cp s3://cloudformation-templates-shared-files/letsencrypt /etc/letsencrypt --recursive
+          # aws s3 cp s3://cloudformation-templates-shared-files/letsencrypt /etc/letsencrypt --recursive
           sudo systemctl start lighttpd
           sudo mkdir -p /etc/lighttpd/dehydrated/tls-alpn-01
           cd /tmp && git clone https://github.com/lukas2511/dehydrated && cd dehydrated
@@ -326,7 +315,22 @@ Resources:
           sudo ./dehydrated -d pi-hole.edward.sydney -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
           sudo mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
           sudo aws s3 cp s3://cloudformation-templates-shared-files/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf
+          sudo systemctl restart lighttpd
+          # Install unbound
+          sudo apt install unbound -y
+          sudo wget https://www.internic.net/domain/named.root -qO- | sudo tee /var/lib/unbound/root.hints
+          sudo mv /etc/unbound/unbound.conf.d/pi-hole.conf /etc/unbound/unbound.conf.d/pi-hole.conf.old
+          sudo aws s3 cp s3://cloudformation-templates-shared-files/unbound/pi-hole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
+          sudo mkdir -p /var/log/unbound
+          sudo touch /var/log/unbound/unbound.log
+          sudo chown unbound /var/log/unbound/unbound.log
+          sudo echo -e "/var/log/unbound/unbound.log rw," >> /etc/apparmor.d/local/usr.sbin.unbound
+          sudo apparmor_parser -r /etc/apparmor.d/usr.sbin.unbound
           sudo service unbound restart
+          # Reconfig PiHole
+          sudo mv /etc/pihole/setupVars.conf /etc/pihole/setupVars.conf.bak
+          sudo aws s3 cp s3://cloudformation-templates-shared-files/pihole/setupVars.conf /etc/pihole/setupVars.conf --recursive
+          sudo /etc/.pihole/automated\ install/basic-install.sh --reconfigure --unattended
           sudo systemctl restart lighttpd
           # Run cfn-signal
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
