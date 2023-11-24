@@ -303,12 +303,14 @@ Resources:
           snap install --classic certbot
           ln -s /snap/bin/certbot /usr/bin/certbot
           systemctl stop lighttpd
-          certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
+          # certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
+          certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward.sydney --non-interactive --agree-tos -m edward@cheng.sydney
           systemctl start lighttpd
           mkdir -p /etc/lighttpd/dehydrated/tls-alpn-01
           cd /tmp && git clone https://github.com/lukas2511/dehydrated && cd dehydrated
           ./dehydrated --register --accept-terms
-          ./dehydrated -d pi-hole.edward-cheng.name -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
+          # ./dehydrated -d pi-hole.edward-cheng.name -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
+          ./dehydrated -d pi-hole.edward.sydney -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
           mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
           aws s3 cp s3://cloudformation-templates-shared-files/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf
           systemctl restart lighttpd
