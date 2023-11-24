@@ -338,8 +338,8 @@ Resources:
           # Install AmazonCloudWatchAgent and restart it
           wget https://amazoncloudwatch-agent-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
           sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+          # Run cfn-init
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
-          sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
           # Install PiHole
           sudo apt install lighttpd -y
           sudo su
@@ -349,12 +349,12 @@ Resources:
           sudo snap install core; sudo snap refresh core
           sudo snap install --classic certbot
           sudo ln -s /snap/bin/certbot /usr/bin/certbot
-          sudo systemctl stop lighttpd
-          sudo certbot certonly --standalone -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
-          sudo systemctl start lighttpd
+          sudo certbot certonly --webroot -w /var/www/html -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
           mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
           cp /etc/lighttpd/lighttpd.conf.bak /etc/lighttpd/lighttpd.conf
           sudo systemctl restart lighttpd
+          # Run cfn-signal
+          sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-${AWS::Region}-PiHole-EC2-Instance'
