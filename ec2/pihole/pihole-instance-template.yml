@@ -293,6 +293,11 @@ Resources:
           sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
           # Run cfn-init
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
+          # Install OpenVPN
+          sudo aws s3 cp s3://cloudformation-templates-shared-files/openvpn/openvpn.sh ./openvpn.sh
+          sudo chmod 755 openvpn.sh
+          sudo bash openvpn.sh --auto
+          TUN0_IPV4=`ip -o -4 addr list tun0 | awk -F ' *|/' '{print $4}'` && export TUN0_IPV4
           # Install PiHole
           sudo apt install lighttpd -y
           sudo su
@@ -304,7 +309,7 @@ Resources:
           sudo ln -s /snap/bin/certbot /usr/bin/certbot
           sudo systemctl stop lighttpd
           # certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
-          sudo certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward.sydney --non-interactive --agree-tos -m edward@cheng.sydney
+          sudo certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward.sydney -d pi-hole.cheng.sydney -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
           sudo aws s3 cp /etc/letsencrypt s3://cloudformation-templates-shared-files/letsencrypt --recursive
           # aws s3 cp s3://cloudformation-templates-shared-files/letsencrypt /etc/letsencrypt --recursive
           sudo systemctl start lighttpd
