@@ -297,7 +297,14 @@ Resources:
           sudo aws s3 cp s3://cloudformation-templates-shared-files/openvpn/openvpn.sh ./openvpn.sh
           sudo chmod 755 openvpn.sh
           sudo bash openvpn.sh --auto
+          sudo sed -i 's/push "dhcp-option/#push "dhcp-option/g' /etc/openvpn/server/server.conf
           TUN0_IPV4=`ip -o -4 addr list tun0 | awk -F ' *|/' '{print $4}'` && export TUN0_IPV4
+          sudo echo -e "push \"dhcp-option DNS ${TUN0_IPV4}\"" >> /etc/openvpn/server/server.conf
+          sudo echo -e "log /var/log/openvpn.log" >> /etc/openvpn/server/server.conf
+          sudo echo -e "verb 3" >> /etc/openvpn/server/server.conf
+          sudo systemctl restart openvpn-server@server
+          sudo service openvpn-server@server restart
+          sudo aws s3 cp /home/ubuntu/pihole.ovpn s3://cloudformation-templates-shared-files/openvpn/pihole.ovpn
           # Install PiHole
           sudo apt install lighttpd -y
           sudo su
