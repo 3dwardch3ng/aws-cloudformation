@@ -270,9 +270,11 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           # Update needrestart config
+          echo "Update needrestart config"
           needrestart -r a
           sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
           # Install environment toolings
+          echo "Install environment toolings"
           sudo apt upgrade -y
           sudo apt-get update && sudo apt-get upgrade -y
           sudo apt-get install unzip
@@ -283,17 +285,22 @@ Resources:
           wget https://bootstrap.pypa.io/ez_setup.py -O – | sudo python3
           pip3 install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
           # Install AWS Cli
+          echo "Install AWS Cli"
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
           unzip awscliv2.zip
           sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
           # Install EC2 Instance Connect
+          echo "Install EC2 Instance Connect"
           sudo apt-get install ec2-instance-connect
           # Install AmazonCloudWatchAgent and restart it
+          echo "Install AmazonCloudWatchAgent and restart it"
           wget https://amazoncloudwatch-agent-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
           sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
           # Run cfn-init
+          echo "Run cfn-init"
           sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
           # Install OpenVPN
+          echo "Install OpenVPN"
           sudo aws s3 cp s3://cloudformation-templates-shared-files/openvpn/openvpn.sh ./openvpn.sh
           sudo chmod 755 openvpn.sh
           sudo bash openvpn.sh --auto
@@ -304,12 +311,14 @@ Resources:
           sudo echo -e "verb 3" >> /etc/openvpn/server/server.conf
           sudo systemctl restart openvpn-server@server
           sudo service openvpn-server@server restart
-          sudo aws s3 cp /home/ubuntu/pihole.ovpn s3://cloudformation-templates-shared-files/openvpn/pihole.ovpn
+          sudo aws s3 cp /root/pihole.ovpn s3://cloudformation-templates-shared-files/openvpn/pihole.ovpn
           # Install PiHole
+          echo "Install PiHole"
           sudo apt install lighttpd -y
           sudo su
           curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
           # Install Lighttpd SSL support
+          echo "Install Lighttpd SSL support"
           sudo apt install snapd
           sudo snap install core; sudo snap refresh core
           sudo snap install --classic certbot
@@ -329,6 +338,7 @@ Resources:
           sudo aws s3 cp s3://cloudformation-templates-shared-files/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf
           sudo systemctl restart lighttpd
           # Install unbound
+          echo "Install unbound"
           sudo apt install unbound -y
           sudo wget https://www.internic.net/domain/named.root -qO- | sudo tee /var/lib/unbound/root.hints
           sudo mv /etc/unbound/unbound.conf.d/pi-hole.conf /etc/unbound/unbound.conf.d/pi-hole.conf.old
@@ -340,14 +350,18 @@ Resources:
           sudo apparmor_parser -r /etc/apparmor.d/usr.sbin.unbound
           sudo service unbound restart
           # Reconfig PiHole
+          echo "Reconfig PiHole"
           sudo mv /etc/pihole/setupVars.conf /etc/pihole/setupVars.conf.bak
           sudo aws s3 cp s3://cloudformation-templates-shared-files/pihole/setupVars.conf /etc/pihole/setupVars.conf --recursive
           sudo /etc/.pihole/automated\ install/basic-install.sh --reconfigure --unattended
           sudo echo -e "RATE_LIMIT=0/0\nDELAY_STARTUP=5" >> /etc/pihole/pihole-FTL.conf
+          # Restart services
+          echo "Restart services"
           sudo pihole restartdns
           sudo service unbound restart
           sudo systemctl restart lighttpd
           # Run cfn-signal
+          echo "Run cfn-signal"
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
       Tags:
         - Key: Name
