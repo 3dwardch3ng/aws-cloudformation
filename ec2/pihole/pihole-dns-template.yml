@@ -11,6 +11,15 @@ Parameters:
     Type: String
 
 Resources:
+  # EC2 EIP Association
+  PiHoleEC2EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ] ]
+      InstanceId:
+        Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-Ref'
+
   # Route 53 Record Set
   PiHoleAR53RecordSet:
     Type: AWS::Route53::RecordSet
@@ -20,7 +29,8 @@ Resources:
         Fn::ImportValue: !Sub 'route-53-stack-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-Id'
       Name: pi-hole.edward-cheng.name
       ResourceRecords:
-        - Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
+        - Fn::ImportValue: !Sub 'ec2-eip-stack-${AWS::Region}-EC2-EIP-ElasticIP1-PublicIp'
+#        - Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIp'
       TTL: 60
       Type: A
   PiHoleAAAAR53RecordSet:
@@ -34,12 +44,3 @@ Resources:
         - Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-PublicIpv6'
       TTL: 60
       Type: AAAA
-
-  # EC2 EIP Association
-  PiHoleEC2EIPAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId:
-        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-ElasticIP1-AllocationId' ]]
-      InstanceId:
-        Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-Ref'
