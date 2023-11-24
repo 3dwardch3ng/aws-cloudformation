@@ -345,14 +345,20 @@ Resources:
           sudo su
           curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
           # Install Lighttpd SSL support
-          sudo apt install snapd
-          sudo snap install core; sudo snap refresh core
-          sudo snap install --classic certbot
-          sudo ln -s /snap/bin/certbot /usr/bin/certbot
-          sudo certbot certonly --webroot -w /var/www/html -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
+          apt install snapd
+          snap install core; sudo snap refresh core
+          snap install --classic certbot
+          ln -s /snap/bin/certbot /usr/bin/certbot
+          systemctl stop lighttpd
+          certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
+          systemctl start lighttpd
+          mkdir -p /etc/lighttpd/dehydrated/tls-alpn-01
+          cd /tmp && git clone https://github.com/lukas2511/dehydrated && cd dehydrated
+          ./dehydrated --register --accept-terms
+          ./dehydrated -d pi-hole.edward-cheng.name -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
           mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
           cp /etc/lighttpd/lighttpd.conf.bak /etc/lighttpd/lighttpd.conf
-          sudo systemctl restart lighttpd
+          systemctl restart lighttpd
           # Run cfn-signal
           sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region}'
       Tags:
