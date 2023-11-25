@@ -114,7 +114,7 @@ jobs:
             [{"data": "${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstancePublicIpv6 }}", "ttl": 600 }]
           headers: >-
             {
-              "Authentication": "sso-key ${{ secrets.GODADDY_API_KEY }}:${{ secrets.GODADDY_API_SECRET }}",
+              "Authorization": "sso-key ${{ secrets.GODADDY_API_KEY }}:${{ secrets.GODADDY_API_SECRET }}",
               "Content-Type": "application/json"
             }
       - name: Update DNS AAAA Record for Godaddy cheng.sydney
@@ -126,7 +126,7 @@ jobs:
             [{"data": "${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstancePublicIpv6 }}", "ttl": 600 }]
           headers: >-
             {
-              "Authentication": "sso-key ${{ secrets.GODADDY_API_KEY }}:${{ secrets.GODADDY_API_SECRET }}",
+              "Authorization": "sso-key ${{ secrets.GODADDY_API_KEY }}:${{ secrets.GODADDY_API_SECRET }}",
               "Content-Type": "application/json"
             }
       - name: Delete PiHole Instance Stack ${{ github.event.inputs.previous-stack-number }}
