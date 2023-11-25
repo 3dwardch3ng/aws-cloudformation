@@ -105,6 +105,30 @@ jobs:
           parameter-overrides: >-
             StackNumber=${{ github.run_number }},
             EC2InstanceId=${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
+      - name: Update DNS AAAA Record for Godaddy edward.sydney
+        uses: satak/webrequest-action@master
+        with:
+          url: ${{ secrets.GODADDY_API_BASE_URL }}/v1/domains/edward.sydney/records/AAAA/pi-hole
+          method: PUT
+          payload: |
+            '[{"data": "${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstancePublicIpv6 }}", "ttl": 600 }]'
+          headers: >-
+            '{'
+            '"Authentication": "sso-key ${{ secrets.GODADDY_API_KEY }}:${{ secrets.GODADDY_API_SECRET }}",'
+            '"Content-Type": "application/json"'
+            '}'
+      - name: Update DNS AAAA Record for Godaddy cheng.sydney
+        uses: satak/webrequest-action@master
+        with:
+          url: ${{ secrets.GODADDY_API_BASE_URL }}/v1/domains/cheng.sydney/records/AAAA/pi-hole
+          method: PUT
+          payload: |
+            '[{"data": "${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstancePublicIpv6 }}", "ttl": 600 }]'
+          headers: >-
+            '{'
+            '"Authentication": "sso-key ${{ secrets.GODADDY_API_KEY }}:${{ secrets.GODADDY_API_SECRET }}",'
+            '"Content-Type": "application/json"'
+            '}'
       - name: Delete PiHole Instance Stack ${{ github.event.inputs.previous-stack-number }}
         id: pihole-instance-stack-delete
         run: |
