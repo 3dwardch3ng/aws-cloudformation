@@ -21,6 +21,18 @@ Resources:
         Fn::ImportValue: !Sub 'pihole-instance-stack-${StackNumber}-${AWS::Region}-EC2-Instance-PiHoleEC2Instance-Ref'
 
   # Route 53 Record Set
+  PiHoleAR53RecordSet:
+    DependsOn: PiHoleEC2EIPAssociation
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: 'PiHoleEC2Instance Ipv4 DNS Record'
+      HostedZoneId:
+        Fn::ImportValue: !Sub 'route-53-stack-${AWS::Region}-Route53-HostedZone-EdwardChengNameHostedZone-Id'
+      Name: pi-hole.edward-cheng.name
+      ResourceRecords:
+        - Fn::ImportValue: !Sub 'ec2-eip-stack-${AWS::Region}-EC2-EIP-ElasticIP1-PublicIp'
+      TTL: 60
+      Type: A
   PiHoleAAAAR53RecordSet:
     DependsOn: PiHoleEC2EIPAssociation
     Type: AWS::Route53::RecordSet
