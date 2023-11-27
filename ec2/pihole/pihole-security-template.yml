@@ -1,6 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a PiHole EC2 Security Resources in AWS
 
+Parameters:
+  IngressCidrIp:
+    Description: The CidrIp for the SecurityGroup Ingress
+    Type: String
+  IngressCidrIpv6:
+    Description: The CidrIpv6 for the SecurityGroup Ingress
+    Type: String
+
 Resources:
   # IAM Role
   PiHoleIAMRole:
@@ -54,82 +62,92 @@ Resources:
       GroupDescription: PiHole EC2 Security Group
       GroupName: PiHoleEC2SecurityGroup
       SecurityGroupIngress:
-        - CidrIp: 0.0.0.0/0
+        - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound ICMP (ping)
           IpProtocol: icmp
           FromPort: -1
           ToPort: -1
-        - CidrIpv6: ::/0
+        - CidrIpv6: !Ref IngressCidrIpv6
           Description: Allow inbound ICMPv6 (ping)
           IpProtocol: icmpv6
           FromPort: -1
           ToPort: -1
-        - CidrIp: 0.0.0.0/0
+        - CidrIp: !Ref IngressCidrIp
+          Description: Allow inbound ipv4 traffic for SSH TCP on port 22
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        - CidrIpv6: !Ref IngressCidrIpv6
+          Description: Allow inbound ipv6 traffic for SSH TCP on port 22
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound ipv4 traffic for OpenVPN UDP on port 1194
           IpProtocol: udp
           FromPort: 1194
           ToPort: 1194
-        - CidrIpv6: ::/0
+        - CidrIpv6: !Ref IngressCidrIpv6
           Description: Allow inbound ipv6 traffic for OpenVPN UDP on port 1194
           IpProtocol: udp
           FromPort: 1194
           ToPort: 1194
-        - CidrIp: 0.0.0.0/0
+        - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound ipv4 traffic for pihole-FTL DNS TCP on port 53
           IpProtocol: tcp
           FromPort: 53
           ToPort: 53
-        - CidrIpv6: ::/0
+        - CidrIpv6: !Ref IngressCidrIpv6
           Description: Allow inbound ipv6 traffic for pihole-FTL DNS TCP on port 53
           IpProtocol: tcp
           FromPort: 53
           ToPort: 53
-        - CidrIp: 0.0.0.0/0
+        - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound ipv4 traffic for pihole-FTL DNS UDP on port 53
           IpProtocol: udp
           FromPort: 53
           ToPort: 53
-        - CidrIpv6: ::/0
+        - CidrIpv6: !Ref IngressCidrIpv6
           Description: Allow inbound ipv6 traffic for pihole-FTL DNS UDP on port 53
           IpProtocol: udp
           FromPort: 53
           ToPort: 53
-        - CidrIp: 0.0.0.0/0
+        - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound traffic for pihole-FTL DHCP IPv4 UDP on port 67
           IpProtocol: udp
           FromPort: 67
           ToPort: 67
-        - CidrIpv6: ::/0
+        - CidrIpv6: !Ref IngressCidrIpv6
           Description: Allow inbound traffic for pihole-FTL DHCPv6 UDP on port 547
           IpProtocol: udp
           FromPort: 547
           ToPort: 547
-        - CidrIp: 0.0.0.0/0
+        - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound ipv4 traffic for lighttpd HTTP TCP on port 80
           IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-        - CidrIpv6: ::/0
+        - CidrIpv6: !Ref IngressCidrIpv6
           Description: Allow inbound ipv6 traffic for lighttpd HTTP TCP on port 80
           IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-        - CidrIp: 0.0.0.0/0
+        - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound ipv4 traffic for lighttpd HTTPS TCP on port 443
           IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-        - CidrIpv6: ::/0
+        - CidrIpv6: !Ref IngressCidrIpv6
           Description: Allow inbound ipv6 traffic for lighttpd HTTPS TCP on port 443
           IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-        - CidrIp: 0.0.0.0/0
+        - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound ipv4 traffic for pihole-FTL TCP on port 4711
           IpProtocol: tcp
           FromPort: 4711
           ToPort: 4711
-        - CidrIpv6: ::/0
+        - CidrIpv6: !Ref IngressCidrIpv6
           Description: Allow inbound ipv6 traffic for pihole-FTL TCP on port 4711
           IpProtocol: tcp
           FromPort: 4711

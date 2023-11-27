@@ -36,6 +36,9 @@ on:
         description: 'The previous stack number'
         type: string
         default: '1'
+      ingress-cidr-ipv6:
+        description: 'The CidrIpv6 for the SG EdwardHomeSecurityGroup Ingress rules'
+        type: string
 
 permissions:
   id-token: write
@@ -67,6 +70,9 @@ jobs:
           name: pihole-security-stack
           template: ec2/pihole/pihole-security-template.yml
           capabilities: CAPABILITY_NAMED_IAM
+          parameter-overrides: >-
+            IngressCidrIp=${{ secrets.EDWARD_HOME_IPV4 }},
+            IngressCidrIpv6=${{ github.event.inputs.ingress-cidr-ipv6 }}
           no-fail-on-empty-changeset: "1"
       - name: Deploy PiHole Log Stack via CloudFormation
         id: pihole-log-stack
@@ -89,6 +95,10 @@ jobs:
             Ipv6HostNumber=${{ github.event.inputs.ipv6-host-value }},
             PiHoleAdminPwdHash=${{ secrets.PI_HOLE_ADMIN_PASSWORD_HASH }}
           no-fail-on-empty-changeset: "1"
+      - name: Sleep for 5 mins
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '300s'
       - name: Wait for instances
         id: ec2-wait
         uses: truemark/aws-ec2-instance-wait-action@v3

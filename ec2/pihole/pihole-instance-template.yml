@@ -237,7 +237,6 @@ Resources:
           DeviceIndex: 0
           GroupSet:
             - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'EC2-SecurityGroup-PiHoleEC2SecurityGroup-Id' ] ]
-            - Fn::ImportValue: !Join [ '-', [ 'edward-home-ec2-security-group-stack', Ref: AWS::Region, 'EC2-SecurityGroup-EdwardHomeSecurityGroup-GroupId' ] ]
           Ipv6Addresses:
             - Ipv6Address:
                 Fn::Sub:

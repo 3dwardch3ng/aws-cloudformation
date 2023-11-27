@@ -24,9 +24,6 @@ on:
           - 'eu-west-2'
           - 'eu-west-3'
           - 'eu-north-1'
-      ingress-cidr-ip:
-        description: 'The CidrIp for the SG EdwardHomeSecurityGroup Ingress rules'
-        type: string
       ingress-cidr-ipv6:
         description: 'The CidrIpv6 for the SG EdwardHomeSecurityGroup Ingress rules'
         type: string
@@ -57,6 +54,6 @@ jobs:
           name: edward-home-ec2-security-group-stack
           template: ec2/edward-home-ec2-security-group-template.yml
           parameter-overrides: >-
-            EdwardHomeSGIngressCidrIp=${{ github.event.inputs.ingress-cidr-ip }},
+            EdwardHomeSGIngressCidrIp=${{ secrets.EDWARD_HOME_IPV4 }},
             EdwardHomeSGIngressCidrIpv6=${{ github.event.inputs.ingress-cidr-ipv6 }}
           no-fail-on-empty-changeset: "1"
