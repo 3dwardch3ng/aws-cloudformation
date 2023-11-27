@@ -37,7 +37,7 @@ on:
         type: string
         default: '1'
       ingress-cidr-ipv6:
-        description: 'The CidrIpv6 for the SG EdwardHomeSecurityGroup Ingress rules'
+        description: 'The CidrIpv6 for the SecurityGroup Ingress rules'
         type: string
 
 permissions:
