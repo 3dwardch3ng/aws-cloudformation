@@ -122,12 +122,12 @@ Resources:
           IpProtocol: udp
           FromPort: 547
           ToPort: 547
-        - CidrIp: !Ref IngressCidrIp
+        - CidrIp: 0.0.0.0/0
           Description: Allow inbound ipv4 traffic for lighttpd HTTP TCP on port 80
           IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-        - CidrIpv6: !Ref IngressCidrIpv6
+        - CidrIpv6: ::0/0
           Description: Allow inbound ipv6 traffic for lighttpd HTTP TCP on port 80
           IpProtocol: tcp
           FromPort: 80
