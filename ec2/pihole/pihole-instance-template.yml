@@ -359,7 +359,6 @@ Resources:
           sudo echo -e PIHOLE_DNS_2=127.0.0.1#8953 >> /etc/pihole/setupVars.conf
           sudo echo -e PIHOLE_DNS_3=::1#8953 >> /etc/pihole/setupVars.conf
           sudo echo -e PIHOLE_DNS_4= >> /etc/pihole/setupVars.conf
-          sudo aws s3 cp s3://cloudformation-templates-shared-files/pihole/setupVars.conf /etc/pihole/setupVars.conf
           sudo /etc/.pihole/automated\ install/basic-install.sh --reconfigure --unattended
           sudo echo -e "RATE_LIMIT=0/0\nDELAY_STARTUP=5" >> /etc/pihole/pihole-FTL.conf
           # Restart services
