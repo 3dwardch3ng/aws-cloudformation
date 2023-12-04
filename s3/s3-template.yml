@@ -94,6 +94,49 @@ Resources:
               - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ]]
               - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ]]
 
+  IGVWebAppCloudFormationTemplatesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: igv-web-app
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  IGVWebAppCloudFormationTemplatesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref IGVWebAppCloudFormationTemplatesBucket
+      PolicyDocument:
+        Id: IGVWebAppCloudFormationTemplatesBucketPolicyDocument
+        Version: '2012-10-17'
+        Statement:
+          - Sid: IGVWebAppCloudFormationTemplatesBucketPolicyDocumentStatement
+            Effect: Allow
+            Principal:
+              AWS: !Ref AwsAccountNum
+            Action:
+              - 's3:GetObject'
+              - 's3:ListBucket'
+            Resource:
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ] ]
+          - Sid: IGVWebAppCloudFormationTemplatesBucketPutBucketPolicyDocumentStatement
+            Effect: Allow
+            Principal:
+              AWS: !Ref AwsAccountNum
+            Action:
+              - 's3:PutBucketPolicy'
+            Resource:
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ] ]
+
 Outputs:
   DeleteFromS3ActionBucketArn:
     Value: !GetAtt DeleteFromS3ActionBucket.Arn
@@ -103,3 +146,7 @@ Outputs:
     Value: !GetAtt CloudFormationTemplatesBucket.Arn
     Export:
       Name: CloudFormationTemplatesBucketArn
+  IGVWebAppCloudFormationTemplatesBucketArn:
+    Value: !GetAtt IGVWebAppCloudFormationTemplatesBucket.Arn
+    Export:
+      Name: IGVWebAppCloudFormationTemplatesBucketArn
