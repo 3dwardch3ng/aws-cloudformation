@@ -128,8 +128,8 @@ Resources:
               - 's3:GetObject'
               - 's3:ListBucket'
             Resource:
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ] ]
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket, '/*' ] ]
           - Sid: IGVWebAppCloudFormationTemplatesBucketPutBucketPolicyDocumentStatement
             Effect: Allow
             Principal:
@@ -137,8 +137,8 @@ Resources:
             Action:
               - 's3:PutBucketPolicy'
             Resource:
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket ] ]
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref CloudFormationTemplatesBucket, '/*' ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket ] ]
+              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket, '/*' ] ]
 
 Outputs:
   DeleteFromS3ActionBucketArn:
