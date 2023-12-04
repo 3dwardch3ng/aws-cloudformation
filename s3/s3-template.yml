@@ -65,6 +65,9 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
 
   CloudFormationTemplatesBucketPolicy:
     Type: AWS::S3::BucketPolicy
