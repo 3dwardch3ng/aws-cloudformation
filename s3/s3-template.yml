@@ -105,12 +105,12 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      AccessControl: Private
+      AccessControl: PublicRead
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
 
   IGVWebAppCloudFormationTemplatesBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -126,7 +126,6 @@ Resources:
               AWS: !Ref AwsAccountNum
             Action:
               - 's3:GetObject'
-              - 's3:ListBucket'
             Resource:
               - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket ] ]
               - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket, '/*' ] ]
@@ -139,6 +138,16 @@ Resources:
             Resource:
               - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket ] ]
               - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket, '/*' ] ]
+
+  IGVWebAppCloudFormationTemplatesBucketAccessPoint:
+    Type: AWS::S3::AccessPoint
+    Properties:
+      Bucket: !Ref IGVWebAppCloudFormationTemplatesBucket
+      BucketAccountId: !Ref AwsAccountNum
+      Name: IGVWebAppCloudFormationTemplatesBucketAccessPoint
+      VpcConfiguration:
+        VpcId:
+          Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpc-VpcId'
 
 Outputs:
   DeleteFromS3ActionBucketArn:
