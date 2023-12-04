@@ -129,15 +129,6 @@ Resources:
             Resource:
               - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket ] ]
               - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket, '/*' ] ]
-          - Sid: IGVWebAppCloudFormationTemplatesBucketPutBucketPolicyDocumentStatement
-            Effect: Allow
-            Principal:
-              AWS: !Ref AwsAccountNum
-            Action:
-              - 's3:PutBucketPolicy'
-            Resource:
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket ] ]
-              - Fn::Join: [ '', [ 'arn:aws:s3:::', !Ref IGVWebAppCloudFormationTemplatesBucket, '/*' ] ]
 
   IGVWebAppCloudFormationTemplatesBucketAccessPoint:
     Type: AWS::S3::AccessPoint
