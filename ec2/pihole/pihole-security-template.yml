@@ -64,8 +64,14 @@ Resources:
       SecurityGroupIngress:
         - CidrIp: 10.8.0.0/24
           Description: Allow inbound ipv4 traffic via Open VPN tunnel
-          FromPort: -1
-          ToPort: -1
+          IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+        - CidrIp: 10.8.0.0/24
+          Description: Allow inbound ipv4 traffic via Open VPN tunnel
+          IpProtocol: udp
+          FromPort: 0
+          ToPort: 65535
         - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound ICMP (ping)
           IpProtocol: icmp
