@@ -62,6 +62,21 @@ Resources:
       GroupDescription: PiHole EC2 Security Group
       GroupName: PiHoleEC2SecurityGroup
       SecurityGroupIngress:
+        - CidrIp: 10.8.0.0/24
+          Description: Allow inbound ipv4 traffic via Open VPN tunnel
+          IpProtocol: tcp
+          FromPort: -1
+          ToPort: -1
+        - CidrIp: 10.8.0.0/24
+          Description: Allow inbound ipv4 traffic via Open VPN tunnel
+          IpProtocol: udp
+          FromPort: -1
+          ToPort: -1
+        - CidrIp: 10.8.0.0/24
+          Description: Allow inbound ipv4 traffic via Open VPN tunnel
+          IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
         - CidrIp: !Ref IngressCidrIp
           Description: Allow inbound ICMP (ping)
           IpProtocol: icmp
