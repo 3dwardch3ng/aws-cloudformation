@@ -82,12 +82,12 @@ Resources:
           IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-        - CidrIp: !Ref IngressCidrIp
+        - CidrIp: 0.0.0.0/0
           Description: Allow inbound ipv4 traffic for OpenVPN UDP on port 1194
           IpProtocol: udp
           FromPort: 1194
           ToPort: 1194
-        - CidrIpv6: !Ref IngressCidrIpv6
+        - CidrIpv6: ::0/0
           Description: Allow inbound ipv6 traffic for OpenVPN UDP on port 1194
           IpProtocol: udp
           FromPort: 1194
