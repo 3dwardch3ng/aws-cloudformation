@@ -10,6 +10,14 @@ Resources:
         - Key: Name
           Value: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-ElasticIP1'
 
+  ElasticIP2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: standard
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-ElasticIP2'
+
 Outputs:
   ElasticIP1Ref:
     Value: !Ref ElasticIP1
@@ -23,3 +31,15 @@ Outputs:
     Value: !GetAtt ElasticIP1.PublicIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-ElasticIP1-PublicIp'
+  ElasticIP2Ref:
+    Value: !Ref ElasticIP2
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-ElasticIP2-Ref'
+  ElasticIP2AllocationId:
+    Value: !GetAtt ElasticIP2.AllocationId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-ElasticIP2-AllocationId'
+  ElasticIP2PublicIp:
+    Value: !GetAtt ElasticIP2.PublicIp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-ElasticIP2-PublicIp'
