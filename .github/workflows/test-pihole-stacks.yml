@@ -1,4 +1,4 @@
-name: PiHole Stacks
+name: Test PiHole Stacks
 
 on:
   workflow_dispatch:
@@ -24,21 +24,6 @@ on:
           - 'eu-west-2'
           - 'eu-west-3'
           - 'eu-north-1'
-      ipv4-host-value:
-        description: 'The host value of the public IPv4 address for the new instance'
-        type: string
-        default: '100'
-      ipv6-host-value:
-        description: 'The host value of the public IPv6 address for the new instance'
-        type: string
-        default: '10'
-      previous-stack-number:
-        description: 'The previous stack number'
-        type: string
-        default: '1'
-      ingress-cidr-ipv6:
-        description: 'The CidrIpv6 for the SecurityGroup Ingress rules'
-        type: string
 
 permissions:
   id-token: write
