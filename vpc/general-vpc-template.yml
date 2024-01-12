@@ -27,9 +27,23 @@ Resources:
     Properties:
       GroupDescription: General Vpc Default Security Group
       SecurityGroupEgress:
-        - IpProtocol: -1
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all ipv4 outbound traffic by default
+          IpProtocol: -1
+        - CidrIpv6: ::/0
+          Description: Allow all ipv6 outbound traffic by default
+          IpProtocol: -1
       SecurityGroupIngress:
-        - IpProtocol: -1
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all ipv4 inbound traffic by default
+          IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+        - CidrIpv6: ::0/0
+          Description: Allow all ipv6 inbound traffic by default
+          IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
       Tags:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'GeneralVpc-SecurityGroup' ] ]
