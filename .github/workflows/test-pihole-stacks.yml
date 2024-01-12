@@ -1,0 +1,80 @@
+name: PiHole Stacks
+
+on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: 'AWS Region'
+        type: choice
+        default: 'ap-southeast-2'
+        options:
+          - 'us-east-1'
+          - 'us-east-2'
+          - 'us-west-1'
+          - 'us-west-2'
+          - 'ap-south-1'
+          - 'ap-northeast-1'
+          - 'ap-northeast-2'
+          - 'ap-northeast-3'
+          - 'ap-southeast-1'
+          - 'ap-southeast-2'
+          - 'ca-central-1'
+          - 'eu-central-1'
+          - 'eu-west-1'
+          - 'eu-west-2'
+          - 'eu-west-3'
+          - 'eu-north-1'
+      ipv4-host-value:
+        description: 'The host value of the public IPv4 address for the new instance'
+        type: string
+        default: '100'
+      ipv6-host-value:
+        description: 'The host value of the public IPv6 address for the new instance'
+        type: string
+        default: '10'
+      previous-stack-number:
+        description: 'The previous stack number'
+        type: string
+        default: '1'
+      ingress-cidr-ipv6:
+        description: 'The CidrIpv6 for the SecurityGroup Ingress rules'
+        type: string
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  create-update-stacks:
+    name: Create / Update PiHole Stacks
+    runs-on: ubuntu-latest
+    environment: AWS
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          arch: amd64
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.region }}
+      - name: Deploy PiHole Security Stack via CloudFormation
+        id: pihole-security-stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: test-pihole-security-stack
+          template: ec2/pihole/pihole-security-test-template.yml
+          capabilities: CAPABILITY_NAMED_IAM
+          no-fail-on-empty-changeset: "1"
+      - name: Deploy PiHole Log Stack via CloudFormation
+        id: pihole-log-stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: test-pihole-log-stack
+          template: ec2/pihole/pihole-log-test-template.yml
+          no-fail-on-empty-changeset: "1"

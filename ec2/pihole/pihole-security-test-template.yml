@@ -1,0 +1,213 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a PiHole EC2 Security Resources in AWS
+
+Resources:
+  # IAM Role
+  TestPiHoleIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Description: 'The IAM Role for the PiHole EC2 Instance'
+      MaxSessionDuration: 43200
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/IAMReadOnlyAccess
+        # Policies from role AmazonSSMRoleForInstancesQuickSetup
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonSSMPatchAssociation
+      Policies:
+        - PolicyName: PiHoleIAMRoleS3Policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                  - 's3:PutObject'
+                Resource:
+                  - 'arn:aws:s3:::*'
+        - PolicyName: PiHoleIAMRoleLogPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:PutRetentionPolicy'
+                Resource:
+                  - '*'
+      RoleName: 'TestPiHoleIAMRole'
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Test', 'PiHole', 'IAMRole' ]]
+
+  # Security Group
+  TestPiHoleEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Test PiHole EC2 Security Group
+      GroupName: TestPiHoleEC2SecurityGroup
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic via Open VPN tunnel
+          IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic via Open VPN tunnel
+          IpProtocol: udp
+          FromPort: 0
+          ToPort: 65535
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ICMP (ping)
+          IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ICMPv6 (ping)
+          IpProtocol: icmpv6
+          FromPort: -1
+          ToPort: -1
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for SSH TCP on port 22
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic for SSH TCP on port 22
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for OpenVPN UDP on port 1194
+          IpProtocol: udp
+          FromPort: 1194
+          ToPort: 1194
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic for OpenVPN UDP on port 1194
+          IpProtocol: udp
+          FromPort: 1194
+          ToPort: 1194
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS UDP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL DNS UDP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound traffic for pihole-FTL DHCP IPv4 UDP on port 67
+          IpProtocol: udp
+          FromPort: 67
+          ToPort: 67
+        - CidrIpv6: ::0/0
+          Description: Allow inbound traffic for pihole-FTL DHCPv6 UDP on port 547
+          IpProtocol: udp
+          FromPort: 547
+          ToPort: 547
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for lighttpd HTTP TCP on port 80
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic for lighttpd HTTP TCP on port 80
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for lighttpd HTTPS TCP on port 443
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic for lighttpd HTTPS TCP on port 443
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL TCP on port 4711
+          IpProtocol: tcp
+          FromPort: 4711
+          ToPort: 4711
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL TCP on port 4711
+          IpProtocol: tcp
+          FromPort: 4711
+          ToPort: 4711
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all ipv4 outbound traffic by default
+          IpProtocol: -1
+        - CidrIpv6: ::/0
+          Description: Allow all ipv6 outbound traffic by default
+          IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Test', 'PiHole', 'SecurityGroup' ]]
+      VpcId:
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpc-VpcId' ]]
+
+  # IAM Instance Profile
+  TestPiHoleIAMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: TestPiHoleIAMInstanceProfile
+      Roles:
+        - !Ref TestPiHoleIAMRole
+
+Outputs:
+  TestPiHoleIAMRoleRef:
+    Value: !Ref TestPiHoleIAMRole
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-TestPiHoleIAMRole-Ref'
+  TestPiHoleIAMRoleArn:
+    Value: !GetAtt TestPiHoleIAMRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-TestPiHoleIAMRole-Arn'
+  TestPiHoleIAMRoleId:
+    Value: !GetAtt TestPiHoleIAMRole.RoleId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-Role-TestPiHoleIAMRole-Id'
+  TestPiHoleEC2SecurityGroupRef:
+    Value: !Ref TestPiHoleEC2SecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-TestPiHoleEC2SecurityGroup-Ref'
+  TestPiHoleEC2SecurityGroupId:
+    Value: !GetAtt TestPiHoleEC2SecurityGroup.GroupId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-TestPiHoleEC2SecurityGroup-Id'
+  TestPiHoleEC2SecurityGroupVpcId:
+    Value: !GetAtt TestPiHoleEC2SecurityGroup.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-SecurityGroup-TestPiHoleEC2SecurityGroup-VpcId'
+  TestPiHoleIAMInstanceProfileRef:
+    Value: !Ref TestPiHoleIAMInstanceProfile
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-TestPiHoleIAMInstanceProfile-Ref'
+  TestPiHoleIAMInstanceProfileArn:
+    Value: !GetAtt TestPiHoleIAMInstanceProfile.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-IAM-InstanceProfile-TestPiHoleIAMInstanceProfile-Arn'
+

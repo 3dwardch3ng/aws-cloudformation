@@ -22,6 +22,19 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'GeneralVpc' ]]
 
+  GeneralVpcDefaultSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: General Vpc Default Security Group
+      SecurityGroupEgress:
+        - IpProtocol: -1
+      SecurityGroupIngress:
+        - IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'GeneralVpc-SecurityGroup' ] ]
+      VpcId: !Ref GeneralVpc
+
   GeneralVpcIPv6CidrBlock:
     Type: AWS::EC2::VPCCidrBlock
     Properties:
@@ -252,6 +265,58 @@ Resources:
       SubnetId: !Ref GeneralVpcPrivateSubnet2
       RouteTableId: !Ref GeneralVpcPrivateSubnet2RouteTable
 
+  GeneralVpcInterfaceEndpointSSM:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: yes
+      SecurityGroupIds:
+        - !Ref GeneralVpcDefaultSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ssm'
+      SubnetIds:
+        - !Ref GeneralVpcPrivateSubnet1
+        - !Ref GeneralVpcPrivateSubnet2
+      VpcEndpointType: Interface
+      VpcId: !Ref GeneralVpc
+
+  GeneralVpcInterfaceEndpointEC2Messages:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: yes
+      SecurityGroupIds:
+        - !Ref GeneralVpcDefaultSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ec2messages'
+      SubnetIds:
+        - !Ref GeneralVpcPrivateSubnet1
+        - !Ref GeneralVpcPrivateSubnet2
+      VpcEndpointType: Interface
+      VpcId: !Ref GeneralVpc
+
+  GeneralVpcInterfaceEndpointEC2:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: yes
+      SecurityGroupIds:
+        - !Ref GeneralVpcDefaultSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ec2'
+      SubnetIds:
+        - !Ref GeneralVpcPrivateSubnet1
+        - !Ref GeneralVpcPrivateSubnet2
+      VpcEndpointType: Interface
+      VpcId: !Ref GeneralVpc
+
+  GeneralVpcInterfaceEndpointSSMMessages:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: yes
+      SecurityGroupIds:
+        - !Ref GeneralVpcDefaultSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ssmmessages'
+      SubnetIds:
+        - !Ref GeneralVpcPrivateSubnet1
+        - !Ref GeneralVpcPrivateSubnet2
+      VpcEndpointType: Interface
+      VpcId: !Ref GeneralVpc
+
 Outputs:
   GeneralVpcRef:
     Value: !Ref GeneralVpc
@@ -273,6 +338,18 @@ Outputs:
     Value: !GetAtt GeneralVpc.VpcId
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-VpcId'
+  GeneralVpcDefaultSecurityGroupRef:
+    Value: !Ref GeneralVpcDefaultSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcDefaultSecurityGroup-Ref'
+  GeneralVpcDefaultSecurityGroupGroupId:
+    Value: !GetAtt GeneralVpcDefaultSecurityGroup.GroupId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcDefaultSecurityGroup-GroupId'
+  GeneralVpcDefaultSecurityGroupVpcId:
+    Value: !GetAtt GeneralVpcDefaultSecurityGroup.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcDefaultSecurityGroup-VpcId'
   GeneralVpcIPv6CidrBlockRef:
     Value: !Ref GeneralVpcIPv6CidrBlock
     Export:
@@ -441,3 +518,83 @@ Outputs:
     Value: !GetAtt GeneralVpcPrivateSubnet2.SubnetId
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet2-SubnetId'
+  GeneralVpcInterfaceEndpointSSMRef:
+    Value: !Ref GeneralVpcInterfaceEndpointSSM
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSM-Ref'
+  GeneralVpcInterfaceEndpointSSMCreationTimestamp:
+    Value: !GetAtt GeneralVpcInterfaceEndpointSSM.CreationTimestamp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSM-CreationTimestamp'
+  GeneralVpcInterfaceEndpointSSMDnsEntries:
+    Value: !GetAtt GeneralVpcInterfaceEndpointSSM.DnsEntries
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSM-DnsEntries'
+  GeneralVpcInterfaceEndpointSSMId:
+    Value: !GetAtt GeneralVpcInterfaceEndpointSSM.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSM-Id'
+  GeneralVpcInterfaceEndpointSSMNetworkInterfaceIds:
+    Value: !GetAtt GeneralVpcInterfaceEndpointSSM.NetworkInterfaceIds
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSM-NetworkInterfaceIds'
+  GeneralVpcInterfaceEndpointEC2MessagesRef:
+    Value: !Ref GeneralVpcInterfaceEndpointEC2Messages
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2Messages-Ref'
+  GeneralVpcInterfaceEndpointEC2MessagesCreationTimestamp:
+    Value: !GetAtt GeneralVpcInterfaceEndpointEC2Messages.CreationTimestamp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2Messages-CreationTimestamp'
+  GeneralVpcInterfaceEndpointEC2MessagesDnsEntries:
+    Value: !GetAtt GeneralVpcInterfaceEndpointEC2Messages.DnsEntries
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2Messages-DnsEntries'
+  GeneralVpcInterfaceEndpointEC2MessagesId:
+    Value: !GetAtt GeneralVpcInterfaceEndpointEC2Messages.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2Messages-Id'
+  GeneralVpcInterfaceEndpointEC2MessagesNetworkInterfaceIds:
+    Value: !GetAtt GeneralVpcInterfaceEndpointEC2Messages.NetworkInterfaceIds
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2Messages-NetworkInterfaceIds'
+  GeneralVpcInterfaceEndpointEC2Ref:
+    Value: !Ref GeneralVpcInterfaceEndpointEC2
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2-Ref'
+  GeneralVpcInterfaceEndpointEC2CreationTimestamp:
+    Value: !GetAtt GeneralVpcInterfaceEndpointEC2.CreationTimestamp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2-CreationTimestamp'
+  GeneralVpcInterfaceEndpointEC2DnsEntries:
+    Value: !GetAtt GeneralVpcInterfaceEndpointEC2.DnsEntries
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2-DnsEntries'
+  GeneralVpcInterfaceEndpointEC2Id:
+    Value: !GetAtt GeneralVpcInterfaceEndpointEC2.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2-Id'
+  GeneralVpcInterfaceEndpointEC2NetworkInterfaceIds:
+    Value: !GetAtt GeneralVpcInterfaceEndpointEC2.NetworkInterfaceIds
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointEC2-NetworkInterfaceIds'
+  GeneralVpcInterfaceEndpointSSMMessagesRef:
+    Value: !Ref GeneralVpcInterfaceEndpointSSMMessages
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSMMessages-Ref'
+  GeneralVpcInterfaceEndpointSSMMessagesCreationTimestamp:
+    Value: !GetAtt GeneralVpcInterfaceEndpointSSMMessages.CreationTimestamp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSMMessages-CreationTimestamp'
+  GeneralVpcInterfaceEndpointSSMMessagesDnsEntries:
+    Value: !GetAtt GeneralVpcInterfaceEndpointSSMMessages.DnsEntries
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSMMessages-DnsEntries'
+  GeneralVpcInterfaceEndpointSSMMessagesId:
+    Value: !GetAtt GeneralVpcInterfaceEndpointSSMMessages.Id
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSMMessages-Id'
+  GeneralVpcInterfaceEndpointSSMMessagesNetworkInterfaceIds:
+    Value: !GetAtt GeneralVpcInterfaceEndpointSSMMessages.NetworkInterfaceIds
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcInterfaceEndpointSSMMessages-NetworkInterfaceIds'
