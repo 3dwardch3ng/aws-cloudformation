@@ -226,7 +226,7 @@ Resources:
       AvailabilityZone:
         Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-AvailabilityZone'
       IamInstanceProfile:
-        Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-InstanceProfile-TestPiHoleIAMInstanceProfile-Ref'
+        Fn::ImportValue: !Join [ '-', [ 'test-pihole-security-stack', Ref: AWS::Region, 'IAM-InstanceProfile-TestPiHoleIAMInstanceProfile-Ref' ] ]
       ImageId: ami-0a02bc4adcb6b5fbe # Ubuntu Server 22.04, AMD64, HVM-SSD, Release 20231121
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: pihole-key
@@ -237,7 +237,7 @@ Resources:
           Description: 'Test PiHole EC2 Network Interface 0'
           DeviceIndex: 0
           GroupSet:
-            - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'EC2-SecurityGroup-TestPiHoleEC2SecurityGroup-Id' ] ]
+            - Fn::ImportValue: !Join [ '-', [ 'test-pihole-security-stack', Ref: AWS::Region, 'EC2-SecurityGroup-TestPiHoleEC2SecurityGroup-Id' ] ]
           Ipv6Addresses:
             - Ipv6Address:
                 Fn::Sub:
@@ -260,7 +260,7 @@ Resources:
                         - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-CidrBlock' ] ]
                 HostPart: !Ref Ipv4HostNumber
           SubnetId:
-            Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-SubnetId'
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-SubnetId' ] ]
       PrivateDnsNameOptions:
         EnableResourceNameDnsAAAARecord: true
         EnableResourceNameDnsARecord: true
