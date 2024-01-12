@@ -24,6 +24,14 @@ on:
           - 'eu-west-2'
           - 'eu-west-3'
           - 'eu-north-1'
+    ipv4-host-value:
+      description: 'The host value of the public IPv4 address for the new instance'
+      type: string
+      default: '100'
+    ipv6-host-value:
+      description: 'The host value of the public IPv6 address for the new instance'
+      type: string
+      default: '10'
 
 permissions:
   id-token: write
@@ -62,4 +70,18 @@ jobs:
         with:
           name: test-pihole-log-stack
           template: ec2/pihole/pihole-log-test-template.yml
+          no-fail-on-empty-changeset: "1"
+      - name: Deploy PiHole Instance Stack ${{ github.run_number }} via CloudFormation
+        id: pihole-instance-stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: test-pihole-instance-stack-${{ github.run_number }}
+          template: ec2/pihole/pihole-instance-test-template.yml
+          capabilities: CAPABILITY_NAMED_IAM
+          parameter-overrides: >-
+            StackNumber=${{ github.run_number }},
+            EC2ServiceName=pihole,
+            Ipv4HostNumber=${{ github.event.inputs.ipv4-host-value }},
+            Ipv6HostNumber=${{ github.event.inputs.ipv6-host-value }},
+            PiHoleAdminPwdHash=${{ secrets.PI_HOLE_ADMIN_PASSWORD_HASH }}
           no-fail-on-empty-changeset: "1"

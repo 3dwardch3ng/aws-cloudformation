@@ -1,0 +1,398 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a Test PiHole EC2 Security Resources in AWS
+
+Parameters:
+  StackNumber:
+    Description: The integer number of the stack
+    Type: String
+    Default: 1
+  EC2ServiceName:
+    Description: The name of the EC2 service
+    Type: String
+    Default: pihole
+  Ipv4HostNumber:
+    Description: The host value of the public IPv4 address for the new instance
+    Type: String
+    Default: 100
+  Ipv6HostNumber:
+    Description: The host value of the public IPv6 address for the new instance
+    Type: String
+    Default: 10
+  PiHoleAdminPwdHash:
+    Description: The password double hash to access the PiHole Admin Console
+    Type: String
+
+Resources:
+  # EC2 Instance
+  TestPiHoleEC2Instance:
+    Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          default:
+            - 01_setupCfnHup
+            - 02_config-amazon-cloudwatch-agent
+            - 03_restart_amazon-cloudwatch-agent
+            - 04_setupPiHoleInstallationConfig
+          UpdateEnvironment:
+            - 02_config-amazon-cloudwatch-agent
+            - 03_restart_amazon-cloudwatch-agent
+        # Definition of json configuration of AmazonCloudWatchAgent, you can change the configuration below.
+        02_config-amazon-cloudwatch-agent:
+          files:
+            '/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json':
+              content: !Sub |
+                {
+                  "agent": {
+                    "metrics_collection_interval": 5,
+                    "region": "${AWS::Region}",
+                    "credentials": {
+                      "role_arn": "arn:aws:iam::359331717478:role/TestPiHoleIAMRole"
+                    },
+                    "debug": true,
+                    "aws_sdk_log_level": "LogDebug",
+                    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+                  },
+                  "metrics": {
+                    "append_dimensions": {
+                      "ImageId": "${!aws:ImageId}",
+                      "InstanceId": "${!aws:InstanceId}",
+                      "InstanceType": "${!aws:InstanceType}"
+                    },
+                    "metrics_collected": {
+                      "cpu": {
+                        "resources": [
+                          "*"
+                        ],
+                        "measurement": [
+                          {"name": "cpu_usage_idle", "rename": "CPU_USAGE_IDLE", "unit": "Percent"},
+                          {"name": "cpu_usage_nice", "unit": "Percent"},
+                          "cpu_usage_guest"
+                        ],
+                        "totalcpu": false,
+                        "drop_original_metrics": [ "cpu_usage_guest" ],
+                        "metrics_collection_interval": 5
+                      },
+                      "disk": {
+                        "measurement": [
+                          "used_percent"
+                        ],
+                        "resources": [
+                          "*"
+                        ],
+                        "drop_device": true,
+                        "metrics_collection_interval": 5
+                      },
+                      "diskio": {
+                        "measurement": [
+                          "reads", "writes", "read_bytes", "write_bytes", "read_time", "write_time", "io_time", "iops_in_progress"
+                        ],
+                        "metrics_collection_interval": 5
+                      },
+                      "mem": {
+                        "measurement": [
+                          "active", "available", "available_percent", "buffered", "cached", "free", "inactive", "total", "used", "used_percent"
+                        ],
+                        "metrics_collection_interval": 5
+                      },
+                      "swap": {
+                        "measurement": [
+                          "free", "used", "used_percent"
+                        ],
+                        "metrics_collection_interval": 5
+                      }
+                    },
+                    "force_flush_interval": 5,
+                    "credentials": {
+                      "role_arn": "arn:aws:iam::359331717478:role/PiHoleIAMRole"
+                    }
+                  },
+                  "logs": {
+                    "logs_collected": {
+                      "files": {
+                        "collect_list": [
+                          {
+                            "file_path": "/var/log/syslog",
+                            "log_group_name": "test-pihole-syslog-log-group",
+                            "log_stream_name": "test-pihole-syslog-log-stream",
+                            "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
+                            "timezone": "Local"
+                          },
+                          {
+                            "file_path": "/var/log/cfn-init.log",
+                            "log_group_name": "test-pihole-cfn-init-log-group",
+                            "log_stream_name": "test-pihole-cfn-init-log-stream",
+                            "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
+                            "timezone": "Local"
+                          },
+                          {
+                            "file_path": "/var/log/cfn-init-cmd.log",
+                            "log_group_name": "pihole-cfn-init-cmd-log-group",
+                            "log_stream_name": "pihole-cfn-init-cmd-log-stream",
+                            "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
+                            "timezone": "Local"
+                          },
+                          {
+                            "file_path": "/var/log/cfn-wire.log",
+                            "log_group_name": "test-pihole-cfn-wire-log-group",
+                            "log_stream_name": "test-pihole-cfn-wire-log-stream",
+                            "timestamp_format": "%Y-%m-%d %H:%M:%S.%f",
+                            "timezone": "Local"
+                          }
+                        ]
+                      }
+                    },
+                    "log_stream_name": "test-pihole-log-stream",
+                    "force_flush_interval": 5,
+                    "credentials": {
+                      "role_arn": "arn:aws:iam::359331717478:role/TestPiHoleIAMRole"
+                    }
+                  }
+                }
+        # Invoke amazon-cloudwatch-agent-ctl to restart the AmazonCloudWatchAgent.
+        03_restart_amazon-cloudwatch-agent:
+          commands:
+            01_stop_service:
+              command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a stop
+            02_start_service:
+              command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+        # Cfn-hup setting, it is to monitor the change of metadata.
+        # When there is change in the contents of json file in the metadata section, cfn-hup will call cfn-init to restart the AmazonCloudWatchAgent.
+        01_setupCfnHup:
+          files:
+            '/etc/cfn/cfn-hup.conf':
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+                interval=1
+              mode: '000400'
+              owner: root
+              group: root
+            '/etc/cfn/hooks.d/amazon-cloudwatch-agent-auto-reloader.conf':
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.TestPiHoleEC2Instance.Metadata.AWS::CloudFormation::Init.02_config-amazon-cloudwatch-agent
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource TestPiHoleEC2Instance --region ${AWS::Region} --configsets UpdateEnvironment
+                runas=root
+              mode: '000400'
+              owner: root
+              group: root
+            "/lib/systemd/system/cfn-hup.service":
+              content: !Sub |
+                [Unit]
+                Description=cfn-hup daemon
+                [Service]
+                Type=simple
+                ExecStart=/opt/aws/bin/cfn-hup
+                Restart=always
+                [Install]
+                WantedBy=multi-user.target
+          commands:
+            01enable_cfn_hup:
+              command: !Sub |
+                systemctl enable cfn-hup.service
+            02start_cfn_hup:
+              command: !Sub |
+                systemctl start cfn-hup.service
+        # PiHole Configuration for the unattended installation
+        04_setupPiHoleInstallationConfig:
+          files:
+            '/etc/pihole/setupVars.conf':
+              content: !Sub |
+                WEBPASSWORD=${PiHoleAdminPwdHash}
+                PIHOLE_INTERFACE=eth0
+                IPV4_ADDRESS=10.1.10.${Ipv4HostNumber}
+                IPV6_ADDRESS=2406:da1c:1c:2f01::${Ipv6HostNumber}
+                QUERY_LOGGING=true
+                INSTALL_WEB=true
+                DNSMASQ_LISTENING=single
+                PIHOLE_DNS_1=8.8.8.8
+                PIHOLE_DNS_2=8.8.4.4
+                PIHOLE_DNS_3=2001:4860:4860:0:0:0:0:8888
+                PIHOLE_DNS_4=2001:4860:4860:0:0:0:0:8844
+                DNS_FQDN_REQUIRED=true
+                DNS_BOGUS_PRIV=true
+                DNSSEC=true
+                TEMPERATUREUNIT=C
+                WEBUIBOXEDLAYOUT=traditional
+                API_EXCLUDE_DOMAINS=
+                API_EXCLUDE_CLIENTS=
+                API_QUERY_LOG_SHOW=all
+                API_PRIVACY_MODE=false
+                MAXDBDAYS=7
+    Properties:
+      AvailabilityZone:
+        Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-AvailabilityZone'
+      IamInstanceProfile:
+        Fn::ImportValue: !Sub 'pihole-security-stack-${AWS::Region}-IAM-InstanceProfile-TestPiHoleIAMInstanceProfile-Ref'
+      ImageId: ami-0a02bc4adcb6b5fbe # Ubuntu Server 22.04, AMD64, HVM-SSD, Release 20231121
+      InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
+      KeyName: pihole-key
+      Monitoring: true
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: false
+          DeleteOnTermination: true
+          Description: 'Test PiHole EC2 Network Interface 0'
+          DeviceIndex: 0
+          GroupSet:
+            - Fn::ImportValue: !Join [ '-', [ 'pihole-security-stack', Ref: AWS::Region, 'EC2-SecurityGroup-TestPiHoleEC2SecurityGroup-Id' ] ]
+          Ipv6Addresses:
+            - Ipv6Address:
+                Fn::Sub:
+                  - '${NetworkPart}${HostPart}'
+                  - NetworkPart:
+                      Fn::Select:
+                        - '0'
+                        - Fn::Split:
+                            - '/64'
+                            - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-Ipv6CidrBlock' ] ]
+                    HostPart: !Ref Ipv6HostNumber
+          PrivateIpAddress:
+            Fn::Sub:
+              - '${NetworkPart}${HostPart}'
+              - NetworkPart:
+                  Fn::Select:
+                    - '0'
+                    - Fn::Split:
+                        - '0/24'
+                        - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-CidrBlock' ] ]
+                HostPart: !Ref Ipv4HostNumber
+          SubnetId:
+            Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1-SubnetId'
+      PrivateDnsNameOptions:
+        EnableResourceNameDnsAAAARecord: true
+        EnableResourceNameDnsARecord: true
+        HostnameType: 'resource-name'
+      PropagateTagsToVolumeOnCreation: true
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          # Update needrestart config
+          echo "Update needrestart config"
+          needrestart -r a
+          sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
+          # Install environment toolings
+          echo "Install environment toolings"
+          sudo apt upgrade -y
+          sudo apt-get update && sudo apt-get upgrade -y
+          sudo apt-get install unzip
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3 get-pip.py
+          export PATH="/home/ubuntu/.local/bin:$PATH"
+          echo 'export PATH=/home/ubuntu/.local/bin:$PATH' >>~/.profile
+          wget https://bootstrap.pypa.io/ez_setup.py -O – | sudo python3
+          pip3 install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
+          # Install AWS Cli
+          echo "Install AWS Cli"
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+          unzip awscliv2.zip
+          sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+          # Install EC2 Instance Connect
+          echo "Install EC2 Instance Connect"
+          sudo apt-get install ec2-instance-connect
+          # Install AmazonCloudWatchAgent and restart it
+          echo "Install AmazonCloudWatchAgent and restart it"
+          wget https://amazoncloudwatch-agent-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+          sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+          # Run cfn-init
+          echo "Run cfn-init"
+          sudo /usr/local/bin/cfn-init -v --stack ${AWS::StackId} --resource PiHoleEC2Instance --region ${AWS::Region} --configsets default
+          # Install OpenVPN
+          echo "Install OpenVPN"
+          sudo aws s3 cp s3://cloudformation-templates-shared-files/openvpn/openvpn.sh ./openvpn.sh
+          sudo chmod 755 openvpn.sh
+          sudo bash openvpn.sh --auto
+          sudo sed -i 's/push "dhcp-option/#push "dhcp-option/g' /etc/openvpn/server/server.conf
+          sudo export TUN0_IPV4=`ip -o -4 addr list tun0 | awk -F ' *|/' '{print $4}'`
+          sudo echo -e push \"dhcp-option DNS $TUN0_IPV4\" >> /etc/openvpn/server/server.conf
+          sudo echo -e "log /var/log/openvpn.log" >> /etc/openvpn/server/server.conf
+          sudo echo -e "verb 3" >> /etc/openvpn/server/server.conf
+          sudo systemctl restart openvpn-server@server
+          sudo service openvpn-server@server restart
+          sudo aws s3 cp /root/pihole.ovpn s3://cloudformation-templates-shared-files/openvpn/test-pihole.ovpn
+          # Install PiHole
+          echo "Install PiHole"
+          sudo apt install lighttpd -y
+          sudo su
+          curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
+          # Install Lighttpd SSL support
+          echo "Install Lighttpd SSL support"
+          #sudo apt install snapd
+#          sudo snap install core; sudo snap refresh core
+#          sudo snap install --classic certbot
+#          sudo ln -s /snap/bin/certbot /usr/bin/certbot
+#          sudo systemctl stop lighttpd
+          # certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
+#          sudo certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward.sydney -d pi-hole.cheng.sydney -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
+#          sudo aws s3 cp /etc/letsencrypt s3://cloudformation-templates-shared-files/letsencrypt --recursive
+          # aws s3 cp s3://cloudformation-templates-shared-files/letsencrypt /etc/letsencrypt --recursive
+          sudo systemctl start lighttpd
+          sudo mkdir -p /etc/lighttpd/dehydrated/tls-alpn-01
+          cd /tmp && git clone https://github.com/lukas2511/dehydrated && cd dehydrated
+          sudo ./dehydrated --register --accept-terms
+          # sudo ./dehydrated -d pi-hole.edward-cheng.name -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
+#          sudo ./dehydrated -d pi-hole.edward.sydney -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
+#          sudo mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
+          sudo aws s3 cp s3://cloudformation-templates-shared-files/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf
+          sudo systemctl restart lighttpd
+          # Install unbound
+          echo "Install unbound"
+          sudo apt install unbound -y
+          sudo wget https://www.internic.net/domain/named.root -qO- | sudo tee /var/lib/unbound/root.hints
+          sudo mv /etc/unbound/unbound.conf.d/pi-hole.conf /etc/unbound/unbound.conf.d/pi-hole.conf.old
+          sudo aws s3 cp s3://cloudformation-templates-shared-files/unbound/pi-hole.conf /etc/unbound/unbound.conf.d/pi-hole.conf
+          sudo mkdir -p /var/log/unbound
+          sudo touch /var/log/unbound/unbound.log
+          sudo chown unbound /var/log/unbound/unbound.log
+          sudo echo -e "/var/log/unbound/unbound.log rw," >> /etc/apparmor.d/local/usr.sbin.unbound
+          sudo apparmor_parser -r /etc/apparmor.d/usr.sbin.unbound
+          sudo service unbound restart
+          # Reconfig PiHole
+          echo "Reconfig PiHole"
+          sudo cp /etc/pihole/setupVars.conf /etc/pihole/setupVars.conf.old
+          sudo sed -i 's/PIHOLE_DNS_1=/#PIHOLE_DNS_1=/g' /etc/pihole/setupVars.conf
+          sudo sed -i 's/PIHOLE_DNS_2=/#PIHOLE_DNS_2=/g' /etc/pihole/setupVars.conf
+          sudo sed -i 's/PIHOLE_DNS_3=/#PIHOLE_DNS_3=/g' /etc/pihole/setupVars.conf
+          sudo sed -i 's/PIHOLE_DNS_4=/#PIHOLE_DNS_4=/g' /etc/pihole/setupVars.conf
+          sudo echo -e PIHOLE_DNS_1=127.0.0.1#5335 >> /etc/pihole/setupVars.conf
+          sudo echo -e PIHOLE_DNS_2=127.0.0.1#8953 >> /etc/pihole/setupVars.conf
+          sudo echo -e PIHOLE_DNS_3=::1#8953 >> /etc/pihole/setupVars.conf
+          sudo echo -e PIHOLE_DNS_4= >> /etc/pihole/setupVars.conf
+          sudo /etc/.pihole/automated\ install/basic-install.sh --reconfigure --unattended
+          sudo echo -e "RATE_LIMIT=0/0\nDELAY_STARTUP=5" >> /etc/pihole/pihole-FTL.conf
+          sudo cp /etc/pihole/logrotate /etc/pihole/logrotate.old
+          sudo aws s3 cp s3://cloudformation-templates-shared-files/pihole/logrotate /etc/pihole/logrotate
+          sudo chmod 644 /etc/pihole/logrotate
+          # Restart services
+          echo "Restart services"
+          sudo pihole restartdns
+          sudo service pihole-FTL restart
+          sudo service unbound restart
+          sudo systemctl restart lighttpd
+          # Run cfn-signal
+          echo "Run cfn-signal"
+          sudo /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource TestPiHoleEC2Instance --region ${AWS::Region}'
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-TestPiHoleEC2Instance'
+
+Outputs:
+  TestPiHoleEC2InstanceRef:
+    Value: !Ref TestPiHoleEC2Instance
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-TestPiHoleEC2Instance-Ref'
+  TestPiHoleEC2InstanceAvailabilityZone:
+    Value: !GetAtt TestPiHoleEC2Instance.AvailabilityZone
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-TestPiHoleEC2Instance-AvailabilityZone'
+  TestPiHoleEC2InstancePrivateDnsName:
+    Value: !GetAtt TestPiHoleEC2Instance.PrivateDnsName
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-TestPiHoleEC2Instance-PrivateDnsName'
+  TestPiHoleEC2InstancePrivateIp:
+    Value: !GetAtt TestPiHoleEC2Instance.PrivateIp
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-Instance-TestPiHoleEC2Instance-PrivateIp'
+
