@@ -320,21 +320,21 @@ Resources:
           # Install Lighttpd SSL support
           echo "Install Lighttpd SSL support"
           #sudo apt install snapd
-#          sudo snap install core; sudo snap refresh core
-#          sudo snap install --classic certbot
-#          sudo ln -s /snap/bin/certbot /usr/bin/certbot
-#          sudo systemctl stop lighttpd
+          #  sudo snap install core; sudo snap refresh core
+          #  sudo snap install --classic certbot
+          #  sudo ln -s /snap/bin/certbot /usr/bin/certbot
+          #  sudo systemctl stop lighttpd
           # certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
-#          sudo certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward.sydney -d pi-hole.cheng.sydney -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
-#          sudo aws s3 cp /etc/letsencrypt s3://cloudformation-templates-shared-files/letsencrypt --recursive
+          #  sudo certbot certonly --standalone --preferred-challenges http-01 -d pi-hole.edward.sydney -d pi-hole.cheng.sydney -d pi-hole.edward-cheng.name --non-interactive --agree-tos -m edward@cheng.sydney
+          #  sudo aws s3 cp /etc/letsencrypt s3://cloudformation-templates-shared-files/letsencrypt --recursive
           # aws s3 cp s3://cloudformation-templates-shared-files/letsencrypt /etc/letsencrypt --recursive
           sudo systemctl start lighttpd
           sudo mkdir -p /etc/lighttpd/dehydrated/tls-alpn-01
           cd /tmp && git clone https://github.com/lukas2511/dehydrated && cd dehydrated
           sudo ./dehydrated --register --accept-terms
           # sudo ./dehydrated -d pi-hole.edward-cheng.name -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
-#          sudo ./dehydrated -d pi-hole.edward.sydney -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
-#          sudo mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
+          #  sudo ./dehydrated -d pi-hole.edward.sydney -t tls-alpn-01 --out /etc/lighttpd/certs --alpn /etc/lighttpd/dehydrated/tls-alpn-01 -c --ca letsencrypt
+          #  sudo mv /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.old
           sudo aws s3 cp s3://cloudformation-templates-shared-files/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf
           sudo systemctl restart lighttpd
           # Install unbound
