@@ -22,6 +22,19 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'GeneralVpc' ]]
 
+  GeneralVpcDefaultSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: General Vpc Default Security Group
+      SecurityGroupEgress:
+        - IpProtocol: -1
+      SecurityGroupIngress:
+        - IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'GeneralVpc-SecurityGroup' ] ]
+      VpcId: !Ref GeneralVpc
+
   GeneralVpcIPv6CidrBlock:
     Type: AWS::EC2::VPCCidrBlock
     Properties:
@@ -252,6 +265,58 @@ Resources:
       SubnetId: !Ref GeneralVpcPrivateSubnet2
       RouteTableId: !Ref GeneralVpcPrivateSubnet2RouteTable
 
+  GeneralVpcInterfaceEndpointSSM:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: yes
+      SecurityGroupIds:
+        - !Ref GeneralVpcDefaultSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ssm'
+      SubnetIds:
+        - !Ref GeneralVpcPrivateSubnet1
+        - !Ref GeneralVpcPrivateSubnet2
+      VpcEndpointType: Interface
+      VpcId: !Ref GeneralVpc
+
+  GeneralVpcInterfaceEndpointEC2Messages:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: yes
+      SecurityGroupIds:
+        - !Ref GeneralVpcDefaultSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ec2messages'
+      SubnetIds:
+        - !Ref GeneralVpcPrivateSubnet1
+        - !Ref GeneralVpcPrivateSubnet2
+      VpcEndpointType: Interface
+      VpcId: !Ref GeneralVpc
+
+  GeneralVpcInterfaceEndpointEC2:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: yes
+      SecurityGroupIds:
+        - !Ref GeneralVpcDefaultSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ec2'
+      SubnetIds:
+        - !Ref GeneralVpcPrivateSubnet1
+        - !Ref GeneralVpcPrivateSubnet2
+      VpcEndpointType: Interface
+      VpcId: !Ref GeneralVpc
+
+  GeneralVpcInterfaceEndpointSSMMessages:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: yes
+      SecurityGroupIds:
+        - !Ref GeneralVpcDefaultSecurityGroup
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ssmmessages'
+      SubnetIds:
+        - !Ref GeneralVpcPrivateSubnet1
+        - !Ref GeneralVpcPrivateSubnet2
+      VpcEndpointType: Interface
+      VpcId: !Ref GeneralVpc
+
 Outputs:
   GeneralVpcRef:
     Value: !Ref GeneralVpc
@@ -273,6 +338,18 @@ Outputs:
     Value: !GetAtt GeneralVpc.VpcId
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpc-VpcId'
+  GeneralVpcDefaultSecurityGroupRef:
+    Value: !Ref GeneralVpcDefaultSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcDefaultSecurityGroup-Ref'
+  GeneralVpcDefaultSecurityGroupGroupId:
+    Value: !GetAtt GeneralVpcDefaultSecurityGroup.GroupId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcDefaultSecurityGroup-GroupId'
+  GeneralVpcDefaultSecurityGroupVpcId:
+    Value: !GetAtt GeneralVpcDefaultSecurityGroup.VpcId
+    Export:
+      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcDefaultSecurityGroup-VpcId'
   GeneralVpcIPv6CidrBlockRef:
     Value: !Ref GeneralVpcIPv6CidrBlock
     Export:
