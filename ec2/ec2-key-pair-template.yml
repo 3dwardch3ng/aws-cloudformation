@@ -25,15 +25,6 @@ Resources:
       Tags:
         - Key: KeyPair
           Value: !Join [ '-', [ 'EC2KeyPair', Ref: AWS::Region, Ref: KeyFormat, Ref: KeyName, Ref: KeyType ]]
-  NatInstanceEC2KeyPair:
-    Type: AWS::EC2::KeyPair
-    Properties:
-      KeyFormat: pem
-      KeyName: NatInstanceEC2KeyPair
-      KeyType: rsa
-      Tags:
-        - Key: KeyPair
-          Value: !Join [ '-', [ 'NatInstanceEC2KeyPair', Ref: AWS::Region, Ref: KeyFormat, Ref: KeyName, Ref: KeyType ] ]
 
 
 Outputs:
@@ -49,18 +40,6 @@ Outputs:
     Value: !GetAtt EC2KeyPair.KeyPairId
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-KeyPair-EC2KeyPair-KeyPairId'
-  NatInstanceEC2KeyPairRef:
-    Value: !Ref NatInstanceEC2KeyPair
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-KeyPair-NatInstanceEC2KeyPair-Ref'
-  NatInstanceEC2KeyPairKeyFingerprint:
-    Value: !GetAtt NatInstanceEC2KeyPair.KeyFingerprint
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-KeyPair-NatInstanceEC2KeyPair-KeyFingerprint'
-  NatInstanceEC2KeyPairKeyPairId:
-    Value: !GetAtt NatInstanceEC2KeyPair.KeyPairId
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-KeyPair-NatInstanceEC2KeyPair-KeyPairId'
 
 # Notes:
 # 1. Following CLI command can be used to get the ID of the key pair after it is created:
