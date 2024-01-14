@@ -1,7 +1,40 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Creates a Nat Instance Security Resources in AWS
+Description: Creates a Nat Instance Common Resources in AWS
 
 Resources:
+  NatInstanceTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties: { }
+  NatInstanceTopicPolicy:
+    Type: 'AWS::SNS::TopicPolicy'
+    Properties:
+      PolicyDocument:
+        Id: Id1
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Sid1
+            Effect: Allow
+            Principal:
+              Service:
+                - 'events.amazonaws.com'
+                - 'budgets.amazonaws.com'
+            Action: 'sns:Publish'
+            Resource: !Ref NatInstanceTopic
+          - Sid: Sid2
+            Effect: Allow
+            Principal:
+              AWS: '*'
+            Action: 'sns:Publish'
+            Resource: !Ref NatInstanceTopic
+            Condition:
+              StringEquals:
+                'AWS:SourceOwner': !Ref 'AWS::AccountId'
+      Topics:
+        - !Ref NatInstanceTopic
+  NatInstanceLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 7
   NatInstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -151,8 +184,7 @@ Resources:
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
                   - 'logs:DescribeLogStreams'
-                Resource:
-                  Fn::ImportValue: !Join [ '-', [ 'nat-instance-logs-stack', Ref: AWS::Region, 'Logs-LogGroup-NatInstanceLogGroup-Arn' ] ]
+                Resource: !GetAtt NatInstanceLogGroup.Arn
         - PolicyName: s3
           PolicyDocument:
             Version: 2012-10-17
@@ -171,6 +203,30 @@ Resources:
         - !Ref NatInstanceIAMRole
 
 Outputs:
+  NatInstanceTopicRef:
+    Value: !Ref NatInstanceTopic
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-Ref' ] ]
+  NatInstanceTopicTopicArn:
+    Value: !GetAtt NatInstanceTopic.TopicArn
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicArn' ] ]
+  NatInstanceTopicTopicName:
+    Value: !GetAtt NatInstanceTopic.TopicName
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicName' ] ]
+  NatInstanceTopicPolicyId:
+    Value: !GetAtt NatInstanceTopicPolicy.Id
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-TopicPolicy-NatInstanceTopicPolicy-Id' ] ]
+  NatInstanceLogGroupRef:
+    Value: !Ref NatInstanceLogGroup
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Logs-LogGroup-NatInstanceLogGroup-Ref' ] ]
+  NatInstanceLogGroupArn:
+    Value: !GetAtt NatInstanceLogGroup.Arn
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Logs-LogGroup-NatInstanceLogGroup-Arn' ] ]
   NatInstanceSecurityGroupRef:
     Value: !Ref NatInstanceSecurityGroup
     Export:

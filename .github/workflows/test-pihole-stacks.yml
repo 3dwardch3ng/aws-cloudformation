@@ -93,7 +93,7 @@ jobs:
         id: ec2-wait
         uses: truemark/aws-ec2-instance-wait-action@v3
         with:
-          instance-ids: ${{ steps.pihole-instance-stack.outputs.PiHoleEC2InstanceRef }}
+          instance-ids: ${{ steps.pihole-instance-stack.outputs.TestPiHoleEC2InstanceRef }}
           region: "ap-southeast-2"
           timeout-ms: "600000"
 
