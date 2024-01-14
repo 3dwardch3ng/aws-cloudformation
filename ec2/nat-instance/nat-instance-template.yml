@@ -367,7 +367,7 @@ Resources:
     CreationPolicy:
       ResourceSignal:
         Count: 1
-        Timeout: PT10M
+        Timeout: PT30M
     UpdatePolicy:
       AutoScalingRollingUpdate:
         PauseTime: PT10M
