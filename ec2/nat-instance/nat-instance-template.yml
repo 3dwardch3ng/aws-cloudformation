@@ -361,8 +361,7 @@ Resources:
         - NotificationTypes:
             - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
             - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
-          TopicARN:
-            Fn::ImportValue': !GetAtt NatInstanceTopic.TopicArn
+          TopicARN: !GetAtt NatInstanceTopic.TopicArn
       VPCZoneIdentifier:
         - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-SubnetId' ] ]
     CreationPolicy:
