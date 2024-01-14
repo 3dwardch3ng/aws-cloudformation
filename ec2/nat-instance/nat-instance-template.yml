@@ -389,8 +389,7 @@ Resources:
       EvaluationPeriods: 1
       ComparisonOperator: GreaterThanThreshold
       Threshold: 80
-      AlarmActions:
-        - Fn::ImportValue: !GetAtt NatInstanceTopic.TopicArn
+      AlarmActions: !GetAtt NatInstanceTopic.TopicArn
       Dimensions:
         - Name: AutoScalingGroupName
           Value: !Ref NatInstanceAutoScalingGroup
