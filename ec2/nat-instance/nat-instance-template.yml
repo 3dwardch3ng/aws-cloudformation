@@ -5,7 +5,7 @@ Parameters:
   AMIId:
     Description: The AMI ID for the Nat Instance
     Type: String
-    Default: ami-01ab4a3bc7e75f44a
+    Default: ami-09b42976632b27e9b
 
 Resources:
   NatInstanceTopic:
