@@ -282,7 +282,7 @@ Resources:
           python3 get-pip.py
           export PATH="/home/ubuntu/.local/bin:$PATH"
           echo 'export PATH=/home/ubuntu/.local/bin:$PATH' >>~/.profile
-          wget https://bootstrap.pypa.io/ez_setup.py -O – | sudo python3
+          wget https://bootstrap.pypa.io/ez_setup.py -O – | sudo python
           pip3 install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
           # Install AWS Cli
           echo "Install AWS Cli"
