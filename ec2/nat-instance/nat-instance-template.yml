@@ -36,7 +36,7 @@ Resources:
               StringEquals:
                 'AWS:SourceOwner': !Ref 'AWS::AccountId'
       Topics:
-        - !Ref Topic
+        - !Ref NatInstanceTopic
   NatInstanceLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
