@@ -1,14 +1,46 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a Nat Instance Security Resources in AWS
 
+Parameters:
+  AMIId:
+    Description: The AMI ID for the Nat Instance
+    Type: String
+    Default: ami-01ab4a3bc7e75f44a
+
 Resources:
-  NatInstanceElasticIP:
-    Type: AWS::EC2::EIP
+  NatInstanceTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties: { }
+  NatInstanceTopicPolicy:
+    Type: 'AWS::SNS::TopicPolicy'
     Properties:
-      Domain: standard
-      Tags:
-        - Key: Name
-          Value: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-ElasticIP2'
+      PolicyDocument:
+        Id: Id1
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Sid1
+            Effect: Allow
+            Principal:
+              Service:
+                - 'events.amazonaws.com'
+                - 'budgets.amazonaws.com'
+            Action: 'sns:Publish'
+            Resource: !Ref NatInstanceTopic
+          - Sid: Sid2
+            Effect: Allow
+            Principal:
+              AWS: '*'
+            Action: 'sns:Publish'
+            Resource: !Ref NatInstanceTopic
+            Condition:
+              StringEquals:
+                'AWS:SourceOwner': !Ref 'AWS::AccountId'
+      Topics:
+        - !Ref Topic
+  NatInstanceLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 7
   NatInstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -143,22 +175,11 @@ Resources:
             Principal:
               Service: 'ec2.amazonaws.com'
             Action: 'sts:AssumeRole'
-      ManagedPolicyArns: !If [ HasManagedPolicyArns, !Split [ ',', !Ref ManagedPolicyArns ], !Ref 'AWS::NoValue' ]
-      PermissionsBoundary: !If [ HasPermissionsBoundary, !Ref PermissionsBoundary, !Ref 'AWS::NoValue' ]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/IAMReadOnlyAccess
       Policies:
-        - PolicyName: ec2
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Sid: Stmt1425023276000
-                Effect: Allow
-                Action:
-                  - 'ec2:AssociateAddress'
-                  - 'ec2:ModifyInstanceAttribute'
-                  - 'ec2:CreateRoute'
-                  - 'ec2:ReplaceRoute'
-                Resource:
-                  - '*'
         - PolicyName: logs
           PolicyDocument:
             Version: '2012-10-17'
@@ -169,27 +190,237 @@ Resources:
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
                   - 'logs:DescribeLogStreams'
-                Resource: !GetAtt 'Logs.Arn'
+                Resource: !GetAtt NatInstanceLogGroup.Arn
+        - PolicyName: s3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                  - 's3:PutObject'
+                Resource:
+                  - 'arn:aws:s3:::*'
   NatInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
       InstanceProfileName: NatInstanceIAMInstanceProfile
       Roles:
         - !Ref NATIAMRole
+  NatInstanceLaunchTemplate:
+    Type: 'AWS::EC2::LaunchTemplate'
+    Metadata:
+      'AWS::CloudFormation::Init':
+        configSets:
+          default:  [awslogs, config]
+        awslogs:
+          packages:
+            yum:
+              awslogs: []
+          files:
+            '/etc/awslogs/awscli.conf':
+              content: !Sub |
+                [default]
+                region = ${AWS::Region}
+                [plugins]
+                cwlogs = cwlogs
+              mode: '000644'
+              owner: root
+              group: root
+            '/etc/awslogs/awslogs.conf':
+              content: !Sub |
+                [general]
+                state_file = /var/lib/awslogs/agent-state
+                [/var/log/messages]
+                datetime_format = %b %d %H:%M:%S
+                file = /var/log/messages
+                log_stream_name = {instance_id}/var/log/messages
+                log_group_name = ${Logs}
+                [/var/log/secure]
+                datetime_format = %b %d %H:%M:%S
+                file = /var/log/secure
+                log_stream_name = {instance_id}/var/log/secure
+                log_group_name = ${Logs}
+                [/var/log/cron]
+                datetime_format = %b %d %H:%M:%S
+                file = /var/log/cron
+                log_stream_name = {instance_id}/var/log/cron
+                log_group_name = ${Logs}
+                [/var/log/cloud-init.log]
+                datetime_format = %b %d %H:%M:%S
+                file = /var/log/cloud-init.log
+                log_stream_name = {instance_id}/var/log/cloud-init.log
+                log_group_name = ${Logs}
+                [/var/log/cfn-init.log]
+                datetime_format = %Y-%m-%d %H:%M:%S
+                file = /var/log/cfn-init.log
+                log_stream_name = {instance_id}/var/log/cfn-init.log
+                log_group_name = ${Logs}
+                [/var/log/cfn-hup.log]
+                datetime_format = %Y-%m-%d %H:%M:%S
+                file = /var/log/cfn-hup.log
+                log_stream_name = {instance_id}/var/log/cfn-hup.log
+                log_group_name = ${Logs}
+                [/var/log/cfn-init-cmd.log]
+                datetime_format = %Y-%m-%d %H:%M:%S
+                file = /var/log/cfn-init-cmd.log
+                log_stream_name = {instance_id}/var/log/cfn-init-cmd.log
+                log_group_name = ${Logs}
+                [/var/log/cloud-init-output.log]
+                file = /var/log/cloud-init-output.log
+                log_stream_name = {instance_id}/var/log/cloud-init-output.log
+                log_group_name = ${Logs}
+                [/var/log/dmesg]
+                file = /var/log/dmesg
+                log_stream_name = {instance_id}/var/log/dmesg
+                log_group_name = ${Logs}
+              mode: '000644'
+              owner: root
+              group: root
+          services:
+            sysvinit:
+              awslogs:
+                enabled: true
+                ensureRunning: true
+                packages:
+                  yum:
+                    - awslogs
+                files:
+                  - '/etc/awslogs/awslogs.conf'
+                  - '/etc/awslogs/awscli.conf'
+        config:
+          files:
+            '/etc/cfn/cfn-hup.conf':
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+                interval=1
+              mode: '000400'
+              owner: root
+              group: root
+            '/etc/cfn/hooks.d/cfn-auto-reloader.conf':
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.LaunchTemplate.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init --verbose --stack=${AWS::StackName} --region=${AWS::Region} --resource=NatInstanceLaunchTemplate
+                runas=root
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: true
+                ensureRunning: true
+                files:
+                  - '/etc/cfn/cfn-hup.conf'
+                  - '/etc/cfn/hooks.d/cfn-auto-reloader.conf'
+    Properties:
+      LaunchTemplateData:
+        BlockDeviceMappings:
+          - DeviceName: '/dev/xvda'
+            Ebs:
+              Encrypted: true
+              VolumeType: gp3
+        IamInstanceProfile:
+          Name: !Ref NatInstanceProfile
+        ImageId: ${AMIId}
+        InstanceType: t2.micro
+        KeyName: nat-instance-key-pair
+        MetadataOptions:
+          HttpTokens: required
+        NetworkInterfaces:
+          - AssociatePublicIpAddress: true
+            DeviceIndex: 0
+            Groups:
+              - !Ref NatInstanceSecurityGroup
+        UserData:
+          'Fn::Base64': !Sub
+            - |
+              #!/bin/bash -ex
+              trap '/opt/aws/bin/cfn-signal -e 1 --region ${Region} --stack ${StackName} --resource NatInstanceAutoScalingGroup' ERR
+              /opt/aws/bin/cfn-init -v --stack ${StackName} --resource NatInstanceLaunchTemplate --region ${Region}
+              sudo aws s3 cp s3://cloudformation-templates-shared-files/iptables/*.* ./etc/iptables
+              sudo bash ./etc/iptables/iptables-init.sh
+              sudo bash ./etc/iptables/ip6tables-init.sh
+              /opt/aws/bin/cfn-signal -e 0 --region ${Region} --stack ${StackName} --resource NatInstanceAutoScalingGroup
+            - Region: !Ref 'AWS::Region'
+              StackName: !Ref 'AWS::StackName'
+  NatInstanceAutoScalingGroup:
+    Type: 'AWS::AutoScaling::AutoScalingGroup'
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplate
+        Version: !GetAtt NatInstanceLaunchTemplate.LatestVersionNumber
+      MaxSize: '1'
+      MinSize: '1'
+      Tags:
+        - Key: Name
+          Value: 'NAT instance Auto Scaling Group'
+          PropagateAtLaunch: true
+      NotificationConfigurations:
+        - NotificationTypes:
+            - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
+            - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
+          TopicARN:
+            Fn::ImportValue': !GetAtt NatInstanceTopic.TopicArn
+      VPCZoneIdentifier:
+        - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-SubnetId' ] ]
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT10M
+    UpdatePolicy:
+      AutoScalingRollingUpdate:
+        PauseTime: PT10M
+        SuspendProcesses:
+          - HealthCheck
+          - ReplaceUnhealthy
+          - AZRebalance
+          - AlarmNotification
+          - ScheduledActions
+        WaitOnResourceSignals: true
+  CPUTooHighAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmDescription: 'Average CPU utilization over last 10 minutes higher than 80%'
+      Namespace: 'AWS/EC2'
+      MetricName: CPUUtilization
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 1
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 80
+      AlarmActions:
+        - Fn::ImportValue: !GetAtt NatInstanceTopic.TopicArn
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref NatInstanceAutoScalingGroup
 
 Outputs:
-  NatInstanceElasticIPRef:
-    Value: !Ref NatInstanceElasticIP
+  NatInstanceTopicRef:
+    Value: !Ref NatInstanceTopic
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-Ref' ] ]
-  NatInstanceElasticIPAllocationId:
-    Value: !GetAtt NatInstanceElasticIP.AllocationId
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-Ref' ] ]
+  NatInstanceTopicTopicArn:
+    Value: !GetAtt NatInstanceTopic.TopicArn
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-AllocationId' ] ]
-  NatInstanceElasticIPPublicIp:
-    Value: !GetAtt NatInstanceElasticIP.PublicIp
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicArn' ] ]
+  NatInstanceTopicTopicName:
+    Value: !GetAtt NatInstanceTopic.TopicName
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-PublicIp' ] ]
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicName' ] ]
+  NatInstanceTopicPolicyId:
+    Value: !GetAtt NatInstanceTopicPolicy.Id
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-TopicPolicy-NatInstanceTopicPolicy-Id' ] ]
+  NatInstanceLogGroupRef:
+    Value: !Ref NatInstanceLogGroup
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Logs-LogGroup-NatInstanceLogGroup-Ref' ] ]
+  NatInstanceLogGroupArn:
+    Value: !GetAtt NatInstanceLogGroup.Arn
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Logs-LogGroup-NatInstanceLogGroup-Arn' ] ]
   NatInstanceSecurityGroupRef:
     Value: !Ref NatInstanceSecurityGroup
     Export:
@@ -214,7 +445,7 @@ Outputs:
     Value: !GetAtt NatInstanceIAMRole.RoleId
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-Role-NatInstanceIAMRole-RoleId' ] ]
-  NatInstanceProfile:
+  NatInstanceProfileRef:
     Value: !Ref NatInstanceProfile
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceProfile' ] ]
@@ -222,3 +453,23 @@ Outputs:
     Value: !GetAtt NatInstanceProfile.Arn
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceProfile-Arn' ] ]
+  NatInstanceLaunchTemplateRef:
+    Value: !Ref NatInstanceLaunchTemplate
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-LaunchTemplate-NatInstanceLaunchTemplate-Ref' ] ]
+  NatInstanceLaunchTemplateDefaultVersionNumber:
+    Value: !GetAtt NatInstanceLaunchTemplate.DefaultVersionNumber
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-LaunchTemplate-NatInstanceLaunchTemplate-DefaultVersionNumber' ] ]
+  NatInstanceLaunchTemplateLatestVersionNumber:
+    Value: !GetAtt NatInstanceLaunchTemplate.LatestVersionNumber
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-LaunchTemplate-NatInstanceLaunchTemplate-LatestVersionNumber' ] ]
+  NatInstanceLaunchTemplateLaunchTemplateId:
+    Value: !GetAtt NatInstanceLaunchTemplate.LaunchTemplateId
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-LaunchTemplate-NatInstanceLaunchTemplate-LaunchTemplateId' ] ]
+  NatInstanceAutoScalingGroupRef:
+    Value: !Ref NatInstanceAutoScalingGroup
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'AutoScaling-AutoScalingGroup-NatInstanceAutoScalingGroup-Ref' ] ]
