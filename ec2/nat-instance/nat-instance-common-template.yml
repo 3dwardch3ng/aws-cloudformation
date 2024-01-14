@@ -256,6 +256,6 @@ Outputs:
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceInstanceProfile-Ref' ] ]
   NatInstanceInstanceProfileArn:
-    Value: !GetAtt NatInstanceProfile.Arn
+    Value: !GetAtt NatInstanceInstanceProfile.Arn
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceInstanceProfile-Arn' ] ]
