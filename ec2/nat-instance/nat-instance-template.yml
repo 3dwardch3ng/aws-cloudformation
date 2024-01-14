@@ -212,7 +212,7 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Init':
         configSets:
-          default:  [awslogs, config]
+          default:  [awslogs, ssh-access, config]
         awslogs:
           packages:
             yum:
@@ -288,6 +288,11 @@ Resources:
                 files:
                   - '/etc/awslogs/awslogs.conf'
                   - '/etc/awslogs/awscli.conf'
+        ssh-access:
+          services:
+            sysvinit:
+              sshd:
+                enabled: true
         config:
           files:
             '/etc/cfn/cfn-hup.conf':
@@ -326,8 +331,6 @@ Resources:
         ImageId: !Ref AMIId
         InstanceType: t2.micro
         KeyName: nat-instance-key-pair
-        MetadataOptions:
-          HttpTokens: required
         NetworkInterfaces:
           - AssociatePublicIpAddress: true
             DeviceIndex: 0
