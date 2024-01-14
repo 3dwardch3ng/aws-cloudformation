@@ -59,3 +59,17 @@ while IFS= read -r line
 do
   $ipt6 -A INPUT -p udp -s $line -j ACCEPT
 done < "$input"
+
+# Allow TCP traffic from whitelisted MAC addresses
+input="/etc/iptables/whitelisted-mac-tcp.txt"
+while IFS= read -r line
+do
+  $ipt6 -A INPUT -m mac --mac-source $line -j ACCEPT
+done < "$input"
+
+# Allow UDP traffic from whitelisted MAC addresses
+input="/etc/iptables/whitelisted-mac-udp.txt"
+while IFS= read -r line
+do
+  $ipt6 -A INPUT -m mac --mac-source $line -j ACCEPT
+done < "$input"
