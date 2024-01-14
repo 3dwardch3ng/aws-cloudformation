@@ -303,7 +303,7 @@ Resources:
               content: !Sub |
                 [cfn-auto-reloader-hook]
                 triggers=post.update
-                path=Resources.LaunchTemplate.Metadata.AWS::CloudFormation::Init
+                path=Resources.NatInstanceLaunchTemplate.Metadata.AWS::CloudFormation::Init
                 action=/opt/aws/bin/cfn-init --verbose --stack=${AWS::StackName} --region=${AWS::Region} --resource=NatInstanceLaunchTemplate
                 runas=root
           services:
@@ -349,7 +349,7 @@ Resources:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
       LaunchTemplate:
-        LaunchTemplateId: !Ref LaunchTemplate
+        LaunchTemplateId: !Ref NatInstanceLaunchTemplate
         Version: !GetAtt NatInstanceLaunchTemplate.LatestVersionNumber
       MaxSize: '1'
       MinSize: '1'
