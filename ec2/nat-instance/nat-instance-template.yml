@@ -235,45 +235,45 @@ Resources:
                 datetime_format = %b %d %H:%M:%S
                 file = /var/log/messages
                 log_stream_name = {instance_id}/var/log/messages
-                log_group_name = ${Logs}
+                log_group_name = ${NatInstanceLogGroup}
                 [/var/log/secure]
                 datetime_format = %b %d %H:%M:%S
                 file = /var/log/secure
                 log_stream_name = {instance_id}/var/log/secure
-                log_group_name = ${Logs}
+                log_group_name = ${NatInstanceLogGroup}
                 [/var/log/cron]
                 datetime_format = %b %d %H:%M:%S
                 file = /var/log/cron
                 log_stream_name = {instance_id}/var/log/cron
-                log_group_name = ${Logs}
+                log_group_name = ${NatInstanceLogGroup}
                 [/var/log/cloud-init.log]
                 datetime_format = %b %d %H:%M:%S
                 file = /var/log/cloud-init.log
                 log_stream_name = {instance_id}/var/log/cloud-init.log
-                log_group_name = ${Logs}
+                log_group_name = ${NatInstanceLogGroup}
                 [/var/log/cfn-init.log]
                 datetime_format = %Y-%m-%d %H:%M:%S
                 file = /var/log/cfn-init.log
                 log_stream_name = {instance_id}/var/log/cfn-init.log
-                log_group_name = ${Logs}
+                log_group_name = ${NatInstanceLogGroup}
                 [/var/log/cfn-hup.log]
                 datetime_format = %Y-%m-%d %H:%M:%S
                 file = /var/log/cfn-hup.log
                 log_stream_name = {instance_id}/var/log/cfn-hup.log
-                log_group_name = ${Logs}
+                log_group_name = ${NatInstanceLogGroup}
                 [/var/log/cfn-init-cmd.log]
                 datetime_format = %Y-%m-%d %H:%M:%S
                 file = /var/log/cfn-init-cmd.log
                 log_stream_name = {instance_id}/var/log/cfn-init-cmd.log
-                log_group_name = ${Logs}
+                log_group_name = ${NatInstanceLogGroup}
                 [/var/log/cloud-init-output.log]
                 file = /var/log/cloud-init-output.log
                 log_stream_name = {instance_id}/var/log/cloud-init-output.log
-                log_group_name = ${Logs}
+                log_group_name = ${NatInstanceLogGroup}
                 [/var/log/dmesg]
                 file = /var/log/dmesg
                 log_stream_name = {instance_id}/var/log/dmesg
-                log_group_name = ${Logs}
+                log_group_name = ${NatInstanceLogGroup}
               mode: '000644'
               owner: root
               group: root
