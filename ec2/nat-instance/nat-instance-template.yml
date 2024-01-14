@@ -9,36 +9,36 @@ Parameters:
 
 Resources:
   NatInstanceTopic:
-    Type: 'AWS::SNS::Topic'
+    Type: AWS::SNS::Topic
     Properties: { }
   NatInstanceTopicPolicy:
-    Type: 'AWS::SNS::TopicPolicy'
+    Type: AWS::SNS::TopicPolicy
     Properties:
       PolicyDocument:
         Id: Id1
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
           - Sid: Sid1
             Effect: Allow
             Principal:
               Service:
-                - 'events.amazonaws.com'
-                - 'budgets.amazonaws.com'
-            Action: 'sns:Publish'
+                - events.amazonaws.com
+                - budgets.amazonaws.com
+            Action: sns:Publish
             Resource: !Ref NatInstanceTopic
           - Sid: Sid2
             Effect: Allow
             Principal:
-              AWS: '*'
-            Action: 'sns:Publish'
+              AWS: *
+            Action: sns:Publish
             Resource: !Ref NatInstanceTopic
             Condition:
               StringEquals:
-                'AWS:SourceOwner': !Ref 'AWS::AccountId'
+                AWS:SourceOwner: !Ref AWS::AccountId
       Topics:
         - !Ref NatInstanceTopic
   NatInstanceLogGroup:
-    Type: 'AWS::Logs::LogGroup'
+    Type: AWS::Logs::LogGroup
     Properties:
       RetentionInDays: 7
   NatInstanceSecurityGroup:
@@ -166,15 +166,15 @@ Resources:
       VpcId:
         Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpc-VpcId' ] ]
   NatInstanceIAMRole:
-    Type: 'AWS::IAM::Role'
+    Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Principal:
-              Service: 'ec2.amazonaws.com'
-            Action: 'sts:AssumeRole'
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
@@ -182,14 +182,14 @@ Resources:
       Policies:
         - PolicyName: logs
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - 'logs:CreateLogGroup'
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                  - 'logs:DescribeLogStreams'
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
                 Resource: !GetAtt NatInstanceLogGroup.Arn
         - PolicyName: s3
           PolicyDocument:
@@ -197,20 +197,20 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 's3:GetObject'
-                  - 's3:PutObject'
+                  - s3:GetObject
+                  - s3:PutObject
                 Resource:
-                  - 'arn:aws:s3:::*'
+                  - arn:aws:s3:::*
   NatInstanceInstanceProfile:
-    Type: 'AWS::IAM::InstanceProfile'
+    Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: NatInstanceIAMInstanceProfile
       Roles:
         - !Ref NatInstanceIAMRole
   NatInstanceLaunchTemplate:
-    Type: 'AWS::EC2::LaunchTemplate'
+    Type: AWS::EC2::LaunchTemplate
     Metadata:
-      'AWS::CloudFormation::Init':
+      AWS::CloudFormation::Init:
         configSets:
           default:  [awslogs, ssh-access, config]
         awslogs:
@@ -286,8 +286,8 @@ Resources:
                   yum:
                     - awslogs
                 files:
-                  - '/etc/awslogs/awslogs.conf'
-                  - '/etc/awslogs/awscli.conf'
+                  - /etc/awslogs/awslogs.conf
+                  - /etc/awslogs/awscli.conf
         ssh-access:
           services:
             sysvinit:
@@ -317,8 +317,8 @@ Resources:
                 enabled: true
                 ensureRunning: true
                 files:
-                  - '/etc/cfn/cfn-hup.conf'
-                  - '/etc/cfn/hooks.d/cfn-auto-reloader.conf'
+                  - /etc/cfn/cfn-hup.conf
+                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
     Properties:
       LaunchTemplateData:
         BlockDeviceMappings:
@@ -336,13 +336,13 @@ Resources:
             Groups:
               - !Ref NatInstanceSecurityGroup
         UserData:
-          'Fn::Base64': !Sub |
+          Fn::Base64: !Sub |
             #!/bin/bash -ex
             # Install environment toolings
             echo "Install environment toolings"
             sudo yum update && sudo yum upgrade -y
             export PATH="/home/ec2-user/.local/bin:$PATH"
-            echo 'export PATH=/home/ec2-user/.local/bin:$PATH' >>~/.profile
+            echo 'export PATH=/home/ec2-user/.local/bin:$PATH' >> ~/.profile
             wget https://bootstrap.pypa.io/ez_setup.py -O – | sudo python3
             pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
             # Install AWS Cli
@@ -366,7 +366,7 @@ Resources:
             sudo bash ./etc/iptables/ip6tables-init.sh
             /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup
   NatInstanceAutoScalingGroup:
-    Type: 'AWS::AutoScaling::AutoScalingGroup'
+    Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       LaunchTemplate:
         LaunchTemplateId: !Ref NatInstanceLaunchTemplate
@@ -399,7 +399,7 @@ Resources:
           - ScheduledActions
         WaitOnResourceSignals: true
   CPUTooHighAlarm:
-    Type: 'AWS::CloudWatch::Alarm'
+    Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmDescription: 'Average CPU utilization over last 10 minutes higher than 80%'
       Namespace: 'AWS/EC2'
