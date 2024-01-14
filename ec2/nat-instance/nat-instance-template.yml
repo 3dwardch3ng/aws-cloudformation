@@ -8,6 +8,205 @@ Parameters:
     Default: ami-09b42976632b27e9b
 
 Resources:
+  NatInstanceTopic:
+    Type: 'AWS::SNS::Topic'
+    Properties: { }
+  NatInstanceTopicPolicy:
+    Type: 'AWS::SNS::TopicPolicy'
+    Properties:
+      PolicyDocument:
+        Id: Id1
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Sid1
+            Effect: Allow
+            Principal:
+              Service:
+                - 'events.amazonaws.com'
+                - 'budgets.amazonaws.com'
+            Action: 'sns:Publish'
+            Resource: !Ref NatInstanceTopic
+          - Sid: Sid2
+            Effect: Allow
+            Principal:
+              AWS: '*'
+            Action: 'sns:Publish'
+            Resource: !Ref NatInstanceTopic
+            Condition:
+              StringEquals:
+                'AWS:SourceOwner': !Ref 'AWS::AccountId'
+      Topics:
+        - !Ref NatInstanceTopic
+  NatInstanceLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 7
+  NatInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Nat Instance Security Group
+      GroupName: NatInstanceSecurityGroup
+      SecurityGroupIngress:
+        - CidrIp:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-CidrBlock' ] ]
+          Description: Allow inbound ipv4 traffic from Private Subnet 1
+          IpProtocol: -1
+        - CidrIpv6:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-Ipv6CidrBlock' ] ]
+          Description: Allow inbound ipv6 traffic from Private Subnet 1
+          IpProtocol: -1
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic from Internet for SSH on port 22
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic from Internet for SSH on port 22
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic from Internet for HTTP TCP on port 80
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic from Internet for HTTP TCP on port 80
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic from Internet for HTTPS TCP on port 443
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic from Internet for HTTPS TCP on port 443
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIp: 0.0.0.0/0
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS UDP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6: ::0/0
+          Description: Allow inbound ipv6 traffic for pihole-FTL UDP TCP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+      SecurityGroupEgress:
+        - CidrIp:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-CidrBlock' ] ]
+          Description: Allow inbound ipv4 traffic for HTTP to Private Subnet 1
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIpv6:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-Ipv6CidrBlock' ] ]
+          Description: Allow inbound ipv6 traffic for HTTP to Private Subnet 1
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        - CidrIp:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-CidrBlock' ] ]
+          Description: Allow inbound ipv4 traffic for HTTPS to Private Subnet 1
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        - CidrIpv6:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-Ipv6CidrBlock' ] ]
+          Description: Allow inbound ipv6 traffic for HTTPS to Private Subnet 1
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        - CidrIp:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-CidrBlock' ] ]
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-Ipv6CidrBlock' ] ]
+          Description: Allow inbound ipv6 traffic for pihole-FTL DNS TCP on port 53
+          IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+        - CidrIp:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-CidrBlock' ] ]
+          Description: Allow inbound ipv4 traffic for pihole-FTL DNS UDP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+        - CidrIpv6:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1-Ipv6CidrBlock' ] ]
+          Description: Allow inbound ipv6 traffic for pihole-FTL DNS UDP on port 53
+          IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all ipv4 outbound traffic to Internet
+          IpProtocol: -1
+        - CidrIpv6: ::/0
+          Description: Allow all ipv6 outbound traffic to Internet
+          IpProtocol: -1
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'NatInstanceSecurityGroup' ] ]
+      VpcId:
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpc-VpcId' ] ]
+  NatInstanceIAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'ec2.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/IAMReadOnlyAccess
+      Policies:
+        - PolicyName: logs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'logs:DescribeLogStreams'
+                Resource: !GetAtt NatInstanceLogGroup.Arn
+        - PolicyName: s3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                  - 's3:PutObject'
+                Resource:
+                  - 'arn:aws:s3:::*'
+  NatInstanceInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      InstanceProfileName: NatInstanceIAMInstanceProfile
+      Roles:
+        - !Ref NatInstanceIAMRole
   NatInstanceLaunchTemplate:
     Type: 'AWS::EC2::LaunchTemplate'
     Metadata:
@@ -128,16 +327,14 @@ Resources:
               Encrypted: true
               VolumeType: gp3
         IamInstanceProfile:
-          Name:
-            Fn::ImportedValue: !Join [ '-', [ 'nat-instance-security-stack', Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceInstanceProfile-Ref' ] ]
-        ImageId: !Ref AMIId
+          Name: !Ref NatInstanceInstanceProfile
         InstanceType: t2.micro
         KeyName: nat-instance-key-pair
         NetworkInterfaces:
           - AssociatePublicIpAddress: true
             DeviceIndex: 0
             Groups:
-              - ImportValue: !Join [ '-', [ 'nat-instance-security-stack', Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-Ref' ] ]
+              - !Ref NatInstanceSecurityGroup
         UserData:
           'Fn::Base64': !Sub |
             #!/bin/bash -ex
@@ -184,8 +381,7 @@ Resources:
         - NotificationTypes:
             - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
             - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
-          TopicARN:
-            Fn::ImportValue: !Join [ '-', [ 'nat-instance-logs-stack', Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicArn' ] ]
+          TopicARN: !GetAtt NatInstanceTopic.TopicArn
       VPCZoneIdentifier:
         - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-SubnetId' ] ]
     CreationPolicy:
@@ -219,6 +415,62 @@ Resources:
           Value: !Ref NatInstanceAutoScalingGroup
 
 Outputs:
+  NatInstanceTopicRef:
+    Value: !Ref NatInstanceTopic
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-Ref' ] ]
+  NatInstanceTopicTopicArn:
+    Value: !GetAtt NatInstanceTopic.TopicArn
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicArn' ] ]
+  NatInstanceTopicTopicName:
+    Value: !GetAtt NatInstanceTopic.TopicName
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicName' ] ]
+  NatInstanceTopicPolicyId:
+    Value: !GetAtt NatInstanceTopicPolicy.Id
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-TopicPolicy-NatInstanceTopicPolicy-Id' ] ]
+  NatInstanceLogGroupRef:
+    Value: !Ref NatInstanceLogGroup
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Logs-LogGroup-NatInstanceLogGroup-Ref' ] ]
+  NatInstanceLogGroupArn:
+    Value: !GetAtt NatInstanceLogGroup.Arn
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Logs-LogGroup-NatInstanceLogGroup-Arn' ] ]
+  NatInstanceSecurityGroupRef:
+    Value: !Ref NatInstanceSecurityGroup
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-Ref' ] ]
+  NatInstanceSecurityGroupGroupId:
+    Value: !GetAtt NatInstanceSecurityGroup.GroupId
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-GroupId' ] ]
+  NatInstanceSecurityGroupVpcId:
+    Value: !GetAtt NatInstanceSecurityGroup.VpcId
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-VpcId' ] ]
+  NatInstanceIAMRoleRef:
+    Value: !Ref NatInstanceIAMRole
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-Role-NatInstanceIAMRole-Ref' ] ]
+  NatInstanceIAMRoleArn:
+    Value: !GetAtt NatInstanceIAMRole.Arn
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-Role-NatInstanceIAMRole-Arn' ] ]
+  NatInstanceIAMRoleRoleId:
+    Value: !GetAtt NatInstanceIAMRole.RoleId
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-Role-NatInstanceIAMRole-RoleId' ] ]
+  NatInstanceInstanceProfileRef:
+    Value: !Ref NatInstanceInstanceProfile
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceInstanceProfile-Ref' ] ]
+  NatInstanceInstanceProfileArn:
+    Value: !GetAtt NatInstanceInstanceProfile.Arn
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceInstanceProfile-Arn' ] ]
   NatInstanceLaunchTemplateRef:
     Value: !Ref NatInstanceLaunchTemplate
     Export:
