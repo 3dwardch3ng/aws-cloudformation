@@ -24,10 +24,10 @@ on:
           - 'eu-west-2'
           - 'eu-west-3'
           - 'eu-north-1'
-    image:
-      description: 'The AMI image ID'
-      type: string
-      default: 'ami-01ab4a3bc7e75f44a'
+      image:
+        description: 'The AMI image ID'
+        type: string
+        default: 'ami-01ab4a3bc7e75f44a'
 
 permissions:
   id-token: write
