@@ -17,7 +17,7 @@ $ipt -Z
 
 # Default policies: deny all incoming
 # Unrestricted outgoing
-$ipt -P INPUT DROP
+$ipt -P INPUT ACCEPT
 $ipt -P FORWARD DROP
 $ipt -P OUTPUT ACCEPT
 
