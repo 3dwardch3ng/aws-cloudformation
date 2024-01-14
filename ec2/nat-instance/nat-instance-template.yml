@@ -206,7 +206,7 @@ Resources:
     Properties:
       InstanceProfileName: NatInstanceIAMInstanceProfile
       Roles:
-        - !Ref NATIAMRole
+        - !Ref NatInstanceIAMRole
   NatInstanceLaunchTemplate:
     Type: 'AWS::EC2::LaunchTemplate'
     Metadata:
