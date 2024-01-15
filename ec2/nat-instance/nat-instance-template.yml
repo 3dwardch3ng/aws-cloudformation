@@ -342,26 +342,14 @@ Resources:
             # Install environment toolings
             echo "Install environment toolings"
             sudo yum update -y && sudo yum upgrade -y
-            curl -L -o ez_setup.py https://bootstrap.pypa.io/ez_setup.py
-            sudo python3 ez_setup.py
-            pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
-            # Install AWS Cli
-            echo "Install AWS Cli"
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
-            unzip awscliv2.zip
-            sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
-            # Install EC2 Instance Connect
-            echo "Install EC2 Instance Connect"
-            sudo yum install ec2-instance-connect
-            # Install AmazonCloudWatchAgent and restart it
-            echo "Install AmazonCloudWatchAgent and restart it"
-            curl -L -o amazon-cloudwatch-agent.rpm https://amazoncloudwatch-agent.s3.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-            sudo rpm -U ./amazon-cloudwatch-agent.rpm
+            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+            python3 get-pip.py
             trap '/opt/aws/bin/cfn-signal -e 1 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup' ERR
             # Run cfn-init
             sudo /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource NatInstanceLaunchTemplate --region ${AWS::Region}
-            sudo aws s3 cp s3://cloudformation-templates-shared-files/iptables/*.* /etc/iptables
             # Initialise iptables and ip6tables
+            sudo aws s3 cp s3://cloudformation-templates-shared-files/iptables/*.* /etc/iptables
+            sudo yum iptables -y && sudo yum ip6tables -y
             sudo bash ./etc/iptables/iptables-init.sh
             sudo bash ./etc/iptables/ip6tables-init.sh
             /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup
