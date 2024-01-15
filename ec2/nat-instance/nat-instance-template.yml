@@ -344,7 +344,7 @@ Resources:
             sudo yum update -y && sudo yum upgrade -y
             curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
             python3 get-pip.py
-            trap '/opt/aws/bin/cfn-signal -e 1 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup' ERR
+            # trap '/opt/aws/bin/cfn-signal -e 1 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup' ERR
             # Run cfn-init
             sudo /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource NatInstanceLaunchTemplate --region ${AWS::Region}
             # Initialise iptables and ip6tables
