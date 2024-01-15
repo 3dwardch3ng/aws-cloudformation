@@ -287,8 +287,6 @@ Resources:
         - !Ref GeneralVpcDefaultSecurityGroup
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ssm'
       SubnetIds:
-        - !Ref GeneralVpcPublicSubnet1
-        - !Ref GeneralVpcPublicSubnet2
         - !Ref GeneralVpcPrivateSubnet1
         - !Ref GeneralVpcPrivateSubnet2
       VpcEndpointType: Interface
@@ -302,8 +300,6 @@ Resources:
         - !Ref GeneralVpcDefaultSecurityGroup
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ec2messages'
       SubnetIds:
-        - !Ref GeneralVpcPublicSubnet1
-        - !Ref GeneralVpcPublicSubnet2
         - !Ref GeneralVpcPrivateSubnet1
         - !Ref GeneralVpcPrivateSubnet2
       VpcEndpointType: Interface
@@ -317,8 +313,6 @@ Resources:
         - !Ref GeneralVpcDefaultSecurityGroup
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ec2'
       SubnetIds:
-        - !Ref GeneralVpcPublicSubnet1
-        - !Ref GeneralVpcPublicSubnet2
         - !Ref GeneralVpcPrivateSubnet1
         - !Ref GeneralVpcPrivateSubnet2
       VpcEndpointType: Interface
@@ -332,8 +326,6 @@ Resources:
         - !Ref GeneralVpcDefaultSecurityGroup
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ssmmessages'
       SubnetIds:
-        - !Ref GeneralVpcPublicSubnet1
-        - !Ref GeneralVpcPublicSubnet2
         - !Ref GeneralVpcPrivateSubnet1
         - !Ref GeneralVpcPrivateSubnet2
       VpcEndpointType: Interface
@@ -347,8 +339,6 @@ Resources:
         - !Ref GeneralVpcDefaultSecurityGroup
       ServiceName: !Sub 'com.amazonaws.${AWS::Region}.monitoring'
       SubnetIds:
-        - !Ref GeneralVpcPublicSubnet1
-        - !Ref GeneralVpcPublicSubnet2
         - !Ref GeneralVpcPrivateSubnet1
         - !Ref GeneralVpcPrivateSubnet2
       VpcEndpointType: Interface

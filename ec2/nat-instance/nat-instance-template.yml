@@ -224,6 +224,36 @@ Resources:
               mode: '000644'
               owner: root
               group: root
+            '/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json':
+              content: !Sub |
+                {
+                  "logs": [
+                  ],
+                  "agent": {
+                    "metrics_collection_interval": 60,
+                    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+                  },
+                  "metrics": {
+                    "append_dimensions": {
+                      "AutoScalingGroupName": "${!aws:AutoScalingGroupName}",
+                      "ImageId": "${!aws:ImageId}",
+                      "InstanceId": "${!aws:InstanceId}",
+                      "InstanceType": "${!aws:InstanceType}"
+                    },
+                    "metrics_collected": {
+                      "mem": {
+                        "measurement": [
+                          "mem_used_percent"
+                        ]
+                      },
+                      "swap": {
+                        "measurement": [
+                          "swap_used_percent"
+                        ]
+                      }
+                    }
+                  }
+                }
             '/etc/awslogs/awslogs.conf':
               content: !Sub |
                 [general]
@@ -338,6 +368,9 @@ Resources:
             sudo yum update -y && sudo yum upgrade -y
             curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
             python3 get-pip.py
+            # Install Cloudwatch Agent
+            echo "Install Cloudwatch Agent"
+            rpm -Uvh https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
             # trap '/opt/aws/bin/cfn-signal -e 1 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup' ERR
             # Run cfn-init
             sudo /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource NatInstanceLaunchTemplate --region ${AWS::Region}
