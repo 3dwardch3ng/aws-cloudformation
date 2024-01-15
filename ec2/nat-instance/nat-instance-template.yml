@@ -29,7 +29,7 @@ Resources:
           - Sid: Sid2
             Effect: Allow
             Principal:
-              AWS: *
+              AWS: '*'
             Action: sns:Publish
             Resource: !Ref NatInstanceTopic
             Condition:
