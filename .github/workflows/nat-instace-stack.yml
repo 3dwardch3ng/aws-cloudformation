@@ -27,7 +27,7 @@ on:
       image:
         description: 'The AMI image ID'
         type: string
-        default: 'ami-09b42976632b27e9b'
+        default: 'ami-083327d0fe6d65178'
 
 permissions:
   id-token: write
