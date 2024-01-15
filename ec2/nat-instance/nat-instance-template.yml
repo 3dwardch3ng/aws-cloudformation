@@ -214,9 +214,6 @@ Resources:
         configSets:
           default:  [awslogs, ssh-access, config]
         awslogs:
-          packages:
-            yum:
-              awslogs: []
           files:
             '/etc/awslogs/awscli.conf':
               content: !Sub |
