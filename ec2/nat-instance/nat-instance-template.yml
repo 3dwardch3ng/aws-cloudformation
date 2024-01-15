@@ -343,7 +343,7 @@ Resources:
             echo "Install environment toolings"
             sudo yum update -y && sudo yum upgrade -y
             curl -L -o ez_setup.py https://bootstrap.pypa.io/ez_setup.py
-            sudo python ez_setup.py
+            sudo python3 ez_setup.py
             pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
             # Install AWS Cli
             echo "Install AWS Cli"
