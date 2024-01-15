@@ -328,6 +328,7 @@ Resources:
               VolumeType: gp3
         IamInstanceProfile:
           Name: !Ref NatInstanceInstanceProfile
+        ImageId: !Ref AMIId
         InstanceType: t2.micro
         KeyName: nat-instance-key-pair
         NetworkInterfaces:
