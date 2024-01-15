@@ -282,9 +282,6 @@ Resources:
               awslogs:
                 enabled: true
                 ensureRunning: true
-                packages:
-                  yum:
-                    - awslogs
                 files:
                   - /etc/awslogs/awslogs.conf
                   - /etc/awslogs/awscli.conf
@@ -349,7 +346,7 @@ Resources:
             sudo /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource NatInstanceLaunchTemplate --region ${AWS::Region}
             # Initialise iptables and ip6tables
             sudo aws s3 cp s3://cloudformation-templates-shared-files/iptables/*.* /etc/iptables
-            sudo yum iptables -y && sudo yum ip6tables -y
+            sudo yum install iptables -y && sudo yum install ip6tables -y
             sudo bash ./etc/iptables/iptables-init.sh
             sudo bash ./etc/iptables/ip6tables-init.sh
             /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup
