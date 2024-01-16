@@ -373,8 +373,7 @@ Resources:
             sudo aws s3 cp --recursive s3://cloudformation-templates-shared-files/iptables /etc/iptables
             yum install iptables-services -y
             sudo yum install iptables -y && sudo yum install ip6tables -y
-            sudo bash ./etc/iptables/iptables-init.sh
-            sudo bash ./etc/iptables/ip6tables-init.sh
+            sudo bash ./etc/iptables/firewall-init.sh
             /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup
   NatInstanceAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
