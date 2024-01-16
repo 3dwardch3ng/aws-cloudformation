@@ -366,7 +366,7 @@ Resources:
             rpm -Uvh https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
             # Initialise iptables and ip6tables
             sudo mkdir /etc/iptables
-            sudo aws s3 cp s3://cloudformation-templates-shared-files/iptables /etc/iptables --recursive
+            sudo aws s3 cp  --recursive s3://cloudformation-templates-shared-files/iptables /etc/iptables
             sudo yum install iptables -y && sudo yum install ip6tables -y
             sudo bash ./etc/iptables/iptables-init.sh
             sudo bash ./etc/iptables/ip6tables-init.sh
