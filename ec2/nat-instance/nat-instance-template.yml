@@ -365,8 +365,13 @@ Resources:
             echo "Install Cloudwatch Agent"
             rpm -Uvh https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
             # Initialise iptables and ip6tables
+            # Turning on IP Forwarding
+            echo "net.ipv4.ip_forward = 1" | sudo tee -a /etc/sysctl.conf
+            echo "net.ipv6.conf.all.forwarding = 1" | sudo tee -a /etc/sysctl.conf
+            sudo sysctl -p
             sudo mkdir /etc/iptables
-            sudo aws s3 cp  --recursive s3://cloudformation-templates-shared-files/iptables /etc/iptables
+            sudo aws s3 cp --recursive s3://cloudformation-templates-shared-files/iptables /etc/iptables
+            yum install iptables-services -y
             sudo yum install iptables -y && sudo yum install ip6tables -y
             sudo bash ./etc/iptables/iptables-init.sh
             sudo bash ./etc/iptables/ip6tables-init.sh
