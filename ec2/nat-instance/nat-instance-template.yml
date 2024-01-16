@@ -227,91 +227,78 @@ Resources:
             '/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json':
               content: !Sub |
                 {
-                  "logs": [
-                  ],
-                  "agent": {
-                    "metrics_collection_interval": 60,
-                    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
-                  },
-                  "metrics": {
-                    "append_dimensions": {
-                      "AutoScalingGroupName": "${!aws:AutoScalingGroupName}",
-                      "ImageId": "${!aws:ImageId}",
-                      "InstanceId": "${!aws:InstanceId}",
-                      "InstanceType": "${!aws:InstanceType}"
-                    },
-                    "metrics_collected": {
-                      "mem": {
-                        "measurement": [
-                          "mem_used_percent"
-                        ]
-                      },
-                      "swap": {
-                        "measurement": [
-                          "swap_used_percent"
+                  "logs": {
+                    "logs_collected": {
+                      "files": {
+                        "collect_list": [
+                          {
+                            "file_path": "/var/lib/awslogs/agent-state"
+                          },
+                          {
+                            "file_path": "/var/log/messages",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/messages",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          },
+                          {
+                            "file_path": "/var/log/secure",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/secure",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          },
+                          {
+                            "file_path": "/var/log/cron",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/cron",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          },
+                          {
+                            "file_path": "/var/log/cloud-init.log",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/cloud-init.log",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          },
+                          {
+                            "file_path": "/var/log/cfn-init.log",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/cfn-init.log",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          },
+                          {
+                            "file_path": "/var/log/cfn-hup.log",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/cfn-hup.log",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          },
+                          {
+                            "file_path": "/var/log/cfn-hup.log",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/cfn-hup.log",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          },
+                          {
+                            "file_path": "/var/log/cfn-init-cmd.log",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/cfn-init-cmd.log",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          },
+                          {
+                            "file_path": "/var/log/cloud-init-output.log",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/cloud-init-output.log",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          },
+                          {
+                            "file_path": "/var/log/dmesg",
+                            "log_group_name": "${NatInstanceLogGroup}",
+                            "log_stream_name": "{instance_id}/var/log/dmesg",
+                            "timestamp_format": "%b %d %H:%M:%S"
+                          }
                         ]
                       }
                     }
                   }
                 }
-            '/etc/awslogs/awslogs.conf':
-              content: !Sub |
-                [general]
-                state_file = /var/lib/awslogs/agent-state
-                [/var/log/messages]
-                datetime_format = %b %d %H:%M:%S
-                file = /var/log/messages
-                log_stream_name = {instance_id}/var/log/messages
-                log_group_name = ${NatInstanceLogGroup}
-                [/var/log/secure]
-                datetime_format = %b %d %H:%M:%S
-                file = /var/log/secure
-                log_stream_name = {instance_id}/var/log/secure
-                log_group_name = ${NatInstanceLogGroup}
-                [/var/log/cron]
-                datetime_format = %b %d %H:%M:%S
-                file = /var/log/cron
-                log_stream_name = {instance_id}/var/log/cron
-                log_group_name = ${NatInstanceLogGroup}
-                [/var/log/cloud-init.log]
-                datetime_format = %b %d %H:%M:%S
-                file = /var/log/cloud-init.log
-                log_stream_name = {instance_id}/var/log/cloud-init.log
-                log_group_name = ${NatInstanceLogGroup}
-                [/var/log/cfn-init.log]
-                datetime_format = %Y-%m-%d %H:%M:%S
-                file = /var/log/cfn-init.log
-                log_stream_name = {instance_id}/var/log/cfn-init.log
-                log_group_name = ${NatInstanceLogGroup}
-                [/var/log/cfn-hup.log]
-                datetime_format = %Y-%m-%d %H:%M:%S
-                file = /var/log/cfn-hup.log
-                log_stream_name = {instance_id}/var/log/cfn-hup.log
-                log_group_name = ${NatInstanceLogGroup}
-                [/var/log/cfn-init-cmd.log]
-                datetime_format = %Y-%m-%d %H:%M:%S
-                file = /var/log/cfn-init-cmd.log
-                log_stream_name = {instance_id}/var/log/cfn-init-cmd.log
-                log_group_name = ${NatInstanceLogGroup}
-                [/var/log/cloud-init-output.log]
-                file = /var/log/cloud-init-output.log
-                log_stream_name = {instance_id}/var/log/cloud-init-output.log
-                log_group_name = ${NatInstanceLogGroup}
-                [/var/log/dmesg]
-                file = /var/log/dmesg
-                log_stream_name = {instance_id}/var/log/dmesg
-                log_group_name = ${NatInstanceLogGroup}
-              mode: '000644'
-              owner: root
-              group: root
-          services:
-            sysvinit:
-              awslogs:
-                enabled: true
-                ensureRunning: true
-                files:
-                  - /etc/awslogs/awslogs.conf
-                  - /etc/awslogs/awscli.conf
         ssh-access:
           services:
             sysvinit:
@@ -368,12 +355,12 @@ Resources:
             sudo yum update -y && sudo yum upgrade -y
             curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
             python3 get-pip.py
-            # Install Cloudwatch Agent
-            echo "Install Cloudwatch Agent"
-            rpm -Uvh https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
             # trap '/opt/aws/bin/cfn-signal -e 1 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup' ERR
             # Run cfn-init
             sudo /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource NatInstanceLaunchTemplate --region ${AWS::Region}
+            # Install Cloudwatch Agent
+            echo "Install Cloudwatch Agent"
+            rpm -Uvh https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
             # Initialise iptables and ip6tables
             sudo aws s3 cp s3://cloudformation-templates-shared-files/iptables/*.* /etc/iptables
             sudo yum install iptables -y && sudo yum install ip6tables -y
