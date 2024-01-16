@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 # iptables / ip6tables single-host firewall script
 
 # Define your command variables
@@ -95,16 +93,16 @@ $ipt6 -A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
 input="/etc/iptables/whitelisted-ipv4.txt"
 while IFS= read -r line
 do
-  $ipt -A INPUT -p tcp -s $line -j ACCEPT
-  $ipt -A INPUT -p udp -s $line -j ACCEPT
+  $ipt -t nat -A POSTROUTING -o eth0 -s $line -j MASQUERADE
+  $ipt -s $line -F FORWARD
 done < "$input"
 
 # Allow TCP/UDP traffic from whitelisted IPv6s
 input="/etc/iptables/whitelisted-ipv6.txt"
 while IFS= read -r line
 do
-  $ipt6 -A INPUT -p tcp -s $line -j ACCEPT
-  $ipt6 -A INPUT -p tudpcp -s $line -j ACCEPT
+  $ipt6 -t nat -A POSTROUTING -o etX0 -s $line -j MASQUERADE
+  $ipt6 -s $line -F FORWARD
 done < "$input"
 
 
@@ -112,5 +110,11 @@ done < "$input"
 input="/etc/iptables/whitelisted-mac.txt"
 while IFS= read -r line
 do
-  $ipt6 -A INPUT -m mac --mac-source $line -j ACCEPT
+  $ipt -t nat -A POSTROUTING -o eth0 -m mac --mac-source $line -j MASQUERADE
+  $ipt -m mac --mac-source $line -F FORWARD
+  $ipt6 -t nat -A POSTROUTING -o eth0 -m mac --mac-source $line -j MASQUERADE
+  $ipt6 -m mac --mac-source $line -F FORWARD
 done < "$input"
+
+service $ipt save
+service $ipt6 save
