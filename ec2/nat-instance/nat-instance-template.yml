@@ -304,7 +304,7 @@ Outputs:
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-PrivateDnsName' ] ]
   NatInstanceEC2InstancePrivateIp:
-    Value: !GetAtt NatInstanceEC2Instance.PrivateIpAddress
+    Value: !GetAtt NatInstanceEC2Instance.PrivateIp
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-PrivateIp' ] ]
   NatInstanceEC2InstancePublicDnsName:
