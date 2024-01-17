@@ -272,14 +272,6 @@ Outputs:
     Value: !GetAtt NatInstanceNetworkInterface.PrimaryPrivateIpAddress
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-PrivateIp' ] ]
-  NatInstanceNetworkInterfaceAttachmentRef:
-    Value: !Ref NatInstanceNetworkInterfaceAttachment
-    Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterfaceAttachment-NatInstanceNetworkInterfaceAttachment-Ref' ] ]
-  NatInstanceNetworkInterfaceAttachmentAttachmentId:
-    Value: !GetAtt NatInstanceNetworkInterfaceAttachment.AttachmentId
-    Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterfaceAttachment-NatInstanceNetworkInterfaceAttachment-AttachmentId' ] ]
   NatInstanceEIPAssociationRef:
     Value: !Ref NatInstanceEIPAssociation
     Export:
