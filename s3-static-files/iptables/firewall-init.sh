@@ -117,5 +117,5 @@ do
   $ipt6 -m mac --mac-source $line -F FORWARD
 done < "$input"
 
-service $ipt save
-service $ipt6 save
+service iptables save
+service ip6tables save
