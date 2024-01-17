@@ -174,10 +174,6 @@ Resources:
       ImageId: !Ref AMIId
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: nat-instance-key-pair
-      PrivateDnsNameOptions:
-        EnableResourceNameDnsAAAARecord: true
-        EnableResourceNameDnsARecord: true
-        HostnameType: 'resource-name'
       PropagateTagsToVolumeOnCreation: true
       Tags:
         - Key: Name
