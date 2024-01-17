@@ -221,7 +221,7 @@ Resources:
       ComparisonOperator: GreaterThanThreshold
       Threshold: 80
       AlarmActions:
-        - !GetAtt NatInstanceTopic.TopicArn
+        - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicArn' ] ]
       Dimensions:
         - Name: AutoScalingGroupName
           Value: !Ref NatInstanceAutoScalingGroup
