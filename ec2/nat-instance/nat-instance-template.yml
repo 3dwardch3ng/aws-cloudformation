@@ -21,13 +21,6 @@ Resources:
       Tags:
         - Key: Name
           Value: 'NAT instance Network Interface'
-  NatInstanceNetworkInterfaceAttachment:
-    Type: AWS::EC2::NetworkInterfaceAttachment
-    Properties:
-      DeleteOnTermination: true
-      DeviceIndex: 1
-      InstanceId: !Ref NatInstanceEC2Instance
-      NetworkInterfaceId: !Ref NatInstanceNetworkInterface
   NatInstanceEIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
@@ -173,7 +166,15 @@ Resources:
       ImageId: !Ref AMIId
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: nat-instance-key-pair
-      NetworkInterfaces: []
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: false
+          DeviceIndex: 0
+          GroupSet:
+            - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-GroupId' ] ]
+          Ipv6AddressCount: 1
+          NetworkInterfaceId: !Ref NatInstanceNetworkInterface
+          SubnetId:
+            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-SubnetId' ] ]
       PropagateTagsToVolumeOnCreation: true
       Tags:
         - Key: Name
