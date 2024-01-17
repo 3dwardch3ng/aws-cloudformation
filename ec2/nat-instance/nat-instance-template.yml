@@ -8,12 +8,39 @@ Parameters:
     Default: ami-09b42976632b27e9b
 
 Resources:
-  NatInstanceLaunchTemplate:
-    Type: AWS::EC2::LaunchTemplate
+  NatInstanceNetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: NatInstanceNetworkInterface
+      GroupSet:
+        - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-Ref' ] ]
+      Ipv4PrefixCount: 1
+      Ipv6AddressCount: 1
+      SourceDestCheck: false
+      SubnetId:
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-SubnetId' ] ]
+      Tags:
+        - Key: Name
+          Value: 'NAT instance Network Interface'
+  NatInstanceNetworkInterfaceAttachment:
+    Type: AWS::EC2::NetworkInterfaceAttachment
+    Properties:
+      DeleteOnTermination: true
+      DeviceIndex: 0
+      InstanceId: !Ref NatInstanceEC2Instance
+      NetworkInterfaceId: !Ref NatInstanceNetworkInterface
+  NatInstanceEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-AllocationId' ] ]
+      InstanceId: !Ref NatInstanceEC2Instance
+  NatInstanceEC2Instance:
+    Type: AWS::EC2::Instance
     Metadata:
       AWS::CloudFormation::Init:
         configSets:
-          default:  [awslogs, ssh-access, config]
+          default: [ awslogs, ssh-access, config ]
         awslogs:
           files:
             '/etc/awslogs/awscli.conf':
@@ -135,54 +162,61 @@ Resources:
                   - /etc/cfn/cfn-hup.conf
                   - /etc/cfn/hooks.d/cfn-auto-reloader.conf
     Properties:
-      LaunchTemplateData:
-        BlockDeviceMappings:
-          - DeviceName: '/dev/xvda'
-            Ebs:
-              Encrypted: true
-              VolumeType: gp3
-        IamInstanceProfile:
-          Name:
-            Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceInstanceProfile-Ref' ] ]
-        ImageId: !Ref AMIId
-        InstanceType: t2.micro
-        KeyName: nat-instance-key-pair
-        NetworkInterfaces:
-          - AssociatePublicIpAddress: true
-            DeviceIndex: 0
-            Groups:
-              - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-Ref' ] ]
-        UserData:
-          Fn::Base64: !Sub |
-            #!/bin/bash -ex
-            # Install environment toolings
-            echo "Install environment toolings"
-            sudo yum update -y && sudo yum upgrade -y
-            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-            python3 get-pip.py
-            # trap '/opt/aws/bin/cfn-signal -e 1 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup' ERR
-            # Run cfn-init
-            sudo /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource NatInstanceLaunchTemplate --region ${AWS::Region}
-            # Install Cloudwatch Agent
-            echo "Install Cloudwatch Agent"
-            rpm -Uvh https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-            # Initialise iptables and ip6tables
-            # Turning on IP Forwarding
-            yum install iptables-services -y
-            sudo systemctl enable iptables
-            sudo systemctl start iptables
-            echo "net.ipv4.ip_forward = 1" | sudo tee -a /etc/sysctl.conf
-            echo "net.ipv6.conf.all.forwarding = 1" | sudo tee -a /etc/sysctl.conf
-            sudo sysctl -p
-            sudo mkdir /etc/iptables
-            sudo aws s3 cp --recursive s3://cloudformation-templates-shared-files/iptables /etc/iptables
-            /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup
+      AvailabilityZone:
+        Fn::ImportValue: !Sub 'general-vpc-stack-${AWS::Region}-EC2-VPC-GeneralVpcPublicSubnet1-AvailabilityZone'
+      BlockDeviceMappings:
+        - DeviceName: '/dev/xvda'
+          Ebs:
+            Encrypted: true
+            VolumeType: gp3
+      IamInstanceProfile:
+        Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceInstanceProfile-Ref' ] ]
+      ImageId: !Ref AMIId
+      InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
+      KeyName: nat-instance-key-pair
+      PrivateDnsNameOptions:
+        EnableResourceNameDnsAAAARecord: true
+        EnableResourceNameDnsARecord: true
+        HostnameType: 'resource-name'
+      PropagateTagsToVolumeOnCreation: true
+      Tags:
+        - Key: Name
+          Value: 'NAT instance EC2 Instance'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -ex
+          # Install environment toolings
+          echo "Install environment toolings"
+          sudo yum update -y && sudo yum upgrade -y
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3 get-pip.py
+          # trap '/opt/aws/bin/cfn-signal -e 1 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup' ERR
+          # Run cfn-init
+          sudo /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource NatInstanceLaunchTemplate --region ${AWS::Region}
+          # Install Cloudwatch Agent
+          # echo "Install Cloudwatch Agent"
+          # rpm -Uvh https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+          # Install fak-nat
+          # echo "Install fak-nat"
+          # curl -L https://github.com/AndrewGuenther/fck-nat/releases/download/v1.2.1/fck-nat-1.2.1-any.rpm -O
+          # sudo rpm -i fck-nat-1.2.1-any.rpm
+          # Initialise iptables and ip6tables
+          # Turning on IP Forwarding
+          # yum install iptables-services -y
+          # sudo systemctl enable iptables
+          # sudo systemctl start iptables
+          # echo "net.ipv4.ip_forward = 1" | sudo tee -a /etc/sysctl.conf
+          # echo "net.ipv6.conf.all.forwarding = 1" | sudo tee -a /etc/sysctl.conf
+          # sudo sysctl -p
+          # sudo mkdir /etc/iptables
+          # sudo aws s3 cp --recursive s3://cloudformation-templates-shared-files/iptables /etc/iptables
+          # sudo bash /etc/iptables/firewall-init.sh
+          /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup
+
   NatInstanceAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
-      LaunchTemplate:
-        LaunchTemplateId: !Ref NatInstanceLaunchTemplate
-        Version: !GetAtt NatInstanceLaunchTemplate.LatestVersionNumber
+      InstanceId: !Ref NatInstanceEC2Instance
       MaxSize: '1'
       MinSize: '1'
       Tags:
@@ -229,22 +263,62 @@ Resources:
           Value: !Ref NatInstanceAutoScalingGroup
 
 Outputs:
-  NatInstanceLaunchTemplateRef:
-    Value: !Ref NatInstanceLaunchTemplate
+  NatInstanceNetworkInterfaceRef:
+    Value: !Ref NatInstanceNetworkInterface
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-LaunchTemplate-NatInstanceLaunchTemplate-Ref' ] ]
-  NatInstanceLaunchTemplateDefaultVersionNumber:
-    Value: !GetAtt NatInstanceLaunchTemplate.DefaultVersionNumber
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-Ref' ] ]
+  NatInstanceNetworkInterfaceId:
+    Value: !Ref NatInstanceNetworkInterface
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-LaunchTemplate-NatInstanceLaunchTemplate-DefaultVersionNumber' ] ]
-  NatInstanceLaunchTemplateLatestVersionNumber:
-    Value: !GetAtt NatInstanceLaunchTemplate.LatestVersionNumber
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-Id' ] ]
+  NatInstanceNetworkInterfacePrivateIp:
+    Value: !GetAtt NatInstanceNetworkInterface.PrimaryPrivateIpAddress
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-LaunchTemplate-NatInstanceLaunchTemplate-LatestVersionNumber' ] ]
-  NatInstanceLaunchTemplateLaunchTemplateId:
-    Value: !GetAtt NatInstanceLaunchTemplate.LaunchTemplateId
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-PrivateIp' ] ]
+  NatInstanceNetworkInterfaceAttachmentRef:
+    Value: !Ref NatInstanceNetworkInterfaceAttachment
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-LaunchTemplate-NatInstanceLaunchTemplate-LaunchTemplateId' ] ]
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterfaceAttachment-NatInstanceNetworkInterfaceAttachment-Ref' ] ]
+  NatInstanceNetworkInterfaceAttachmentAttachmentId:
+    Value: !GetAtt NatInstanceNetworkInterfaceAttachment.AttachmentId
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterfaceAttachment-NatInstanceNetworkInterfaceAttachment-AttachmentId' ] ]
+  NatInstanceEIPAssociationRef:
+    Value: !Ref NatInstanceEIPAssociation
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIPAssociation-NatInstanceEIPAssociation-Ref' ] ]
+  NatInstanceEIPAssociationId:
+    Value: !GetAtt NatInstanceEIPAssociation.Id
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIPAssociation-NatInstanceEIPAssociation-Id' ] ]
+  NatInstanceEC2InstanceRef:
+    Value: !Ref NatInstanceEC2Instance
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-Ref' ] ]
+  NatInstanceEC2InstanceAvailabilityZone:
+    Value: !GetAtt NatInstanceEC2Instance.AvailabilityZone
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-AvailabilityZone' ] ]
+  NatInstanceEC2InstanceId:
+    Value: !GetAtt NatInstanceEC2Instance.Id
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-Id' ] ]
+  NatInstanceEC2InstancePrivateDnsName:
+    Value: !GetAtt NatInstanceEC2Instance.PrivateDnsName
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-PrivateDnsName' ] ]
+  NatInstanceEC2InstancePrivateIp:
+    Value: !GetAtt NatInstanceEC2Instance.PrivateIpAddress
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-PrivateIp' ] ]
+  NatInstanceEC2InstancePublicDnsName:
+    Value: !GetAtt NatInstanceEC2Instance.PublicDnsName
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-PublicDnsName' ] ]
+  NatInstanceEC2InstancePublicIp:
+    Value: !GetAtt NatInstanceEC2Instance.PublicIp
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-PublicIp' ] ]
   NatInstanceAutoScalingGroupRef:
     Value: !Ref NatInstanceAutoScalingGroup
     Export:
