@@ -33,7 +33,7 @@ Resources:
     Properties:
       AllocationId:
         Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-AllocationId' ] ]
-      InstanceId: !Ref NatInstanceEC2Instance
+      NetworkInterfaceId: !Ref NatInstanceNetworkInterface
   NatInstanceEC2Instance:
     Type: AWS::EC2::Instance
     Metadata:
