@@ -299,10 +299,6 @@ Outputs:
     Value: !GetAtt NatInstanceEC2Instance.AvailabilityZone
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-AvailabilityZone' ] ]
-  NatInstanceEC2InstanceId:
-    Value: !GetAtt NatInstanceEC2Instance.Id
-    Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-Id' ] ]
   NatInstanceEC2InstancePrivateDnsName:
     Value: !GetAtt NatInstanceEC2Instance.PrivateDnsName
     Export:
