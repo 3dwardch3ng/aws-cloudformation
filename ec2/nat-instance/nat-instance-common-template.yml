@@ -226,3 +226,23 @@ Outputs:
     Value: !GetAtt NatInstanceSecurityGroup.VpcId
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-VpcId' ] ]
+  NatInstanceIAMRoleRef:
+    Value: !Ref NatInstanceIAMRole
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-Role-NatInstanceIAMRole-Ref' ] ]
+  NatInstanceIAMRoleArn:
+    Value: !GetAtt NatInstanceIAMRole.Arn
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-Role-NatInstanceIAMRole-Arn' ] ]
+  NatInstanceIAMRoleRoleId:
+    Value: !GetAtt NatInstanceIAMRole.RoleId
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-Role-NatInstanceIAMRole-RoleId' ] ]
+  NatInstanceInstanceProfileRef:
+    Value: !Ref NatInstanceInstanceProfile
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceInstanceProfile-Ref' ] ]
+  NatInstanceInstanceProfileArn:
+    Value: !GetAtt NatInstanceInstanceProfile.Arn
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'IAM-InstanceProfile-NatInstanceInstanceProfile-Arn' ] ]
