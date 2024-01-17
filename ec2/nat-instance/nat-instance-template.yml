@@ -176,7 +176,6 @@ Resources:
             sudo sysctl -p
             sudo mkdir /etc/iptables
             sudo aws s3 cp --recursive s3://cloudformation-templates-shared-files/iptables /etc/iptables
-#            sudo bash /etc/iptables/firewall-init.sh
             /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup
   NatInstanceAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
