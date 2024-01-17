@@ -210,6 +210,18 @@ Outputs:
     Value: !GetAtt NatInstanceTopic.TopicArn
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicArn' ] ]
+  NatInstanceTopicTopicName:
+    Value: !GetAtt NatInstanceTopic.TopicName
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicName' ] ]
+  NatInstanceTopicPolicyId:
+    Value: !GetAtt NatInstanceTopicPolicy.Id
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-TopicPolicy-NatInstanceTopicPolicy-Id' ] ]
+  NatInstanceLogGroupRef:
+    Value: !Ref NatInstanceLogGroup
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Logs-LogGroup-NatInstanceLogGroup-Ref' ] ]
   NatInstanceLogGroupArn:
     Value: !GetAtt NatInstanceLogGroup.Arn
     Export:
