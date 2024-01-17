@@ -81,6 +81,7 @@ echo "Allow DHCPv6 from LAN only"
 # $ipt6 -A INPUT -m state --state NEW -m udp -p udp -s fe80::/10 --dport 546 -j ACCEPT
 
 echo "Allow connections from SSH clients"
+$ipt -A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
 $ipt6 -A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -j ACCEPT
 
 echo "Allow HTTP and HTTPS traffic"
@@ -93,7 +94,6 @@ $ipt -P FORWARD ACCEPT
 $ipt6 -P FORWARD ACCEPT
 $ipt -t nat -A POSTROUTING -o etX0 -j MASQUERADE
 $ipt6 -t nat -A POSTROUTING -o etX0 -j MASQUERADE
-
 
 echo "Allow TCP/UDP traffic from whitelisted IPv4s"
 input="/etc/iptables/whitelisted-ipv4.txt"
