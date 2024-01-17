@@ -3,36 +3,36 @@ Description: Creates a Nat Instance Common Resources in AWS
 
 Resources:
   NatInstanceTopic:
-    Type: 'AWS::SNS::Topic'
+    Type: AWS::SNS::Topic
     Properties: { }
   NatInstanceTopicPolicy:
-    Type: 'AWS::SNS::TopicPolicy'
+    Type: AWS::SNS::TopicPolicy
     Properties:
       PolicyDocument:
         Id: Id1
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
           - Sid: Sid1
             Effect: Allow
             Principal:
               Service:
-                - 'events.amazonaws.com'
-                - 'budgets.amazonaws.com'
-            Action: 'sns:Publish'
+                - events.amazonaws.com
+                - budgets.amazonaws.com
+            Action: sns:Publish
             Resource: !Ref NatInstanceTopic
           - Sid: Sid2
             Effect: Allow
             Principal:
               AWS: '*'
-            Action: 'sns:Publish'
+            Action: sns:Publish
             Resource: !Ref NatInstanceTopic
             Condition:
               StringEquals:
-                'AWS:SourceOwner': !Ref 'AWS::AccountId'
+                AWS:SourceOwner: !Ref AWS::AccountId
       Topics:
         - !Ref NatInstanceTopic
   NatInstanceLogGroup:
-    Type: 'AWS::Logs::LogGroup'
+    Type: AWS::Logs::LogGroup
     Properties:
       RetentionInDays: 7
   NatInstanceSecurityGroup:
@@ -160,15 +160,15 @@ Resources:
       VpcId:
         Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpc-VpcId' ] ]
   NatInstanceIAMRole:
-    Type: 'AWS::IAM::Role'
+    Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Principal:
-              Service: 'ec2.amazonaws.com'
-            Action: 'sts:AssumeRole'
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
@@ -176,14 +176,14 @@ Resources:
       Policies:
         - PolicyName: logs
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - 'logs:CreateLogGroup'
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                  - 'logs:DescribeLogStreams'
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
                 Resource: !GetAtt NatInstanceLogGroup.Arn
         - PolicyName: s3
           PolicyDocument:
@@ -191,12 +191,15 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 's3:GetObject'
-                  - 's3:PutObject'
+                  - s3:ListBucket
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListObjects
+                  - s3:ListObjectsV2
                 Resource:
-                  - 'arn:aws:s3:::*'
+                  - arn:aws:s3:::*
   NatInstanceInstanceProfile:
-    Type: 'AWS::IAM::InstanceProfile'
+    Type: AWS::IAM::InstanceProfile
     Properties:
       InstanceProfileName: NatInstanceIAMInstanceProfile
       Roles:
