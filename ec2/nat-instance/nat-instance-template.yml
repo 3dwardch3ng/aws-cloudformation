@@ -14,7 +14,6 @@ Resources:
       Description: NatInstanceNetworkInterface
       GroupSet:
         - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-Ref' ] ]
-      Ipv4PrefixCount: 1
       Ipv6AddressCount: 1
       SourceDestCheck: false
       SubnetId:
