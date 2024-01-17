@@ -206,10 +206,10 @@ Resources:
         - !Ref NatInstanceIAMRole
 
 Outputs:
-  NatInstanceLogGroupRef:
-    Value: !Ref NatInstanceLogGroup
+  NatInstanceTopicTopicArn:
+    Value: !GetAtt NatInstanceTopic.TopicArn
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Logs-LogGroup-NatInstanceLogGroup-Ref' ] ]
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicArn' ] ]
   NatInstanceLogGroupArn:
     Value: !GetAtt NatInstanceLogGroup.Arn
     Export:
