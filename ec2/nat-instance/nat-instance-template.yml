@@ -173,8 +173,6 @@ Resources:
             - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-GroupId' ] ]
           Ipv6AddressCount: 1
           NetworkInterfaceId: !Ref NatInstanceNetworkInterface
-          SubnetId:
-            Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-SubnetId' ] ]
       PropagateTagsToVolumeOnCreation: true
       Tags:
         - Key: Name
