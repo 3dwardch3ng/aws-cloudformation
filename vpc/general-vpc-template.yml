@@ -123,13 +123,6 @@ Resources:
         - Key: Name
           Value: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'GeneralVpc', 'PrivateSubnet1', 'RouteTable' ]]
 
-  GeneralVpcPrivateSubnet1Ipv6Route:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref GeneralVpcPrivateSubnet1RouteTable
-      DestinationIpv6CidrBlock: ::/0
-      EgressOnlyInternetGatewayId: !Ref GeneralVpcEgressOnlyInternetGateway
-
   GeneralVpcPrivateSubnet2RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:

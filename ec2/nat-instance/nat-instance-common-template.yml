@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Creates a Nat Instance Common Resources in AWS
+Description: Creates Nat Instance Common Resources in AWS
 
 Resources:
   NatInstanceTopic:
@@ -233,7 +233,7 @@ Outputs:
   NatInstanceSecurityGroupGroupId:
     Value: !GetAtt NatInstanceSecurityGroup.GroupId
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-GroupId' ] ]
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-  A' ] ]
   NatInstanceSecurityGroupVpcId:
     Value: !GetAtt NatInstanceSecurityGroup.VpcId
     Export:
