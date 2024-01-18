@@ -12,7 +12,7 @@ Resources:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId:
-        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'GeneralVpc-PrivateSubnet1-RouteTable' ] ]
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1RouteTable-RouteTableId' ] ]
       DestinationCidrBlock: 0.0.0.0/0
       InstanceId:
         Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: StackRunNumber, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-Ref' ] ]
@@ -21,7 +21,7 @@ Resources:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId:
-        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'GeneralVpc-PrivateSubnet1-RouteTable' ] ]
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPrivateSubnet1RouteTable-RouteTableId' ] ]
       DestinationIpv6CidrBlock: ::/0
       InstanceId:
         Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: StackRunNumber, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-Ref' ] ]
