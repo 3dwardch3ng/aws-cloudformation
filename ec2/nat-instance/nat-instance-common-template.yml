@@ -18,6 +18,7 @@ Resources:
               Service:
                 - events.amazonaws.com
                 - budgets.amazonaws.com
+                - s3.amazonaws.com
             Action: sns:Publish
             Resource: !Ref NatInstanceTopic
           - Sid: Sid2
