@@ -60,10 +60,6 @@ Outputs:
     Value: !Ref GeneralVpcPrivateSubnet1Route
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Route-GeneralVpcPrivateSubnet1Route-Ref' ] ]
-  GeneralVpcPrivateSubnet1RouteCidrBlock:
-    Value: !Ref GeneralVpcPrivateSubnet1Route.CidrBlock
-    Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Route-GeneralVpcPrivateSubnet1Route-CidrBlock' ] ]
   GeneralVpcPrivateSubnet1Ipv6RouteRef:
     Value: !Ref GeneralVpcPrivateSubnet1Ipv6Route
     Export:
