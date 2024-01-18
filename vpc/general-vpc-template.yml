@@ -542,10 +542,6 @@ Outputs:
     Value: !Ref GeneralVpcInterfaceEndpointSSM
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointSSM-Ref'
-  GeneralVpcInterfaceEndpointSSMCreationTimestamp:
-    Value: !GetAtt GeneralVpcInterfaceEndpointSSM.CreationTimestamp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointSSM-CreationTimestamp'
   GeneralVpcInterfaceEndpointSSMDnsEntries:
     Value: !GetAtt GeneralVpcInterfaceEndpointSSM.DnsEntries
     Export:
@@ -562,10 +558,6 @@ Outputs:
     Value: !Ref GeneralVpcInterfaceEndpointEC2Messages
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointEC2Messages-Ref'
-  GeneralVpcInterfaceEndpointEC2MessagesCreationTimestamp:
-    Value: !GetAtt GeneralVpcInterfaceEndpointEC2Messages.CreationTimestamp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointEC2Messages-CreationTimestamp'
   GeneralVpcInterfaceEndpointEC2MessagesDnsEntries:
     Value: !GetAtt GeneralVpcInterfaceEndpointEC2Messages.DnsEntries
     Export:
@@ -582,10 +574,6 @@ Outputs:
     Value: !Ref GeneralVpcInterfaceEndpointEC2
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointEC2-Ref'
-  GeneralVpcInterfaceEndpointEC2CreationTimestamp:
-    Value: !GetAtt GeneralVpcInterfaceEndpointEC2.CreationTimestamp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointEC2-CreationTimestamp'
   GeneralVpcInterfaceEndpointEC2DnsEntries:
     Value: !GetAtt GeneralVpcInterfaceEndpointEC2.DnsEntries
     Export:
@@ -602,10 +590,6 @@ Outputs:
     Value: !Ref GeneralVpcInterfaceEndpointSSMMessages
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointSSMMessages-Ref'
-  GeneralVpcInterfaceEndpointSSMMessagesCreationTimestamp:
-    Value: !GetAtt GeneralVpcInterfaceEndpointSSMMessages.CreationTimestamp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointSSMMessages-CreationTimestamp'
   GeneralVpcInterfaceEndpointSSMMessagesDnsEntries:
     Value: !GetAtt GeneralVpcInterfaceEndpointSSMMessages.DnsEntries
     Export:
@@ -622,10 +606,6 @@ Outputs:
     Value: !Ref GeneralVpcInterfaceEndpointCloudWatch
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointCloudWatch-Ref'
-  GeneralVpcInterfaceEndpointCloudWatchCreationTimestamp:
-    Value: !GetAtt GeneralVpcInterfaceEndpointCloudWatch.CreationTimestamp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPCEndpoint-GeneralVpcInterfaceEndpointCloudWatch-CreationTimestamp'
   GeneralVpcInterfaceEndpointCloudWatchDnsEntries:
     Value: !GetAtt GeneralVpcInterfaceEndpointCloudWatch.DnsEntries
     Export:
