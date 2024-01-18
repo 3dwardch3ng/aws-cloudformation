@@ -9,7 +9,7 @@ Resources:
         Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'GeneralVpc-PrivateSubnet1-RouteTable' ] ]
       DestinationCidrBlock: 0.0.0.0/0
       InstanceId:
-        Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, ''EC2-Instance-NatInstanceEC2Instance-Ref'' ] ]
+        Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-Ref' ] ]
 
   GeneralVpcPrivateSubnet1Ipv6Route:
     Type: AWS::EC2::Route
@@ -18,7 +18,7 @@ Resources:
         Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'GeneralVpc-PrivateSubnet1-RouteTable' ] ]
       DestinationIpv6CidrBlock: ::/0
       InstanceId:
-        Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, ''EC2-Instance-NatInstanceEC2Instance-Ref'' ] ]
+        Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-Ref' ] ]
 
   # EC2 EIP Association
   NatInstanceEIPAssociation:
