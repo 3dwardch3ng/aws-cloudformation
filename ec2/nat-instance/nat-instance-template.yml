@@ -20,7 +20,6 @@ Resources:
         - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-Ref' ] ]
       Ipv6Addresses:
         - Ipv6Address: !Join [ '', [ '2406:da1c:1c:2f01::1:', Ref: StackRunNumber ] ]
-      Ipv6AddressCount: 1
       SourceDestCheck: false
       SubnetId:
         Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-SubnetId' ] ]
