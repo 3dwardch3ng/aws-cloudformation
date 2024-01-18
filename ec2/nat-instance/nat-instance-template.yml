@@ -21,12 +21,6 @@ Resources:
       Tags:
         - Key: Name
           Value: 'NAT instance Network Interface'
-  NatInstanceEIPAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId:
-        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-AllocationId' ] ]
-      NetworkInterfaceId: !Ref NatInstanceNetworkInterface
   NatInstanceEC2Instance:
     Type: AWS::EC2::Instance
     Metadata:
@@ -165,7 +159,7 @@ Resources:
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: nat-instance-key-pair
       NetworkInterfaces:
-        - AssociatePublicIpAddress: false
+        - AssociatePublicIpAddress: true
           DeviceIndex: 0
           NetworkInterfaceId: !Ref NatInstanceNetworkInterface
       PropagateTagsToVolumeOnCreation: true
@@ -230,14 +224,6 @@ Outputs:
     Value: !GetAtt NatInstanceNetworkInterface.PrimaryPrivateIpAddress
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-PrivateIp' ] ]
-  NatInstanceEIPAssociationRef:
-    Value: !Ref NatInstanceEIPAssociation
-    Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIPAssociation-NatInstanceEIPAssociation-Ref' ] ]
-  NatInstanceEIPAssociationId:
-    Value: !GetAtt NatInstanceEIPAssociation.Id
-    Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIPAssociation-NatInstanceEIPAssociation-Id' ] ]
   NatInstanceEC2InstanceRef:
     Value: !Ref NatInstanceEC2Instance
     Export:
