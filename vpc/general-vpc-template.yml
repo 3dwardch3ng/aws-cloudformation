@@ -430,14 +430,6 @@ Outputs:
     Value: !GetAtt GeneralVpcPrivateSubnet1RouteTable.RouteTableId
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1RouteTable-RouteTableId'
-  GeneralVpcPrivateSubnet1Ipv6RouteRef:
-    Value: !Ref GeneralVpcPrivateSubnet1Ipv6Route
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1Ipv6Route-Ref'
-  GeneralVpcPrivateSubnet1Ipv6RouteCidrBlock:
-    Value: !GetAtt GeneralVpcPrivateSubnet1Ipv6Route.CidrBlock
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-VPC-GeneralVpcPrivateSubnet1Ipv6Route-CidrBlock'
   GeneralVpcPrivateSubnet2RouteTableRef:
     Value: !Ref GeneralVpcPrivateSubnet2RouteTable
     Export:
