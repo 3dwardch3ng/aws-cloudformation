@@ -203,38 +203,6 @@ Resources:
           # sudo bash /etc/iptables/firewall-init.sh
           /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup
 
-  NatInstanceAutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      InstanceId: !Ref NatInstanceEC2Instance
-      MaxSize: '1'
-      MinSize: '1'
-      Tags:
-        - Key: Name
-          Value: 'NAT instance Auto Scaling Group'
-          PropagateAtLaunch: true
-      NotificationConfigurations:
-        - NotificationTypes:
-            - 'autoscaling:EC2_INSTANCE_LAUNCH_ERROR'
-            - 'autoscaling:EC2_INSTANCE_TERMINATE_ERROR'
-          TopicARN:
-            Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicArn' ] ]
-      VPCZoneIdentifier:
-        - Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'EC2-VPC-GeneralVpcPublicSubnet1-SubnetId' ] ]
-    CreationPolicy:
-      ResourceSignal:
-        Count: 1
-        Timeout: PT30M
-    UpdatePolicy:
-      AutoScalingRollingUpdate:
-        PauseTime: PT10M
-        SuspendProcesses:
-          - HealthCheck
-          - ReplaceUnhealthy
-          - AZRebalance
-          - AlarmNotification
-          - ScheduledActions
-        WaitOnResourceSignals: true
   CPUTooHighAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
@@ -297,7 +265,3 @@ Outputs:
     Value: !GetAtt NatInstanceEC2Instance.PublicIp
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-PublicIp' ] ]
-  NatInstanceAutoScalingGroupRef:
-    Value: !Ref NatInstanceAutoScalingGroup
-    Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'AutoScaling-AutoScalingGroup-NatInstanceAutoScalingGroup-Ref' ] ]
