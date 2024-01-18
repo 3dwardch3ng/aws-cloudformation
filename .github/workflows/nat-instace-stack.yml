@@ -68,7 +68,7 @@ jobs:
           template: ec2/nat-instance/nat-instance-template.yml
           capabilities: CAPABILITY_NAMED_IAM
           parameter-overrides: >-
-            AMIId=${{ github.event.inputs.image }}
+            AMIId=${{ github.event.inputs.image }},
             StackRunNumber=${{ github.run_number }}
           no-fail-on-empty-changeset: "1"
       - name: Wait for instances
