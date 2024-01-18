@@ -30,7 +30,7 @@ Resources:
         Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-Id' ] ]
 
   # Route 53 Record Set
-  PiHoleAR53RecordSet:
+  NatInstanceAR53RecordSet:
     DependsOn: NatInstanceEIPAssociation
     Type: AWS::Route53::RecordSet
     Properties:
@@ -42,7 +42,7 @@ Resources:
         - Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-PublicIp' ] ]
       TTL: 60
       Type: A
-  PiHoleAAAAR53RecordSet:
+  NatInstanceAAAAR53RecordSet:
     DependsOn: NatInstanceEIPAssociation
     Type: AWS::Route53::RecordSet
     Properties:
@@ -56,6 +56,18 @@ Resources:
       Type: AAAA
 
 Outputs:
+  GeneralVpcPrivateSubnet1RouteRef:
+    Value: !Ref GeneralVpcPrivateSubnet1Route
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Route-GeneralVpcPrivateSubnet1Route-Ref' ] ]
+  GeneralVpcPrivateSubnet1RouteCidrBlock:
+    Value: !Ref GeneralVpcPrivateSubnet1Route.CidrBlock
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Route-GeneralVpcPrivateSubnet1Route-CidrBlock' ] ]
+  GeneralVpcPrivateSubnet1Ipv6RouteRef:
+    Value: !Ref GeneralVpcPrivateSubnet1Ipv6Route
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Route-GeneralVpcPrivateSubnet1Ipv6Route-Ref' ] ]
   NatInstanceEIPAssociationRef:
     Value: !Ref NatInstanceEIPAssociation
     Export:
@@ -64,3 +76,11 @@ Outputs:
     Value: !GetAtt NatInstanceEIPAssociation.Id
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIPAssociation-NatInstanceEIPAssociation-Id' ] ]
+  NatInstanceAR53RecordSetRef:
+    Value: !Ref NatInstanceAR53RecordSet
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Route53-RecordSet-NatInstanceAR53RecordSet-Ref' ] ]
+  NatInstanceAAAAR53RecordSetRef:
+    Value: !Ref NatInstanceAAAAR53RecordSet
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'Route53-RecordSet-NatInstanceAAAAR53RecordSet-Ref' ] ]
