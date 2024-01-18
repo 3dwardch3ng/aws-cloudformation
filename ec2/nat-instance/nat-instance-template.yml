@@ -167,9 +167,6 @@ Resources:
       NetworkInterfaces:
         - AssociatePublicIpAddress: false
           DeviceIndex: 0
-          GroupSet:
-            - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-GroupId' ] ]
-          Ipv6AddressCount: 1
           NetworkInterfaceId: !Ref NatInstanceNetworkInterface
       PropagateTagsToVolumeOnCreation: true
       Tags:
