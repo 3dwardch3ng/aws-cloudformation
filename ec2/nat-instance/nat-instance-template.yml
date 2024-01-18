@@ -165,7 +165,8 @@ Resources:
       InstanceType: t2.micro #1 vCPU, 1G Mem, EBS Storage Only, Low to Moderate Network Performance
       KeyName: nat-instance-key-pair
       NetworkInterfaces:
-        - NetworkInterfaceId: !Ref NatInstanceNetworkInterface
+        - DeviceIndex: 0
+          NetworkInterfaceId: !Ref NatInstanceNetworkInterface
       PropagateTagsToVolumeOnCreation: true
       Tags:
         - Key: Name
