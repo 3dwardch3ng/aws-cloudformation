@@ -6,6 +6,10 @@ Parameters:
     Description: The AMI ID for the Nat Instance
     Type: String
     Default: ami-09b42976632b27e9b
+  StackRunNumber:
+    Description: The integer run number of the stack
+    Type: String
+    Default: 1
 
 Resources:
   NatInstanceNetworkInterface:
@@ -14,6 +18,8 @@ Resources:
       Description: NatInstanceNetworkInterface
       GroupSet:
         - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'EC2-SecurityGroup-NatInstanceSecurityGroup-Ref' ] ]
+      Ipv6Addresses:
+        - Ipv6Address: !Join [ '', [ '2406:da1c:1c:2f01::1:', Ref: StackRunNumber ] ]
       Ipv6AddressCount: 1
       SourceDestCheck: false
       SubnetId:
@@ -21,12 +27,7 @@ Resources:
       Tags:
         - Key: Name
           Value: 'NAT instance Network Interface'
-  NatInstanceEIPAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      AllocationId:
-        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-AllocationId' ] ]
-      NetworkInterfaceId: !Ref NatInstanceNetworkInterface
+
   NatInstanceEC2Instance:
     Type: AWS::EC2::Instance
     Metadata:
@@ -202,6 +203,7 @@ Resources:
           # sudo bash /etc/iptables/firewall-init.sh
           /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceEC2Instance
 
+
   CPUTooHighAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
@@ -229,14 +231,10 @@ Outputs:
     Value: !GetAtt NatInstanceNetworkInterface.PrimaryPrivateIpAddress
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-PrivateIp' ] ]
-  NatInstanceEIPAssociationRef:
-    Value: !Ref NatInstanceEIPAssociation
+  NatInstanceNetworkInterfaceIpv6Address:
+    Value: !Join [ '', [ '2406:da1c:1c:2f01::1:', Ref: StackRunNumber ] ]
     Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIPAssociation-NatInstanceEIPAssociation-Ref' ] ]
-  NatInstanceEIPAssociationId:
-    Value: !GetAtt NatInstanceEIPAssociation.Id
-    Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIPAssociation-NatInstanceEIPAssociation-Id' ] ]
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-Ipv6Address' ] ]
   NatInstanceEC2InstanceRef:
     Value: !Ref NatInstanceEC2Instance
     Export:
@@ -257,7 +255,3 @@ Outputs:
     Value: !GetAtt NatInstanceEC2Instance.PublicDnsName
     Export:
       Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-PublicDnsName' ] ]
-  NatInstanceEC2InstancePublicIp:
-    Value: !GetAtt NatInstanceEC2Instance.PublicIp
-    Export:
-      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-Instance-NatInstanceEC2Instance-PublicIp' ] ]

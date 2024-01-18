@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates a Nat Instance Network Resources in AWS
+
+Resources:
+  GeneralVpcPrivateSubnet1Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'GeneralVpc-PrivateSubnet1-RouteTable' ] ]
+      DestinationCidrBlock: 0.0.0.0/0
+      InstanceId:
+        Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, ''EC2-Instance-NatInstanceEC2Instance-Ref'' ] ]
+
+  GeneralVpcPrivateSubnet1Ipv6Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Fn::ImportValue: !Join [ '-', [ 'general-vpc-stack', Ref: AWS::Region, 'GeneralVpc-PrivateSubnet1-RouteTable' ] ]
+      DestinationIpv6CidrBlock: ::/0
+      InstanceId:
+        Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, ''EC2-Instance-NatInstanceEC2Instance-Ref'' ] ]
+
+  # EC2 EIP Association
+  NatInstanceEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId:
+        Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-AllocationId' ] ]
+      NetworkInterfaceId:
+        Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-Id' ] ]
+
+  # Route 53 Record Set
+  PiHoleAR53RecordSet:
+    DependsOn: NatInstanceEIPAssociation
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: 'NAT Instance Ipv4 DNS Record'
+      HostedZoneId:
+        Fn::ImportValue: !Join [ '-', [ 'route-53-stack', Ref: AWS::Region, 'Route53-HostedZone-EdwardChengNameHostedZone-Id' ] ]
+      Name: nat.edward-cheng.name
+      ResourceRecords:
+        - Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-PublicIp' ] ]
+      TTL: 60
+      Type: A
+  PiHoleAAAAR53RecordSet:
+    DependsOn: NatInstanceEIPAssociation
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: 'NAT Instance Ipv6 DNS Record'
+      HostedZoneId:
+        Fn::ImportValue: !Join [ '-', [ 'route-53-stack', Ref: AWS::Region, 'Route53-HostedZone-EdwardChengNameHostedZone-Id' ] ]
+      Name: nat.edward-cheng.name
+      ResourceRecords:
+        - Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-Ipv6Address' ] ]
+      TTL: 60
+      Type: AAAA
+
+Outputs:
+  NatInstanceEIPAssociationRef:
+    Value: !Ref NatInstanceEIPAssociation
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIPAssociation-NatInstanceEIPAssociation-Ref' ] ]
+  NatInstanceEIPAssociationId:
+    Value: !GetAtt NatInstanceEIPAssociation.Id
+    Export:
+      Name: !Join [ '-', [ Ref: AWS::StackName, Ref: AWS::Region, 'EC2-EIPAssociation-NatInstanceEIPAssociation-Id' ] ]

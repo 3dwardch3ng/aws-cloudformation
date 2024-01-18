@@ -69,4 +69,20 @@ jobs:
           capabilities: CAPABILITY_NAMED_IAM
           parameter-overrides: >-
             AMIId=${{ github.event.inputs.image }}
+            StackRunNumber=${{ github.run_number }}
+          no-fail-on-empty-changeset: "1"
+      - name: Wait for instances
+        id: ec2-wait
+        uses: truemark/aws-ec2-instance-wait-action@v3
+        with:
+          instance-ids: ${{ steps.nat-instance-stack.outputs.NatInstanceEC2InstanceRef }}
+          region: "ap-southeast-2"
+          timeout-ms: "600000"
+      - name: Deploy Nat Instance Network Stack via CloudFormation
+        id: nat-instance-network-stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: nat-instance-common-stack
+          template: ec2/nat-instance/nat-instance-network-template.yml
+          capabilities: CAPABILITY_NAMED_IAM
           no-fail-on-empty-changeset: "1"
