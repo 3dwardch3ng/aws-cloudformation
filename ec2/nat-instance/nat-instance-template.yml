@@ -180,7 +180,7 @@ Resources:
           sudo yum update -y && sudo yum upgrade -y
           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
           python3 get-pip.py
-          # trap '/opt/aws/bin/cfn-signal -e 1 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup' ERR
+          # trap '/opt/aws/bin/cfn-signal -e 1 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceEC2Instance' ERR
           # Run cfn-init
           sudo /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource NatInstanceLaunchTemplate --region ${AWS::Region}
           # Install Cloudwatch Agent
@@ -201,7 +201,7 @@ Resources:
           # sudo mkdir /etc/iptables
           # sudo aws s3 cp --recursive s3://cloudformation-templates-shared-files/iptables /etc/iptables
           # sudo bash /etc/iptables/firewall-init.sh
-          /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceAutoScalingGroup
+          /opt/aws/bin/cfn-signal -e 0 --region ${AWS::Region} --stack ${AWS::StackId} --resource NatInstanceEC2Instance
 
   CPUTooHighAlarm:
     Type: AWS::CloudWatch::Alarm
@@ -216,9 +216,6 @@ Resources:
       Threshold: 80
       AlarmActions:
         - Fn::ImportValue: !Join [ '-', [ 'nat-instance-common-stack', Ref: AWS::Region, 'SNS-Topic-NatInstanceTopic-TopicArn' ] ]
-      Dimensions:
-        - Name: AutoScalingGroupName
-          Value: !Ref NatInstanceAutoScalingGroup
 
 Outputs:
   NatInstanceNetworkInterfaceRef:
