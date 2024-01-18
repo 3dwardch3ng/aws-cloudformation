@@ -1,6 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Creates a Nat Instance Network Resources in AWS
 
+Parameters:
+  StackRunNumber:
+    Description: The integer run number of the stack
+    Type: String
+    Default: 1
+
 Resources:
   GeneralVpcPrivateSubnet1Route:
     Type: AWS::EC2::Route
@@ -27,7 +33,7 @@ Resources:
       AllocationId:
         Fn::ImportValue: !Join [ '-', [ 'ec2-eip-stack', Ref: AWS::Region, 'EC2-EIP-NatInstanceElasticIP-AllocationId' ] ]
       NetworkInterfaceId:
-        Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-Id' ] ]
+        Fn::ImportValue: !Join [ '-', [ 'nat-instance-stack', Ref: StackRunNumber, Ref: AWS::Region, 'EC2-NetworkInterface-NatInstanceNetworkInterface-Id' ] ]
 
   # Route 53 Record Set
   NatInstanceAR53RecordSet:
