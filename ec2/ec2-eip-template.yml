@@ -10,14 +10,6 @@ Resources:
         - Key: Name
           Value: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-ElasticIP1'
 
-  NatInstanceElasticIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: standard
-      Tags:
-        - Key: Name
-          Value: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-NatInstanceElasticIP'
-
 Outputs:
   ElasticIP1Ref:
     Value: !Ref ElasticIP1
@@ -31,15 +23,3 @@ Outputs:
     Value: !GetAtt ElasticIP1.PublicIp
     Export:
       Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-ElasticIP1-PublicIp'
-  NatInstanceElasticIPRef:
-    Value: !Ref NatInstanceElasticIP
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-NatInstanceElasticIP-Ref'
-  NatInstanceElasticIPAllocationId:
-    Value: !GetAtt NatInstanceElasticIP.AllocationId
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-NatInstanceElasticIP-AllocationId'
-  NatInstanceElasticIPPublicIp:
-    Value: !GetAtt NatInstanceElasticIP.PublicIp
-    Export:
-      Name: !Sub '${AWS::StackName}-${AWS::Region}-EC2-EIP-NatInstanceElasticIP-PublicIp'
